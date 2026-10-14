@@ -1,0 +1,9 @@
+# Client review prototype: every file Netlify serves directly is noindex too.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
