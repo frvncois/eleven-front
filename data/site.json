@@ -1,10 +1,35 @@
 {
   "nav": [
-    { "label": "Mixers", "href": "/mixers/jordan-meltzer", "match": "/mixers" },
-    { "label": "Index", "href": "/index", "match": "/index" },
-    { "label": "Longform", "href": "/longform", "match": "/longform" },
-    { "label": "About", "href": "/about", "match": "/about" },
-    { "label": "Contact", "href": "/contact", "match": "/contact" }
+    {
+      "label": "Mixers",
+      "href": "/mixers/jordan-meltzer",
+      "match": "/mixers",
+      "color": "royal-blue"
+    },
+    {
+      "label": "Index",
+      "href": "/index",
+      "match": "/index",
+      "color": "red"
+    },
+    {
+      "label": "Longform",
+      "href": "/longform",
+      "match": "/longform",
+      "color": "dark-green"
+    },
+    {
+      "label": "About",
+      "href": "/about",
+      "match": "/about",
+      "color": "pink"
+    },
+    {
+      "label": "Contact",
+      "href": "/contact",
+      "match": "/contact",
+      "color": "aqua"
+    }
   ],
   "contact": {
     "title": "Say hi. We’re good listeners. Professionally, even.",
@@ -15,11 +40,18 @@
         "email": "jordan@elevensound.com",
         "phone": "818.216.3682"
       },
-      { "name": "Adrea", "role": "[Role]", "email": "[adrea@elevensound.com]" }
+      {
+        "name": "Adrea",
+        "role": "[Role]",
+        "email": "[adrea@elevensound.com]"
+      }
     ],
     "studio": {
       "label": "Studio",
-      "lines": ["2255 Barry Avenue", "Los Angeles, CA 90064"],
+      "lines": [
+        "2255 Barry Avenue",
+        "Los Angeles, CA 90064"
+      ],
       "map": "https://maps.google.com/?q=2255+Barry+Avenue,+Los+Angeles,+CA+90064",
       "phone": "310.526.2911"
     }
@@ -27,13 +59,28 @@
   "footer": {
     "copyright": "©2026 Eleven",
     "legal": [
-      { "label": "Terms of use", "href": "/terms#terms-of-use" },
-      { "label": "Legal Policy", "href": "/terms#privacy-policy" }
+      {
+        "label": "Terms of use",
+        "href": "/terms#terms-of-use"
+      },
+      {
+        "label": "Legal Policy",
+        "href": "/terms#privacy-policy"
+      }
     ],
-    "credits": { "label": "Credits", "href": "/terms#credits" },
+    "credits": {
+      "label": "Credits",
+      "href": "/terms#credits"
+    },
     "social": [
-      { "label": "LinkedIn", "href": "https://www.linkedin.com/company/eleven-sound" },
-      { "label": "Instagram", "href": "https://www.instagram.com/eleven_sound" }
+      {
+        "label": "LinkedIn",
+        "href": "https://www.linkedin.com/company/eleven-sound"
+      },
+      {
+        "label": "Instagram",
+        "href": "https://www.instagram.com/eleven_sound"
+      }
     ]
   }
 }

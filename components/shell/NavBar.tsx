@@ -9,7 +9,8 @@ import { sound } from "@/lib/sound";
 
 /**
  * Nav/Bar (Figma 7356:3252): five links spread edge to edge, Heading/H4.
- * Hover = 50 % (0.3 s ease-out) + a short sound; the current page keeps the hover state (annotation).
+ * Hover = the link's colour (Mixers royal blue, Index red, Longform dark green, About pink, Contact aqua),
+ * 0.3 s ease-out, + a short sound; the current page keeps the hover state (annotation).
  * `tone="light"` (neutral/300) where it sits on video: home, player.
  */
 export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
@@ -23,11 +24,13 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
     >
       {site.nav.map((item) => {
         const current = pathname === item.match || pathname.startsWith(item.match + "/");
-        const cls = `t-h4 cursor-pointer transition-opacity duration-300 ease-out hover:opacity-50 ${current ? "opacity-50" : ""}`;
+        // Hover = the link's own brand colour at full strength (Figma "Nav Hover" modes); the current page keeps it.
+        const cls = `t-h4 cursor-pointer transition-colors duration-300 ease-out hover:text-(--hover) ${current ? "text-(--hover)" : ""}`;
+        const style = { "--hover": `var(--color-${item.color})` } as React.CSSProperties;
         // Mixers opens the roster overlay instead of a page (annotation).
         if (item.label === "Mixers")
           return (
-            <button key={item.label} type="button" onClick={() => setMixersOpen(true)} onPointerEnter={() => sound.cue("navHover")} className={`${cls} uppercase`}>
+            <button key={item.label} type="button" onClick={() => setMixersOpen(true)} onPointerEnter={() => sound.cue("navHover")} className={`${cls} uppercase`} style={style}>
               {item.label}
             </button>
           );
@@ -38,6 +41,7 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
             aria-current={current ? "page" : undefined}
             onPointerEnter={() => sound.cue("navHover")}
             className={cls}
+            style={style}
           >
             {item.label}
           </Link>

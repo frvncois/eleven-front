@@ -11,7 +11,7 @@ import { Player } from "./Player";
 
 /** V1 · 05 · Mixer · Grid (Figma 7345:1378): name, three-up grid of spots, Who's next. */
 export function MixerPage({ mixer, spots, others }: { mixer: Person; spots: Project[]; others: Person[] }) {
-  const [playing, setPlaying] = useState<Project | null>(null);
+  const [playing, setPlaying] = useState<number | null>(null);
   const rows: Project[][] = [];
   for (let i = 0; i < spots.length; i += 3) rows.push(spots.slice(i, i + 3));
 
@@ -24,7 +24,7 @@ export function MixerPage({ mixer, spots, others }: { mixer: Person; spots: Proj
         {rows.map((row, i) => (
           <div key={i} className="flex h-[353px] gap-2">
             {row.map((p) => (
-              <ProjectCard key={p.slug} project={p} onOpen={setPlaying} />
+              <ProjectCard key={p.slug} project={p} onOpen={(x) => setPlaying(spots.indexOf(x))} />
             ))}
             {/* Keep the three-column rhythm on a short last row. */}
             {Array.from({ length: 3 - row.length }).map((_, k) => (
@@ -35,7 +35,7 @@ export function MixerPage({ mixer, spots, others }: { mixer: Person; spots: Proj
       </section>
       <WhosNext others={others} />
       <NavSub />
-      <Player project={playing} onClose={() => setPlaying(null)} />
+      <Player films={spots} index={playing} onIndex={setPlaying} onClose={() => setPlaying(null)} />
     </main>
   );
 }
