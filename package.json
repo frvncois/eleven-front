@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start -p 3700",
     "lint": "eslint",
-    "data": "node scripts/build-data.mjs"
+    "data": "python3 scripts/build_data.py"
   },
   "dependencies": {
     "framer-motion": "^14.0.0",

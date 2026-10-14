@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "jordan-meltzer",
+    "name": "Jordan Meltzer",
+    "role": "Mixer | Sound Designer",
+    "email": "jordan@elevensound.com",
+    "instagram": "https://www.instagram.com/_jmeltz_/",
+    "linkedin": "https://www.linkedin.com/in/jordanmeltzer/",
+    "isMixer": true,
+    "order": 0,
+    "photo": "/media/team/jordan-meltzer.webp",
+    "icon": {
+      "name": "Walker Texas Pez",
+      "white": "/media/icons/icon-jordan-meltzer-pez.webp",
+      "black": "/media/icons/icon-jordan-meltzer-pez-black.webp"
+    }
+  },
+  {
+    "slug": "jeff-payne",
+    "name": "Jeff Payne",
+    "role": "Mixer | Sound Designer",
+    "email": null,
+    "instagram": "https://www.instagram.com/jeff_payne_13/",
+    "linkedin": "https://www.linkedin.com/in/jeffpayne2/",
+    "isMixer": true,
+    "order": 1,
+    "photo": "/media/team/jeff-payne.webp",
+    "icon": {
+      "name": "9 Volt Battery",
+      "white": "/media/icons/icon-jeff-payne-battery.webp",
+      "black": "/media/icons/icon-jeff-payne-battery-black.webp"
+    }
+  },
+  {
+    "slug": "aj-murillo",
+    "name": "AJ Murillo",
+    "role": "Mixer | Sound Designer",
+    "email": null,
+    "instagram": "https://www.instagram.com/aj__murillo/",
+    "linkedin": "https://www.linkedin.com/in/aj-murillo-91a187379/",
+    "isMixer": true,
+    "order": 2,
+    "photo": "/media/team/aj-murillo.webp",
+    "icon": {
+      "name": "Oreo",
+      "white": "/media/icons/icon-aj-murillo-oreo.webp",
+      "black": "/media/icons/icon-aj-murillo-oreo-black.webp"
+    }
+  },
+  {
+    "slug": "bob-gremore",
+    "name": "Bob Gremore",
+    "role": "Mixer | Sound Designer",
+    "email": null,
+    "instagram": null,
+    "linkedin": "https://www.linkedin.com/in/bob-gremore-564924168/",
+    "isMixer": true,
+    "order": 3,
+    "photo": "/media/team/bob-gremore.webp",
+    "icon": {
+      "name": "American Samoa licence plate",
+      "white": "/media/icons/icon-bob-gremore-plate.webp",
+      "black": "/media/icons/icon-bob-gremore-plate-black.webp"
+    }
+  },
+  {
+    "slug": "bruce-bueckert",
+    "name": "Bruce Bueckert",
+    "role": "Mixer | Sound Designer",
+    "email": null,
+    "instagram": null,
+    "linkedin": "https://www.linkedin.com/in/bruce-bueckert-32287390/",
+    "isMixer": true,
+    "order": 4,
+    "photo": "/media/team/bruce-bueckert.webp",
+    "icon": {
+      "name": "Broccoli",
+      "white": "/media/icons/icon-bruce-bueckert-broccoli.webp",
+      "black": "/media/icons/icon-bruce-bueckert-broccoli-black.webp"
+    }
+  },
+  {
+    "slug": "marco-tornillo",
+    "name": "Marco Tornillo",
+    "role": "Mixer | Sound Designer",
+    "email": null,
+    "instagram": null,
+    "linkedin": null,
+    "isMixer": true,
+    "order": 5,
+    "photo": "/media/team/marco-tornlino.webp",
+    "icon": {
+      "name": "Cheese Grater",
+      "white": "/media/icons/icon-marco-tornillo-grater.webp",
+      "black": "/media/icons/icon-marco-tornillo-grater-black.webp"
+    }
+  },
+  {
+    "slug": "taylor-sargent",
+    "name": "Taylor Sargent",
+    "role": "Producer",
+    "email": "taylor@elevensound.com",
+    "instagram": "https://www.instagram.com/tsarge_/",
+    "linkedin": "https://www.linkedin.com/in/tsargentkanazawa/",
+    "isMixer": false,
+    "order": 6,
+    "photo": "/media/team/taylor-sargent.webp",
+    "icon": null
+  },
+  {
+    "slug": "sean-kiely",
+    "name": "Sean Kiely",
+    "role": "Producer",
+    "email": "sean@elevensound.com",
+    "instagram": "https://www.instagram.com/seanshine432/",
+    "linkedin": "https://www.linkedin.com/in/sean-kiely-sounddesign/",
+    "isMixer": false,
+    "order": 7,
+    "photo": "/media/team/sean-kiely.webp",
+    "icon": null
+  }
+]
