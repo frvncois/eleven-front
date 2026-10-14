@@ -111,6 +111,7 @@ export function Player({ films, index, onIndex, onClose }: Props) {
         mixer && [mixer.name, "Mix"],
         mixer && [mixer.name, "Sound design"],
         film.agency && [film.agency, "Agency"],
+        film.production && [film.production, "Production"],
         film.director && [film.director, "Director"],
       ].filter(Boolean) as [string, string][])
     : [];

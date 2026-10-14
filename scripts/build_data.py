@@ -129,6 +129,12 @@ def main() -> None:
             "poster": to_webp(l.get("file") or _longform_file(l, src["longform"]), "longform"),
         })
 
+    # One shape for every project (spots and longform), so components can read any field.
+    keys = sorted({k for p in projects for k in p})
+    projects = [{k: p.get(k) for k in keys} for p in projects]
+    for p in projects:
+        p["short"] = p["short"] or p["title"]
+
     home = [{
         "label": t["label"],
         "mixer": mixer_slug(t.get("mixer")),
