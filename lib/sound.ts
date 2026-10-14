@@ -48,6 +48,7 @@ function createKit() {
   const buffers = new Map<string, Promise<AudioBuffer | null>>()
   const lastTake = new Map<string, number>()
   const media = new Set<HTMLMediaElement>()
+  let party: { timer: number; out: GainNode } | null = null
   const emit = () => listeners.forEach((l) => l())
 
   const ramp = (g: GainNode | null, to: number, dur = FADE) => {
@@ -188,6 +189,77 @@ function createKit() {
       src.connect(bp).connect(g).connect(master)
       src.start(t)
       src.stop(t + dur + 0.02)
+    },
+    /**
+     * Party mode music (Contact / Terms butterfly). A synthesized 124 bpm loop (kick, off-beat hat,
+     * bass line, stabs) scheduled ahead on the master bus, so the mute toggle still works.
+     * Placeholder until Eleven picks a track. `onBeat` fires on every quarter note.
+     */
+    startParty(onBeat: (beat: number) => void) {
+      kit.stopParty()
+      if (!ctx || !master) return
+      const c = ctx
+      const out = c.createGain()
+      out.gain.value = 0.55
+      out.connect(master)
+      const bpm = 124
+      const sixteenth = 60 / bpm / 4
+      const bass = [41, 0, 41, 0, 44, 0, 41, 0, 39, 0, 39, 0, 46, 0, 44, 0] // MIDI notes, 0 = rest
+      const hz = (m: number) => 440 * Math.pow(2, (m - 69) / 12)
+      const noise = c.createBuffer(1, c.sampleRate * 0.1, c.sampleRate)
+      noise.getChannelData(0).forEach((_, i, a) => (a[i] = Math.random() * 2 - 1))
+      let step = 0
+      let next = c.currentTime + 0.05
+      const voice = (type: OscillatorType, f: number, t: number, dur: number, vol: number, to?: number) => {
+        const o = c.createOscillator()
+        const g = c.createGain()
+        o.type = type
+        o.frequency.setValueAtTime(f, t)
+        if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur)
+        g.gain.setValueAtTime(vol, t)
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
+        o.connect(g).connect(out)
+        o.start(t)
+        o.stop(t + dur + 0.02)
+      }
+      const hat = (t: number) => {
+        const src = c.createBufferSource()
+        const hp = c.createBiquadFilter()
+        const g = c.createGain()
+        src.buffer = noise
+        hp.type = "highpass"
+        hp.frequency.value = 7000
+        g.gain.setValueAtTime(0.25, t)
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05)
+        src.connect(hp).connect(g).connect(out)
+        src.start(t)
+      }
+      const timer = window.setInterval(() => {
+        while (next < c.currentTime + 0.12) {
+          const s = step % 16
+          if (s % 4 === 0) {
+            voice("sine", 150, next, 0.28, 0.9, 45) // kick
+            const beat = step / 4
+            window.setTimeout(() => onBeat(beat), Math.max(0, (next - c.currentTime) * 1000))
+          }
+          if (s % 4 === 2) hat(next)
+          if (bass[s]) voice("sawtooth", hz(bass[s]), next, sixteenth * 1.6, 0.18)
+          if (s === 4 || s === 12) [65, 68, 72].forEach((m) => voice("square", hz(m), next, 0.12, 0.05)) // stabs
+          next += sixteenth
+          step++
+        }
+      }, 25)
+      party = { timer, out }
+    },
+    stopParty() {
+      if (!party) return
+      window.clearInterval(party.timer)
+      const { out } = party
+      if (ctx) {
+        out.gain.setTargetAtTime(0, ctx.currentTime, 0.08)
+        window.setTimeout(() => out.disconnect(), 600)
+      }
+      party = null
     },
     /**
      * Named UI sounds. Each cue plays Eleven's file when one is listed in CUES, otherwise its placeholder.

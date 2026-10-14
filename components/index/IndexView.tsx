@@ -13,16 +13,22 @@ export type Tile = Project & { label: string; client: string; x: number; y: numb
 const MORPH = { duration: 0.6, ease: [0.4, 0, 0.2, 1] as const };
 const r169 = (w: number) => Math.round((w * 9) / 16);
 
-// List: Figma sizes S (332) and L (564), right edge on x 1002.
+// List: the three Figma sizes S 332 / M 448 / L 564, right edge on x 1002.
 const LIST_RIGHT = 1002;
 const SMALL_W = 332;
+const MID_W = 448;
 const BIG_W = 564;
 const GAP = 16;
 const STEP = 300; // scroll distance from one project to the next
-const SMALL_H = r169(SMALL_W);
-const BIG_H = r169(BIG_W);
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+/** Width for a row `d` rows away from the middle: L at 0, M at 1, S from 2, eased in between. */
+const widthAt = (d: number) => {
+  const x = Math.abs(d);
+  if (x <= 1) return MID_W + (BIG_W - MID_W) * smooth(1 - x);
+  if (x <= 2) return SMALL_W + (MID_W - SMALL_W) * smooth(2 - x);
+  return SMALL_W;
+};
 const scaleOf = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
 const vhOf = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--vh")) || 1024;
 
@@ -31,8 +37,8 @@ const vhOf = () => parseFloat(getComputedStyle(document.documentElement).getProp
  * Grid: the Figma field, opening centred on project 01. It moves only when you scroll (after
  * neu.team): vertical scroll moves it up/down, horizontal (trackpad) sideways, with soft inertia;
  * drag works too. The field repeats endlessly, so there is no edge. Hover shows title / client.
- * List: one column. The project in the middle is large with its name in black; the others are
- * small with grey names, growing as they reach the middle and shrinking as they leave it.
+ * List: one column in three sizes: the project in the middle large with its name in black, its
+ * neighbours medium, the rest small and grey; rows grow as they reach the middle and shrink after.
  * The toggle morphs one view into the other (gather / explode sounds). Click a tile to play it.
  */
 export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number; h: number } }) {
@@ -64,8 +70,9 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
             aria-label={view === "grid" ? "Show as list" : "Show as grid"}
             className="block size-8 transition-opacity duration-200 ease-out hover:opacity-50"
           >
+            {/* One button = an action: it shows the view you will switch to. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={view === "grid" ? "/icons/view-grid.svg" : "/icons/view-list.svg"} alt="" width={32} height={32} />
+            <img src={view === "grid" ? "/icons/view-list.svg" : "/icons/view-grid.svg"} alt="" width={32} height={32} />
           </button>
         }
       />
@@ -192,8 +199,6 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
     window.scrollTo(0, 0);
     window.__lenis?.scrollTo(0, { immediate: true, force: true });
     const vh = vhOf();
-    const S = SMALL_H + GAP;
-    const E = (BIG_H - SMALL_H) / 2;
 
     let raf = 0;
     let settle = 0;
@@ -211,20 +216,31 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
         if (centred !== -1) sound.cue("step");
         centred = middle;
       }
+      // Three levels: the middle project large, its neighbours medium, the rest small; each size
+      // blends into the next as rows travel. Widths first, then stack the rows around the middle
+      // so the gaps stay even whatever the sizes.
+      const widths = tiles.map((_, i) => widthAt(i - p));
+      const heights = widths.map(r169);
+      const a = clamp(Math.floor(p), 0, tiles.length - 1);
+      const frac = p - a;
+      const centers = new Array<number>(tiles.length);
+      const pitch = (i: number) => heights[i] / 2 + GAP + heights[i + 1] / 2;
+      centers[a] = C - (a + 1 < tiles.length ? frac * pitch(a) : 0);
+      for (let i = a + 1; i < tiles.length; i++) centers[i] = centers[i - 1] + pitch(i - 1);
+      for (let i = a - 1; i >= 0; i--) centers[i] = centers[i + 1] - pitch(i);
       rows.forEach((r, i) => {
         const d = i - p;
-        const t = smooth(clamp(1 - Math.abs(d), 0, 1));
-        const w = SMALL_W + (BIG_W - SMALL_W) * t;
-        const h = r169(w);
-        const cy = C + d * S + Math.sign(d) * E * Math.min(Math.abs(d), 1);
+        const w = widths[i];
+        const cy = centers[i];
         r.width.set(w);
         r.left.set(LIST_RIGHT - w);
-        r.top.set(cy - h / 2);
+        r.top.set(cy - heights[i] / 2);
         r.name.set(cy);
-        // Name: black in the middle, grey around it; rows far away fade out.
-        const g = Math.round(0xbd * (1 - t));
+        // Name: black in the middle, mid grey for the neighbours, light grey further out.
+        const tone = clamp(Math.abs(d), 0, 2) / 2; // 0 middle → 1 two rows away
+        const g = Math.round(0xbd * smooth(tone));
         r.color.set(`rgb(${g},${g},${g})`);
-        r.fade.set(clamp(3.2 - Math.abs(d), 0, 1));
+        r.fade.set(clamp(3.6 - Math.abs(d), 0, 1));
       });
       // When scrolling stops, settle on the nearest project.
       window.clearTimeout(settle);
@@ -238,7 +254,7 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
       cancelAnimationFrame(raf);
       window.clearTimeout(settle);
     };
-  }, [tiles.length, rows]);
+  }, [tiles, rows]);
 
   return (
     <div className="relative" style={{ height: `calc(${(tiles.length - 1) * STEP}px + var(--vh))` }}>

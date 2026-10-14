@@ -6,6 +6,7 @@ import { SmoothScroll } from "@/components/shell/SmoothScroll";
 import { PageTransition } from "@/components/shell/PageTransition";
 import { CursorTag } from "@/components/shell/CursorTag";
 import { ClickSound } from "@/components/shell/ClickSound";
+import { PartyMode } from "@/components/shell/PartyMode";
 
 export const metadata: Metadata = {
   title: { default: "Eleven", template: "%s · Eleven" },
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ClickSound />
         <div className="stage">
           {children}
+          <PartyMode />
           <CursorTag />
         </div>
         <PageTransition />
