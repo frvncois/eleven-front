@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import site from "@/data/site.json";
+import { sound } from "@/lib/sound";
 
 /**
  * Nav/Bar (Figma 7356:3252): five links spread edge to edge, Heading/H4.
- * Hover = 50 % (0.3 s ease-out); the current page keeps the hover state (annotation).
+ * Hover = 50 % (0.3 s ease-out) + a short sound; the current page keeps the hover state (annotation).
  * `tone="light"` (neutral/300) where it sits on video: home, player.
  */
 export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
@@ -23,6 +24,7 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
             key={item.label}
             href={item.href}
             aria-current={current ? "page" : undefined}
+            onPointerEnter={() => sound.cue("navHover")}
             className={`t-h4 transition-opacity duration-300 ease-out hover:opacity-50 ${current ? "opacity-50" : ""}`}
           >
             {item.label}

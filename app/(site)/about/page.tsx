@@ -19,14 +19,16 @@ export default function AboutPage() {
     <main className="bg-bg">
       <NavBar />
 
-      {/* Story: the ointment sticker stays pinned while the text scrolls past it. */}
+      {/* Story: the ointment sticker sits above the text at Figma's spot (304, 391), scrolling with the page. */}
       <section className="relative flex flex-col items-end px-[22px] pt-[604px]">
-        <div className="pointer-events-none absolute top-0 bottom-0 left-[22.5px]">
-          <div className="sticky top-0 flex h-[544px] w-[817px] flex-col items-center justify-end">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={story.sticker.src} alt="" width={story.sticker.width} height={story.sticker.height} />
-          </div>
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={story.sticker.src}
+          alt=""
+          width={story.sticker.width}
+          height={story.sticker.height}
+          className="pointer-events-none absolute top-[391px] left-[304px] z-10"
+        />
         <div className="relative flex w-[1385px] flex-col items-end">
           <p className="t-h2-indent w-full">{story.intro}</p>
           {story.paragraphs.map((p, i) => (
@@ -50,7 +52,7 @@ export default function AboutPage() {
           alt="Snow globe of the old Santa Monica studio"
           width={story.globe.width}
           height={story.globe.height}
-          className="absolute top-[192.5px] left-[493.5px]"
+          className="absolute top-[134px] left-[494px]"
         />
       </div>
 

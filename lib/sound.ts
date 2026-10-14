@@ -9,6 +9,14 @@
 // - registerMedia / duck / unduck: background media on a bus that overlays can fade.
 import { useEffect, useState, startTransition } from "react";
 
+type Kit = { tone: (f?: number, d?: number, v?: number) => void; whoosh: (d?: number, v?: number, a?: number, b?: number) => void }
+// UI sound cues. `files`: takes from public/sounds (random take, never twice in a row).
+const CUES = {
+  navHover: { files: [] as string[], volume: 0.5, placeholder: (k: Kit) => k.tone(880, 0.12, 0.08) },
+  sweepIn: { files: [] as string[], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.9, 0.14, 250, 2200) },
+  sweepOut: { files: [] as string[], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.9, 0.1, 2200, 400) },
+}
+
 type Listener = () => void
 const KEY = "eleven-sound"
 const FADE = 0.4
@@ -110,7 +118,7 @@ function createKit() {
       emit()
     },
     toggle() {
-      kit.setMuted(!(unlocked && !muted))
+      kit.setMuted(unlocked && !muted) // on → mute; off or still locked → sound on (unlocks)
     },
     /** Hover sounds. `key` groups the takes (e.g. one person) for the no-repeat rule. */
     async play(urls: (string | undefined | null)[], key = "default", volume = 1) {
@@ -142,6 +150,38 @@ function createKit() {
       o.connect(g).connect(master)
       o.start(t)
       o.stop(t + dur + 0.02)
+    },
+    /** Placeholder: a soft filtered-noise sweep (page transitions) until Eleven's file arrives. */
+    whoosh(dur = 0.9, volume = 0.16, from = 300, to = 2400) {
+      if (!unlocked || muted || !ctx || !master) return
+      const t = ctx.currentTime
+      const len = Math.ceil(ctx.sampleRate * dur)
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate)
+      const data = buf.getChannelData(0)
+      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1
+      const src = ctx.createBufferSource()
+      const bp = ctx.createBiquadFilter()
+      const g = ctx.createGain()
+      src.buffer = buf
+      bp.type = "bandpass"
+      bp.Q.value = 1.2
+      bp.frequency.setValueAtTime(from, t)
+      bp.frequency.exponentialRampToValueAtTime(to, t + dur)
+      g.gain.setValueAtTime(0, t)
+      g.gain.linearRampToValueAtTime(volume, t + dur * 0.4)
+      g.gain.linearRampToValueAtTime(0, t + dur)
+      src.connect(bp).connect(g).connect(master)
+      src.start(t)
+      src.stop(t + dur + 0.02)
+    },
+    /**
+     * Named UI sounds. Each cue plays Eleven's file when one is listed in CUES, otherwise its placeholder.
+     * Swapping in the real sounds = adding the file in public/sounds and its path here.
+     */
+    cue(name: keyof typeof CUES) {
+      const c = CUES[name]
+      if (c.files.length) return kit.play(c.files, name, c.volume)
+      c.placeholder(kit)
     },
     preload(urls: (string | undefined | null)[]) {
       if (ctx) urls.filter(Boolean).forEach((u) => load(u as string))
