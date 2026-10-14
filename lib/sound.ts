@@ -15,6 +15,9 @@ const CUES = {
   navHover: { files: [] as string[], volume: 0.5, placeholder: (k: Kit) => k.tone(880, 0.12, 0.08) },
   sweepIn: { files: [] as string[], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.9, 0.14, 250, 2200) },
   sweepOut: { files: [] as string[], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.9, 0.1, 2200, 400) },
+  // Index list → grid: "the line explodes with a sound" (annotation).
+  explode: { files: [] as string[], volume: 0.7, placeholder: (k: Kit) => (k.whoosh(0.5, 0.22, 3000, 120), k.tone(90, 0.5, 0.25)) },
+  gather: { files: [] as string[], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.6, 0.12, 400, 2600) },
 }
 
 type Listener = () => void
