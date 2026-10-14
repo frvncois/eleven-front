@@ -58,7 +58,7 @@ export function MixersOverlay({ open, onClose }: { open: boolean; onClose: () =>
             aria-label="Close"
             data-cursor="close"
             onClick={onClose}
-            className="absolute inset-0 cursor-none bg-royal-blue/50 backdrop-blur-[10px]"
+            className="absolute inset-0 cursor-default bg-royal-blue/50 backdrop-blur-[10px]"
           />
           {/* Names are laid out on the 1024-high Figma frame, centred vertically on taller screens. */}
           <div className="pointer-events-none absolute inset-x-0 top-[calc(50%-512px)] h-[1024px]">
