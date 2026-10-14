@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { fontSans, fontSerif } from "./fonts";
+import { StageScale } from "@/components/shell/StageScale";
+import { SmoothScroll } from "@/components/shell/SmoothScroll";
+import { PageTransition } from "@/components/shell/PageTransition";
+import { CursorTag } from "@/components/shell/CursorTag";
 
 export const metadata: Metadata = {
   title: { default: "Eleven", template: "%s · Eleven" },
@@ -27,7 +31,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script dangerouslySetInnerHTML={{ __html: SCALE_BEFORE_PAINT }} />
       </head>
-      <body>{children}</body>
+      {/* One stage, one Lenis, one sweep, one cursor tag for the whole visit, the 404 included,
+          so a transition that lands on any page always finishes. */}
+      <body>
+        <StageScale />
+        <SmoothScroll />
+        <div className="stage">
+          {children}
+          <CursorTag />
+        </div>
+        <PageTransition />
+      </body>
     </html>
   );
 }

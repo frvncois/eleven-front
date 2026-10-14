@@ -1,19 +1,4 @@
-import { StageScale } from "@/components/shell/StageScale";
-import { SmoothScroll } from "@/components/shell/SmoothScroll";
-import { PageTransition } from "@/components/shell/PageTransition";
-import { CursorTag } from "@/components/shell/CursorTag";
-
-/** Everything behind the password: one stage, one Lenis, one sweep, one cursor tag for the whole visit. */
+/** Site pages share the root shell (app/layout.tsx); this group only exists to keep routes together. */
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <StageScale />
-      <SmoothScroll />
-      <div className="stage">
-        {children}
-        <CursorTag />
-      </div>
-      <PageTransition />
-    </>
-  );
+  return children;
 }

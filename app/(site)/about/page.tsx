@@ -5,6 +5,7 @@ import { NavBar } from "@/components/shell/NavBar";
 import { NavSub } from "@/components/shell/NavSub";
 import { TeamCard } from "@/components/about/TeamCard";
 import { RoomsRow } from "@/components/about/RoomsRow";
+import { StorySticker } from "@/components/about/StorySticker";
 
 export const metadata: Metadata = { title: "About" };
 
@@ -19,16 +20,9 @@ export default function AboutPage() {
     <main className="bg-bg">
       <NavBar />
 
-      {/* Story: the ointment sticker sits above the text at Figma's spot (304, 391), scrolling with the page. */}
+      {/* Story. The sticker rests in the indent of "In 2022…" (x 260, line top 924), sized to the slot. */}
       <section className="relative flex flex-col items-end px-[22px] pt-[604px]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={story.sticker.src}
-          alt=""
-          width={story.sticker.width}
-          height={story.sticker.height}
-          className="pointer-events-none absolute top-[391px] left-[304px] z-10"
-        />
+        <StorySticker src={story.sticker.src} width={112} height={68} top={922} left={264} end={1560} />
         <div className="relative flex w-[1385px] flex-col items-end">
           <p className="t-h2-indent w-full">{story.intro}</p>
           {story.paragraphs.map((p, i) => (

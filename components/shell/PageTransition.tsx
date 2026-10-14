@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { DUR, EASE_SWEEP, SWEEP_COLORS, prefersReducedMotion } from "@/lib/motion";
 import { sound } from "@/lib/sound";
 
+const CARRY_KEY = "eleven-sweep";
+
 function colorFor(path: string) {
   let best = "/";
   for (const k of Object.keys(SWEEP_COLORS)) {
@@ -65,7 +67,19 @@ export function PageTransition() {
       sweep("translateX(-101%)", "translateX(0)", color).then(() => {
         new Promise<void>((resolve) => {
           pending.current = { color, resolve };
+          // If Next falls back to a full page load (it does for unknown routes), the new page
+          // picks this up on mount and finishes the reveal from a covered screen.
+          try {
+            sessionStorage.setItem(CARRY_KEY, JSON.stringify({ color, t: Date.now() }));
+          } catch {}
           router.push(href, { scroll: false });
+          // Never leave the screen covered: reveal after 2.5 s even if no route change was seen.
+          setTimeout(() => {
+            if (pending.current?.resolve === resolve) {
+              pending.current = null;
+              resolve();
+            }
+          }, 2500);
         }).then(() => {
           window.scrollTo(0, 0);
           window.__lenis?.scrollTo(0, { immediate: true, force: true });
@@ -82,11 +96,42 @@ export function PageTransition() {
     return () => window.removeEventListener("click", onClick, true);
   }, [router]);
 
+  // Arrived through a full page load mid-transition: start covered, then reveal.
+  useEffect(() => {
+    let carry: { color: string; t: number } | null = null;
+    try {
+      carry = JSON.parse(sessionStorage.getItem(CARRY_KEY) || "null");
+      sessionStorage.removeItem(CARRY_KEY);
+    } catch {}
+    if (!carry || Date.now() - carry.t > 6000 || prefersReducedMotion()) return;
+    busy.current = true;
+    const bands = Array.from(bandsRef.current?.children ?? []) as HTMLElement[];
+    bands.forEach((b) => {
+      b.style.background = carry.color;
+      b.style.transform = "translateX(0)";
+    });
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        sound.cue("sweepOut");
+        sweep("translateX(0)", "translateX(101%)", carry.color).then(() => {
+          bands.forEach((b) => {
+            b.getAnimations().forEach((x) => x.cancel());
+            b.style.transform = "translateX(-101%)";
+          });
+          busy.current = false;
+        });
+      }),
+    );
+  }, []);
+
   // The new route has rendered: wait two frames so it has painted, then reveal.
   useEffect(() => {
     const p = pending.current;
     if (!p) return;
     pending.current = null;
+    try {
+      sessionStorage.removeItem(CARRY_KEY);
+    } catch {}
     requestAnimationFrame(() => requestAnimationFrame(p.resolve));
   }, [pathname]);
 
