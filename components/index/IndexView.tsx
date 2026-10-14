@@ -19,7 +19,7 @@ const SMALL_W = 332;
 const MID_W = 448;
 const BIG_W = 564;
 const GAP = 16;
-const STEP = 300; // scroll distance from one project to the next
+const STEP = 300; // wheel distance from one project to the next
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 /** Width for a row `d` rows away from the middle: L at 0, M at 1, S from 2, eased in between. */
@@ -37,8 +37,9 @@ const vhOf = () => parseFloat(getComputedStyle(document.documentElement).getProp
  * Grid: the Figma field, opening centred on project 01. It moves only when you scroll (after
  * neu.team): vertical scroll moves it up/down, horizontal (trackpad) sideways, with soft inertia;
  * drag works too. The field repeats endlessly, so there is no edge. Hover shows title / client.
- * List: one column in three sizes: the project in the middle large with its name in black, its
- * neighbours medium, the rest small and grey; rows grow as they reach the middle and shrink after.
+ * List: one endless column in three sizes, opening on project 01 in the middle: the middle project
+ * large with its name in black, its neighbours medium, the rest small and grey; rows grow as they
+ * reach the middle and shrink after. After the last project comes the first again.
  * The toggle morphs one view into the other (gather / explode sounds). Click a tile to play it.
  */
 export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number; h: number } }) {
@@ -51,7 +52,7 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
   };
 
   return (
-    <main className={`relative bg-neutral-0 ${view === "grid" ? "h-(--vh) overflow-hidden" : ""}`}>
+    <main className="relative h-(--vh) overflow-hidden bg-neutral-0">
       <LayoutGroup>
         {view === "grid" ? (
           <GridView tiles={tiles} field={field} onPlay={setPlaying} paused={playing !== null} />
@@ -196,68 +197,109 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
   );
 
   useEffect(() => {
+    // Endless: the list is driven by the wheel, not the page, and wraps from the last project to
+    // the first. It opens on project 01 in the middle of the screen, with projects above and below.
+    window.__lenis?.stop();
     window.scrollTo(0, 0);
-    window.__lenis?.scrollTo(0, { immediate: true, force: true });
+    const n = tiles.length;
     const vh = vhOf();
-
-    let raf = 0;
+    const C = vh / 2;
+    const mod = (v: number) => ((v % n) + n) % n;
+    let target = 0;
+    let cur = 0;
+    let centred = 0;
     let settle = 0;
-    let lastY = -1;
-    let centred = -1;
-    const tick = () => {
-      raf = requestAnimationFrame(tick);
-      const scroll = window.scrollY / scaleOf();
-      if (scroll === lastY) return;
-      lastY = scroll;
-      const p = scroll / STEP;
-      const C = scroll + vh / 2; // the screen's middle, in page units
-      const middle = Math.round(p);
-      if (middle !== centred) {
-        if (centred !== -1) sound.cue("step");
-        centred = middle;
-      }
-      // Three levels: the middle project large, its neighbours medium, the rest small; each size
-      // blends into the next as rows travel. Widths first, then stack the rows around the middle
-      // so the gaps stay even whatever the sizes.
-      const widths = tiles.map((_, i) => widthAt(i - p));
+    let touchY = 0;
+    let dirty = true;
+
+    const draw = () => {
+      // Rows within 6 of the middle, in order, with their (wrapped) distance from it.
+      const a = Math.floor(cur);
+      const frac = cur - a;
+      const ks = Array.from({ length: 13 }, (_, j) => j - 6);
+      const idx = ks.map((k) => mod(a + k));
+      const widths = ks.map((k) => widthAt(k - frac));
       const heights = widths.map(r169);
-      const a = clamp(Math.floor(p), 0, tiles.length - 1);
-      const frac = p - a;
-      const centers = new Array<number>(tiles.length);
-      const pitch = (i: number) => heights[i] / 2 + GAP + heights[i + 1] / 2;
-      centers[a] = C - (a + 1 < tiles.length ? frac * pitch(a) : 0);
-      for (let i = a + 1; i < tiles.length; i++) centers[i] = centers[i - 1] + pitch(i - 1);
-      for (let i = a - 1; i >= 0; i--) centers[i] = centers[i + 1] - pitch(i);
-      rows.forEach((r, i) => {
-        const d = i - p;
-        const w = widths[i];
-        const cy = centers[i];
-        r.width.set(w);
-        r.left.set(LIST_RIGHT - w);
-        r.top.set(cy - heights[i] / 2);
-        r.name.set(cy);
+      // Three levels, stacked around the middle with an even gap whatever the sizes.
+      const centers = new Array<number>(ks.length);
+      const pitch = (j: number) => heights[j] / 2 + GAP + heights[j + 1] / 2;
+      centers[6] = C - frac * pitch(6);
+      for (let j = 7; j < ks.length; j++) centers[j] = centers[j - 1] + pitch(j - 1);
+      for (let j = 5; j >= 0; j--) centers[j] = centers[j + 1] - pitch(j);
+      const shown = new Set<number>();
+      ks.forEach((k, j) => {
+        const i = idx[j];
+        if (shown.has(i)) return; // fewer projects than slots: never draw one twice
+        shown.add(i);
+        const r = rows[i];
+        const d = k - frac;
+        r.width.set(widths[j]);
+        r.left.set(LIST_RIGHT - widths[j]);
+        r.top.set(centers[j] - heights[j] / 2);
+        r.name.set(centers[j]);
         // Name: black in the middle, mid grey for the neighbours, light grey further out.
-        const tone = clamp(Math.abs(d), 0, 2) / 2; // 0 middle → 1 two rows away
-        const g = Math.round(0xbd * smooth(tone));
+        const g = Math.round(0xbd * smooth(clamp(Math.abs(d), 0, 2) / 2));
         r.color.set(`rgb(${g},${g},${g})`);
         r.fade.set(clamp(3.6 - Math.abs(d), 0, 1));
       });
-      // When scrolling stops, settle on the nearest project.
-      window.clearTimeout(settle);
-      settle = window.setTimeout(() => {
-        const target = Math.round(p) * STEP * scaleOf();
-        if (Math.abs(target - window.scrollY) > 2) window.__lenis?.scrollTo(target, { duration: 0.6 });
-      }, 180);
+      rows.forEach((r, i) => !shown.has(i) && r.fade.set(0));
     };
+
+    let raf = 0;
+    const tick = () => {
+      raf = requestAnimationFrame(tick);
+      const delta = target - cur;
+      if (Math.abs(delta) < 0.0005 && !dirty) return;
+      cur += delta * 0.12;
+      if (Math.abs(target - cur) < 0.0005) cur = target;
+      dirty = false;
+      const middle = mod(Math.round(cur));
+      if (middle !== centred) {
+        sound.cue("step");
+        centred = middle;
+      }
+      draw();
+    };
+    // When the scroll stops, settle on the nearest project.
+    const scheduleSettle = () => {
+      window.clearTimeout(settle);
+      settle = window.setTimeout(() => (target = Math.round(target)), 160);
+    };
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      target += e.deltaY / scaleOf() / STEP;
+      scheduleSettle();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowDown") target = Math.round(target) + 1;
+      if (e.key === "ArrowUp") target = Math.round(target) - 1;
+    };
+    const onTouchStart = (e: TouchEvent) => (touchY = e.touches[0].clientY);
+    const onTouchMove = (e: TouchEvent) => {
+      const y = e.touches[0].clientY;
+      target += (touchY - y) / scaleOf() / STEP;
+      touchY = y;
+      scheduleSettle();
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    draw();
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
       window.clearTimeout(settle);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.__lenis?.start();
     };
   }, [tiles, rows]);
 
   return (
-    <div className="relative" style={{ height: `calc(${(tiles.length - 1) * STEP}px + var(--vh))` }}>
+    <div className="absolute inset-0 overflow-hidden">
       {tiles.map((t, i) => {
         const r = rows[i];
         return (
