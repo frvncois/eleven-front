@@ -28,6 +28,7 @@ export function MixersOverlay({ open, onClose }: { open: boolean; onClose: () =>
 
   useEffect(() => {
     if (!open) return;
+    sound.cue("menuOpen");
     sound.duck();
     window.__lenis?.stop();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();

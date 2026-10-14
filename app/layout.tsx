@@ -5,6 +5,7 @@ import { StageScale } from "@/components/shell/StageScale";
 import { SmoothScroll } from "@/components/shell/SmoothScroll";
 import { PageTransition } from "@/components/shell/PageTransition";
 import { CursorTag } from "@/components/shell/CursorTag";
+import { ClickSound } from "@/components/shell/ClickSound";
 
 export const metadata: Metadata = {
   title: { default: "Eleven", template: "%s · Eleven" },
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <StageScale />
         <SmoothScroll />
+        <ClickSound />
         <div className="stage">
           {children}
           <CursorTag />

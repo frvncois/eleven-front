@@ -10,8 +10,6 @@ import { StorySticker } from "@/components/about/StorySticker";
 export const metadata: Metadata = { title: "About" };
 
 const nameOf = (slug: string) => team.find((p) => p.slug === slug)?.name ?? slug;
-// Placeholder hover tones (Hz) until each person's takes arrive: a rising scale across the grid.
-const TONES = [262, 294, 330, 349, 392, 440, 494, 523];
 
 /** V1 · 09 · About (Figma 7345:1607): story with sticky sticker, snow globe, services, rooms, team. */
 export default function AboutPage() {
@@ -78,8 +76,8 @@ export default function AboutPage() {
         <div className="flex flex-col gap-2">
           {about.team.rows.map((row, r) => (
             <div key={r} className="flex gap-2">
-              {row.map((c, i) => (
-                <TeamCard key={c.slug} {...c} name={nameOf(c.slug)} tone={TONES[r * 4 + i]} />
+              {row.map((c) => (
+                <TeamCard key={c.slug} {...c} name={nameOf(c.slug)} />
               ))}
             </div>
           ))}

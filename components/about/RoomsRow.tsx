@@ -36,7 +36,7 @@ export function RoomsRow({ rooms }: { rooms: Room[] }) {
       {rooms.map((r) => (
         <div
           key={r.name}
-          onPointerEnter={() => sound.tone(r.tone, 0.6, 0.12)}
+          onPointerEnter={() => sound.cue("step")}
           className="relative h-full shrink-0"
           style={{ width: r.width }}
         >

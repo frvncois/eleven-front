@@ -2,17 +2,18 @@
 
 import { sound } from "@/lib/sound";
 
-type Props = { name: string; slug: string; bg: string; ink: string; roles: string[]; tone: number };
+type Props = { name: string; slug: string; bg: string; ink: string; roles: string[] };
 
 /**
  * Card/Team/<Name> (Figma 7398:5365 and siblings). Default: a solid brand block, the name and roles
  * parked just outside the card. Hover: they slide in from the top and bottom edges (0.3 s ease-out)
- * and the person's sound plays (annotation). Placeholder tone until Eleven's takes arrive:
+ * and the person's sound plays (annotation). Shared step sounds until Eleven's takes arrive:
  * drop /sounds/<slug>-1.mp3 … -3.mp3 and list them in `takes`.
  */
-export function TeamCard({ name, slug, bg, ink, roles, tone }: Props) {
+export function TeamCard({ name, slug, bg, ink, roles }: Props) {
   const takes: string[] = [];
-  const onEnter = () => (takes.length ? sound.play(takes, slug) : sound.tone(tone, 0.35, 0.18));
+  // Prototype: the shared step sounds until each person has their own takes.
+  const onEnter = () => (takes.length ? sound.play(takes, slug) : sound.cue("step"));
   return (
     <div
       onPointerEnter={onEnter}

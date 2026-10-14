@@ -60,6 +60,7 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
           <button
             type="button"
             onClick={toggle}
+            data-sound="off"
             aria-label={view === "grid" ? "Show as list" : "Show as grid"}
             className="block size-8 transition-opacity duration-200 ease-out hover:opacity-50"
           >
@@ -197,6 +198,7 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
     let raf = 0;
     let settle = 0;
     let lastY = -1;
+    let centred = -1;
     const tick = () => {
       raf = requestAnimationFrame(tick);
       const scroll = window.scrollY / scaleOf();
@@ -204,6 +206,11 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
       lastY = scroll;
       const p = scroll / STEP;
       const C = scroll + vh / 2; // the screen's middle, in page units
+      const middle = Math.round(p);
+      if (middle !== centred) {
+        if (centred !== -1) sound.cue("step");
+        centred = middle;
+      }
       rows.forEach((r, i) => {
         const d = i - p;
         const t = smooth(clamp(1 - Math.abs(d), 0, 1));

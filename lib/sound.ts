@@ -10,15 +10,27 @@
 import { useEffect, useState, startTransition } from "react";
 
 type Kit = { tone: (f?: number, d?: number, v?: number) => void; whoosh: (d?: number, v?: number, a?: number, b?: number) => void }
-// UI sound cues. `files`: takes from public/sounds (random take, never twice in a row).
+type Cue = { files: string[]; volume: number; sequence?: boolean; placeholder: (k: Kit) => void }
+
+// UI sound cues. `files`: takes from public/sounds, a random take each time (never twice in a row),
+// or played in order when `sequence` is set. A cue with no files plays its synthesized placeholder.
+// PROTOTYPE ONLY: the files in public/sounds/placeholder-auge are AUGE's (auge-xp.com), stand-ins
+// until Eleven makes the real ones. Replace them and that folder before launch.
+const A = (n: string) => `/sounds/placeholder-auge/${n}.mp3`
+const HOVERS = [A("hover-1"), A("hover-2"), A("hover-3"), A("hover-4")]
+const STEPS = [A("step-1"), A("step-2"), A("step-3"), A("step-4"), A("step-5"), A("step-6")]
 const CUES = {
-  navHover: { files: [] as string[], volume: 0.5, placeholder: (k: Kit) => k.tone(880, 0.12, 0.08) },
-  sweepIn: { files: [] as string[], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.9, 0.14, 250, 2200) },
-  sweepOut: { files: [] as string[], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.9, 0.1, 2200, 400) },
+  navHover: { files: HOVERS, volume: 0.6, placeholder: (k: Kit) => k.tone(880, 0.12, 0.08) },
+  click: { files: [A("click")], volume: 0.6, placeholder: (k: Kit) => k.tone(520, 0.1, 0.1) },
+  menuOpen: { files: [A("menu-open")], volume: 0.7, placeholder: (k: Kit) => k.whoosh(0.5, 0.12, 300, 1800) },
+  sweepIn: { files: [A("transition")], volume: 0.7, placeholder: (k: Kit) => k.whoosh(0.9, 0.14, 250, 2200) },
+  sweepOut: { files: [] as string[], volume: 0.6, placeholder: () => {} }, // the transition file covers both halves
+  step: { files: STEPS, volume: 0.6, sequence: true, placeholder: (k: Kit) => k.tone(660, 0.15, 0.1) },
   // Index list → grid: "the line explodes with a sound" (annotation).
-  explode: { files: [] as string[], volume: 0.7, placeholder: (k: Kit) => (k.whoosh(0.5, 0.22, 3000, 120), k.tone(90, 0.5, 0.25)) },
-  gather: { files: [] as string[], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.6, 0.12, 400, 2600) },
-}
+  explode: { files: [A("scramble")], volume: 0.8, placeholder: (k: Kit) => (k.whoosh(0.5, 0.22, 3000, 120), k.tone(90, 0.5, 0.25)) },
+  gather: { files: [A("menu-open")], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.6, 0.12, 400, 2600) },
+} satisfies Record<string, Cue>
+const seqPos = new Map<string, number>()
 
 type Listener = () => void
 const KEY = "eleven-sound"
@@ -182,9 +194,14 @@ function createKit() {
      * Swapping in the real sounds = adding the file in public/sounds and its path here.
      */
     cue(name: keyof typeof CUES) {
-      const c = CUES[name]
-      if (c.files.length) return kit.play(c.files, name, c.volume)
-      c.placeholder(kit)
+      const c: Cue = CUES[name]
+      if (!c.files.length) return c.placeholder(kit)
+      if (c.sequence) {
+        const i = seqPos.get(name) ?? 0
+        seqPos.set(name, (i + 1) % c.files.length)
+        return kit.play([c.files[i]], name, c.volume)
+      }
+      return kit.play(c.files, name, c.volume)
     },
     preload(urls: (string | undefined | null)[]) {
       if (ctx) urls.filter(Boolean).forEach((u) => load(u as string))
