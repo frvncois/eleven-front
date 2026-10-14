@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { StageScale } from "@/components/shell/StageScale";
 
 /** Temporary index until the gate + home land (Day 2). */
 const SCREENS = [
@@ -15,7 +14,6 @@ const SCREENS = [
 export default function Home() {
   return (
     <main className="stage p-margin">
-      <StageScale />
       <p className="t-eyebrow">Eleven · website prototype · in progress</p>
       <ul className="mt-40 space-y-2">
         {SCREENS.map(([label, href]) => (

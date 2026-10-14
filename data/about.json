@@ -1,0 +1,58 @@
+{
+  "story": {
+    "intro": "Founded in 1999 by Jeff Payne, Eleven is a boutique audio post-production studio in West Los Angeles. Its work covers mix, sound design, voiceover, ADR, music and voice casting. The name is a nod to Spinal Tap, the studio that goes one louder.",
+    "paragraphs": [
+      {
+        "text": "In 2022, after 24 years in Santa Monica, Jeff and partner Jordan Meltzer bought a building in West LA and built three new studios from scratch.¹AJ Murillo has since joined them as a partner.",
+        "note": { "n": "01", "text": " The original plan was America’s largest Hot Dog-On-A-Stick franchise. Legal squabbles killed the dream, so we settled for three primo studios." },
+        "width": 1147
+      },
+      {
+        "text": "More than 100 brands work with Eleven, including Nike, Apple, Adidas, Uber Eats, Lexus and Verizon.¹¹ We take sound very seriously. Everything else, we’re still working on.",
+        "note": { "n": "02", "text": "Yes, we know. Bragging. Marketing made us put it here." },
+        "width": 922
+      }
+    ],
+    "sticker": { "src": "/media/about/ointment.webp", "width": 254.027, "height": 153.323 },
+    "globe": { "src": "/media/about/snow-globe.webp", "width": 671.621, "height": 515.849 }
+  },
+  "services": {
+    "label": "services",
+    "items": [
+      ["Design", "Lorem"],
+      ["Voice Casting", "Lorem"],
+      ["Mix", "Lorem"],
+      ["Music", "Lorem"],
+      ["ADR", "Lorem"],
+      ["VO", "Lorem"],
+      ["Sound", "Lorem"]
+    ]
+  },
+  "rooms": {
+    "label": "hear the rooms",
+    "items": [
+      { "name": "Studio A", "src": "/media/about/room-01-studio-a.webp", "width": 1346, "tone": 196 },
+      { "name": "Studio B", "src": "/media/about/room-02-studio-b.webp", "width": 1346, "tone": 247 },
+      { "name": "Studio C", "src": "/media/about/room-03-studio-c.webp", "width": 1346, "tone": 294 },
+      { "name": "Studio C, outside", "src": "/media/about/room-04-studio-c-outside.webp", "width": 1600, "tone": 330 },
+      { "name": "Lobby", "src": "/media/about/room-05-lobby.webp", "width": 1346, "tone": 392 }
+    ]
+  },
+  "team": {
+    "label": "team",
+    "rows": [
+      [
+        { "slug": "jordan-meltzer", "bg": "royal-blue", "ink": "neutral-0", "roles": ["Partner", "Sound designer", "Mixer"] },
+        { "slug": "jeff-payne", "bg": "aqua", "ink": "neutral-1000", "roles": ["Founder", "Mixer"] },
+        { "slug": "bob-gremore", "bg": "yellow", "ink": "neutral-1000", "roles": ["Mixer", "Sound designer"] },
+        { "slug": "bruce-bueckert", "bg": "red", "ink": "neutral-300", "roles": ["Mixer", "Sound designer"] }
+      ],
+      [
+        { "slug": "marco-tornillo", "bg": "pink", "ink": "neutral-1000", "roles": ["Mixer", "Sound designer"] },
+        { "slug": "aj-murillo", "bg": "bright-green", "ink": "neutral-1000", "roles": ["Mixer", "Sound designer"] },
+        { "slug": "sean-kiely", "bg": "light-grey", "ink": "neutral-1000", "roles": ["Producer"] },
+        { "slug": "taylor-sargent", "bg": "purple", "ink": "neutral-300", "roles": ["Producer"] }
+      ]
+    ]
+  }
+}

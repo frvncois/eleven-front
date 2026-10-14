@@ -6,7 +6,7 @@
 /*  Breakpoint, Typography collections, dev-ready code syntax).        */
 /*  Build against these only, never raw hex.                           */
 /* ------------------------------------------------------------------ */
-@theme {
+@theme static {
   /* Neutral ramp */
   --color-neutral-0: #ffffff;
   --color-neutral-50: #fdfcfc;
@@ -120,3 +120,4 @@ html.lenis body { height: auto; }
     transition-duration: 0.01ms !important;
   }
 }
+

@@ -1,0 +1,191 @@
+"use client";
+
+// Eleven · sound kit. Ported from the Framer build (framer/code/Sound.tsx), same engine on `window.__elevenSound`.
+// One audio engine for the whole visit; survives client-side page changes.
+// - unlock(): audio needs a user gesture. The Gate calls it; any later click also unlocks if sound was on before.
+// - setMuted / toggle: fades the master over 0.4 s, remembered for the session.
+// - play(urls): one-shot hover sounds. Random take, never the same take twice in a row.
+// - tone(): soft synthesized blip, the placeholder until Eleven's real sounds arrive.
+// - registerMedia / duck / unduck: background media on a bus that overlays can fade.
+import { useEffect, useState, startTransition } from "react";
+
+type Listener = () => void
+const KEY = "eleven-sound"
+const FADE = 0.4
+const isBrowser = () => typeof window !== "undefined"
+
+function createKit() {
+  let ctx: AudioContext | null = null
+  let master: GainNode | null = null
+  let bg: GainNode | null = null
+  let unlocked = false
+  let muted = isBrowser() && sessionStorage.getItem(KEY) === "muted"
+  let ducked = false
+  const listeners = new Set<Listener>()
+  const buffers = new Map<string, Promise<AudioBuffer | null>>()
+  const lastTake = new Map<string, number>()
+  const media = new Set<HTMLMediaElement>()
+  const emit = () => listeners.forEach((l) => l())
+
+  const ramp = (g: GainNode | null, to: number, dur = FADE) => {
+    if (!ctx || !g) return
+    const t = ctx.currentTime
+    g.gain.cancelScheduledValues(t)
+    g.gain.setValueAtTime(g.gain.value, t)
+    g.gain.linearRampToValueAtTime(to, t + dur)
+  }
+  // Media we could not route through Web Audio (cross-origin): tween element.volume instead.
+  const fadeMedia = (to: number, dur = FADE) => {
+    media.forEach((el) => {
+      if ((el as HTMLMediaElement & { __elevenRouted?: boolean }).__elevenRouted) return
+      el.muted = false
+      const from = el.volume
+      const t0 = performance.now()
+      const step = () => {
+        const k = Math.min(1, (performance.now() - t0) / (dur * 1000))
+        el.volume = from + (to - from) * k
+        if (k < 1) requestAnimationFrame(step)
+      }
+      step()
+    })
+  }
+  const load = (url: string) => {
+    if (!buffers.has(url)) {
+      buffers.set(
+        url,
+        fetch(url)
+          .then((r) => r.arrayBuffer())
+          .then((b) => (ctx ? ctx.decodeAudioData(b) : null))
+          .catch(() => null)
+      )
+    }
+    return buffers.get(url)!
+  }
+
+  const kit = {
+    get unlocked() {
+      return unlocked
+    },
+    get muted() {
+      return muted
+    },
+    subscribe(l: Listener) {
+      listeners.add(l)
+      return () => void listeners.delete(l)
+    },
+    /** Call from a user gesture (the Gate's click). */
+    unlock() {
+      if (!isBrowser()) return
+      if (!ctx) {
+        const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+        ctx = new AC()
+        master = ctx.createGain()
+        master.gain.value = 0
+        master.connect(ctx.destination)
+        bg = ctx.createGain()
+        bg.connect(master)
+        media.forEach((el) => kit.registerMedia(el))
+      }
+      ctx.resume()
+      unlocked = true
+      sessionStorage.setItem(KEY, muted ? "muted" : "on")
+      ramp(master, muted ? 0 : 1)
+      fadeMedia(muted || ducked ? 0 : 1)
+      emit()
+    },
+    setMuted(m: boolean) {
+      muted = m
+      if (isBrowser()) sessionStorage.setItem(KEY, m ? "muted" : "on")
+      if (!unlocked) {
+        if (!m) kit.unlock()
+        else emit()
+        return
+      }
+      ramp(master, m ? 0 : 1)
+      fadeMedia(m || ducked ? 0 : 1)
+      emit()
+    },
+    toggle() {
+      kit.setMuted(!(unlocked && !muted))
+    },
+    /** Hover sounds. `key` groups the takes (e.g. one person) for the no-repeat rule. */
+    async play(urls: (string | undefined | null)[], key = "default", volume = 1) {
+      const takes = urls.filter(Boolean) as string[]
+      if (!takes.length || !unlocked || muted || !ctx || !master) return
+      let i = Math.floor(Math.random() * takes.length)
+      if (takes.length > 1 && i === lastTake.get(key)) i = (i + 1) % takes.length
+      lastTake.set(key, i)
+      const buf = await load(takes[i])
+      if (!buf || !ctx || !master) return
+      const src = ctx.createBufferSource()
+      const g = ctx.createGain()
+      g.gain.value = volume
+      src.buffer = buf
+      src.connect(g).connect(master)
+      src.start()
+    },
+    /** Placeholder: a soft synthesized blip, used until the real sound files exist. */
+    tone(freq = 660, dur = 0.2, volume = 0.2) {
+      if (!unlocked || muted || !ctx || !master) return
+      const o = ctx.createOscillator()
+      const g = ctx.createGain()
+      const t = ctx.currentTime
+      o.type = "sine"
+      o.frequency.value = freq
+      g.gain.setValueAtTime(0, t)
+      g.gain.linearRampToValueAtTime(volume, t + 0.012)
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
+      o.connect(g).connect(master)
+      o.start(t)
+      o.stop(t + dur + 0.02)
+    },
+    preload(urls: (string | undefined | null)[]) {
+      if (ctx) urls.filter(Boolean).forEach((u) => load(u as string))
+    },
+    registerMedia(el: HTMLMediaElement) {
+      media.add(el)
+      if (ctx && bg && !(el as HTMLMediaElement & { __elevenRouted?: boolean }).__elevenRouted) {
+        try {
+          el.crossOrigin = el.crossOrigin || "anonymous"
+          ctx.createMediaElementSource(el).connect(bg)
+          ;(el as HTMLMediaElement & { __elevenRouted?: boolean }).__elevenRouted = true
+        } catch {
+          /* cross-origin: volume fallback */
+        }
+      }
+      el.muted = !unlocked || muted
+      return () => void media.delete(el)
+    },
+    duck(dur = 0.6) {
+      ducked = true
+      ramp(bg, 0, dur)
+      fadeMedia(0, dur)
+    },
+    unduck(dur = 0.6) {
+      ducked = false
+      ramp(bg, 1, dur)
+      fadeMedia(muted ? 0 : 1, dur)
+    },
+  }
+
+  // Returning visitor in the same session: re-unlock on the first gesture if they had sound on.
+  if (isBrowser()) {
+    const resume = () => {
+      if (!unlocked && sessionStorage.getItem(KEY) === "on") kit.unlock()
+    }
+    window.addEventListener("pointerdown", resume, { capture: true, once: true })
+    window.addEventListener("keydown", resume, { capture: true, once: true })
+  }
+  return kit
+}
+
+export type SoundKit = ReturnType<typeof createKit>
+export const sound: SoundKit = isBrowser()
+  ? ((window as unknown as { __elevenSound?: SoundKit }).__elevenSound ||= createKit())
+  : createKit()
+
+export function useSound() {
+  const [, set] = useState(0)
+  useEffect(() => sound.subscribe(() => startTransition(() => set((n) => n + 1))), [])
+  return sound
+}
