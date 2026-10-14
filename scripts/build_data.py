@@ -100,6 +100,7 @@ def main() -> None:
             "slug": slugify(w["vimeo_title"] or w["slug"]),
             "kind": "spot",
             "title": w["vimeo_title"] or w["brand"],
+            "short": short_title(w["vimeo_title"] or w["brand"], w["client"] or w["brand"]),
             "client": w["client"] or w["brand"],
             "agency": w.get("agency") or None,
             "director": w.get("director") or None,
@@ -142,11 +143,19 @@ def main() -> None:
     studio = [{"caption": s["caption"], "photo": to_webp(s["file"], "studio")} for s in src["studio_photos"]]
 
     DATA.mkdir(exist_ok=True)
-    for name, value in {"team": team, "projects": projects, "home": home, "studio": studio}.items():
+    for name, value in {"team": team, "projects": projects, "home-tiles": home, "studio": studio}.items():
         (DATA / f"{name}.json").write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
 
     missing = [p["slug"] for p in projects if not p["poster"]]
     print(f"team {len(team)} · projects {len(projects)} · home {len(home)} · studio {len(studio)} · missing posters {missing}")
+
+
+def short_title(title: str, client: str) -> str:
+    """Card title without the brand prefix: "Lucid - Driven" → "Driven" (Figma Card/Project meta)."""
+    parts = [p.strip() for p in re.split(r"\s+-\s+", title) if p.strip()]
+    if len(parts) > 1 and (parts[0].lower() in client.lower() or client.lower() in parts[0].lower()):
+        return " - ".join(parts[1:])
+    return title
 
 
 def _longform_file(entry: dict, all_longform: list) -> str | None:

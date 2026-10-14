@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 import path from "node:path";
 
 const nextConfig: NextConfig = {
+  // `npm run dev` builds into .next-dev so a production build (deploy) never clobbers a running dev server.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   // The studio root (../../..) has its own package.json; keep Turbopack scoped here.
   turbopack: { root: path.resolve(__dirname) },
   // Media is pre-sized WebP/MP4 (scripts/optimise-media.mjs): no runtime image optimisation.
