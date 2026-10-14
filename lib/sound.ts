@@ -37,7 +37,11 @@ function createKit() {
   // Media we could not route through Web Audio (cross-origin): tween element.volume instead.
   const fadeMedia = (to: number, dur = FADE) => {
     media.forEach((el) => {
-      if ((el as HTMLMediaElement & { __elevenRouted?: boolean }).__elevenRouted) return
+      // Routed through Web Audio: the bus gain sets the level, the element itself must stay unmuted.
+    if ((el as HTMLMediaElement & { __elevenRouted?: boolean }).__elevenRouted) {
+      el.muted = false
+      return
+    }
       el.muted = false
       const from = el.volume
       const t0 = performance.now()
@@ -153,7 +157,7 @@ function createKit() {
           /* cross-origin: volume fallback */
         }
       }
-      el.muted = !unlocked || muted
+      el.muted = (el as HTMLMediaElement & { __elevenRouted?: boolean }).__elevenRouted ? false : !unlocked || muted
       return () => void media.delete(el)
     },
     duck(dur = 0.6) {

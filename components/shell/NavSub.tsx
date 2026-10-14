@@ -7,9 +7,10 @@ import { SoundToggle } from "./SoundToggle";
  * The wordmark is its own fixed layer: mix-blend-mode only blends within its stacking context,
  * so it must not sit inside the (z-indexed) toggle bar.
  */
-export function NavSub({ toggles }: { toggles?: React.ReactNode }) {
+export function NavSub({ toggles, wordmark = true }: { toggles?: React.ReactNode; wordmark?: boolean }) {
   return (
     <>
+      {wordmark && (
       <Link
         href="/"
         aria-label="Eleven, home"
@@ -19,6 +20,7 @@ export function NavSub({ toggles }: { toggles?: React.ReactNode }) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/icons/eleven-wordmark.svg" alt="" width={100} height={20.4146} className="rotate-4 invert" />
       </Link>
+      )}
       <div className="fixed right-margin bottom-4 z-50 flex items-center justify-end gap-1">
         {toggles}
         <SoundToggle />
