@@ -20,9 +20,9 @@ export default function AboutPage() {
     <main className="bg-bg">
       <NavBar />
 
-      {/* Story. The sticker rests in the indent of "In 2022…" (x 260, line top 924), sized to the slot. */}
+      {/* Story. The sticker starts just above the first paragraph (x 264, the second paragraph's edge), 134 × 81. */}
       <section className="relative flex flex-col items-end px-[22px] pt-[604px]">
-        <StorySticker src={story.sticker.src} width={112} height={68} top={922} left={264} end={1560} />
+        <StorySticker src={story.sticker.src} width={134} height={81} top={499} left={264} end={1560} />
         <div className="relative flex w-[1385px] flex-col items-end">
           <p className="t-h2-indent w-full">{story.intro}</p>
           {story.paragraphs.map((p, i) => (

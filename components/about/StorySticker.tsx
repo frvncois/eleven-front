@@ -6,7 +6,7 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 type Props = { src: string; width: number; height: number; top: number; left: number; end: number };
 
 /**
- * The ointment sticker (About story). It rests in the indent of the second paragraph, then holds
+ * The ointment sticker (About story). It starts just above the first paragraph, then holds
  * on screen while the story scrolls past, wobbling with the scroll speed (a lagging slide and a tilt,
  * after ascension.pegassi.be/about), and fades out as the text ends, before the snow globe comes in.
  * `top`/`left`: resting slot in the section; `end`: section y where it must be gone.
