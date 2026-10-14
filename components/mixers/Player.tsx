@@ -26,7 +26,7 @@ type Props = { films: Project[]; index: number | null; onIndex: (i: number) => v
  * V1 · 06 · Project player (Figma 7345:1485, Player/Stage 7356:4931). An overlay over the mixer page,
  * so closing is instant. The film fills the screen; the films of this mixer sit on a horizontal strip
  * and the next one slides in when a film ends. Over it: title + mixer top-left, the credits "+" panel
- * mid-left (Player/Info Panel), PAUSE / time / scrub / duration bottom-left, Close top-right, sound
+ * mid-left (Player/Info Panel), time / scrub / duration bottom-left, Close top-right, sound
  * bottom-right. Clicking the film pauses / plays (annotation), with a play / pause cursor tag.
  */
 export function Player({ films, index, onIndex, onClose }: Props) {
@@ -189,11 +189,8 @@ export function Player({ films, index, onIndex, onClose }: Props) {
               </motion.ul>
             </div>
 
-            {/* Controls: PAUSE · 0:12 ——— 0:30 */}
+            {/* Controls: 0:12 ——— 0:30 (pause / play lives on the cursor tag) */}
             <div className="pointer-events-auto absolute right-0 left-0 flex h-3 items-center gap-[25px]" style={{ top: "calc(var(--vh) - 60px)" }}>
-              <button type="button" onClick={toggle} className="t-h6 w-[42px] text-left transition-opacity duration-200 ease-out hover:opacity-50">
-                {playing ? "pause" : "play"}
-              </button>
               <div className="flex w-[397px] items-center gap-4 text-bg-alt">
                 <span className="t-h6 tabular-nums">{fmt(time)}</span>
                 <div onPointerDown={seek} className="relative flex h-3 flex-1 cursor-pointer items-center">

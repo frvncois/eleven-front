@@ -2,17 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
-import { DUR, EASE_OUT } from "@/lib/motion";
+import { usePathname } from "next/navigation";
+import { DUR, EASE_OUT, THEME_INK, themeColor } from "@/lib/motion";
 
 /**
  * The one cursor tag (annotation: "cursors are tags following the original browser cursor,
  * not being the actual cursor"), after seventeenagency.com: the normal arrow stays, and a small tag
  * rides just below-right of its tip, nearly attached (a short spring), fading in and out.
  * Any element opts in with data-cursor="listen" (or play, close, hold…); the closest one under the
- * pointer wins. Grey chip from the Figma Cursor component. Mouse only: nothing on touch.
+ * pointer wins. Chip in the page's theme colour (the colour of its transition: Mixers royal blue,
+ * About pink…), text black or white for contrast. Mouse only: nothing on touch.
  */
 export function CursorTag() {
   const [label, setLabel] = useState<string | null>(null);
+  const bg = themeColor(usePathname());
+  const ink = THEME_INK[bg] ?? "#ffffff";
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
   const sx = useSpring(x, { stiffness: 900, damping: 60, mass: 0.4 });
@@ -45,7 +49,8 @@ export function CursorTag() {
         {label && (
           <motion.span
             key={label}
-            className="t-h6 block bg-neutral-200 px-2 py-1 whitespace-nowrap text-neutral-1000"
+            className="t-h6 block px-2 py-1 whitespace-nowrap"
+            style={{ background: bg, color: ink }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

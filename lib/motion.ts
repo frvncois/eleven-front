@@ -22,5 +22,20 @@ export const SWEEP_COLORS: Record<string, string> = {
   "/terms": "#0f0d0d",
 };
 
+/** The page's theme colour (its sweep colour), longest path prefix wins. */
+export function themeColor(path: string) {
+  let best = "/";
+  for (const k of Object.keys(SWEEP_COLORS)) {
+    if (k !== "/" && (path === k || path.startsWith(k + "/")) && k.length > best.length) best = k;
+  }
+  return SWEEP_COLORS[best];
+}
+
+/** Text that reads on each theme colour: black on the light ones (pink, aqua), white on the rest. */
+export const THEME_INK: Record<string, string> = {
+  "#ff7fe7": "#000000",
+  "#00a7d9": "#000000",
+};
+
 export const prefersReducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;

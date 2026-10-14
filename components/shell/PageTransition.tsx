@@ -2,18 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { DUR, EASE_SWEEP, SWEEP_COLORS, prefersReducedMotion } from "@/lib/motion";
+import { DUR, EASE_SWEEP, prefersReducedMotion, themeColor } from "@/lib/motion";
 import { sound } from "@/lib/sound";
 
 const CARRY_KEY = "eleven-sweep";
 
-function colorFor(path: string) {
-  let best = "/";
-  for (const k of Object.keys(SWEEP_COLORS)) {
-    if (k !== "/" && (path === k || path.startsWith(k + "/")) && k.length > best.length) best = k;
-  }
-  return SWEEP_COLORS[best];
-}
 
 /**
  * Page sweep (Figma "V1 · PAGE TRANSITIONS", 7405:4175): six bands cover from the left, the route changes,
@@ -61,7 +54,7 @@ export function PageTransition() {
       if (prefersReducedMotion()) return router.push(href);
 
       busy.current = true;
-      const color = colorFor(url.pathname);
+      const color = themeColor(url.pathname);
       window.__lenis?.stop();
       sound.cue("sweepIn");
       sweep("translateX(-101%)", "translateX(0)", color).then(() => {
