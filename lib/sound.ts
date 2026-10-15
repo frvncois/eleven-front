@@ -32,6 +32,60 @@ const CUES = {
 } satisfies Record<string, Cue>
 const seqPos = new Map<string, number>()
 
+/** The party loop: 124 bpm kick, off-beat hat, bass line, stabs, scheduled ahead into `out`. Returns the timer id. */
+function beatLoop(c: AudioContext, out: AudioNode, onBeat?: (beat: number) => void) {
+  const bpm = 124
+  const sixteenth = 60 / bpm / 4
+  const bass = [41, 0, 41, 0, 44, 0, 41, 0, 39, 0, 39, 0, 46, 0, 44, 0] // MIDI notes, 0 = rest
+  const hz = (m: number) => 440 * Math.pow(2, (m - 69) / 12)
+  const noise = c.createBuffer(1, c.sampleRate * 0.1, c.sampleRate)
+  noise.getChannelData(0).forEach((_, i, a) => (a[i] = Math.random() * 2 - 1))
+  let step = 0
+  let next = c.currentTime + 0.05
+  const voice = (type: OscillatorType, f: number, t: number, dur: number, vol: number, to?: number) => {
+    const o = c.createOscillator()
+    const g = c.createGain()
+    o.type = type
+    o.frequency.setValueAtTime(f, t)
+    if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur)
+    g.gain.setValueAtTime(vol, t)
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
+    o.connect(g).connect(out)
+    o.start(t)
+    o.stop(t + dur + 0.02)
+  }
+  const hat = (t: number) => {
+    const src = c.createBufferSource()
+    const hp = c.createBiquadFilter()
+    const g = c.createGain()
+    src.buffer = noise
+    hp.type = "highpass"
+    hp.frequency.value = 7000
+    g.gain.setValueAtTime(0.25, t)
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05)
+    src.connect(hp).connect(g).connect(out)
+    src.start(t)
+  }
+  return window.setInterval(() => {
+    while (next < c.currentTime + 0.12) {
+      const s = step % 16
+      if (s % 4 === 0) {
+        voice("sine", 150, next, 0.28, 0.9, 45) // kick
+        const beat = step / 4
+        if (onBeat) window.setTimeout(() => onBeat(beat), Math.max(0, (next - c.currentTime) * 1000))
+      }
+      if (s % 4 === 2) hat(next)
+      if (bass[s]) voice("sawtooth", hz(bass[s]), next, sixteenth * 1.6, 0.18)
+      if (s === 4 || s === 12) [65, 68, 72].forEach((m) => voice("square", hz(m), next, 0.12, 0.05)) // stabs
+      next += sixteenth
+      step++
+    }
+  }, 25)
+}
+
+export type RoomPreset = "studio" | "booth" | "lobby" | "hallway" | "outside" | "party"
+export type RoomHandle = { setPan: (x: number) => void; setNear: (y: number) => void; stop: () => void; analyser: AnalyserNode | null }
+
 type Listener = () => void
 const KEY = "eleven-sound"
 const FADE = 0.4
@@ -202,53 +256,7 @@ function createKit() {
       const out = c.createGain()
       out.gain.value = 0.55
       out.connect(master)
-      const bpm = 124
-      const sixteenth = 60 / bpm / 4
-      const bass = [41, 0, 41, 0, 44, 0, 41, 0, 39, 0, 39, 0, 46, 0, 44, 0] // MIDI notes, 0 = rest
-      const hz = (m: number) => 440 * Math.pow(2, (m - 69) / 12)
-      const noise = c.createBuffer(1, c.sampleRate * 0.1, c.sampleRate)
-      noise.getChannelData(0).forEach((_, i, a) => (a[i] = Math.random() * 2 - 1))
-      let step = 0
-      let next = c.currentTime + 0.05
-      const voice = (type: OscillatorType, f: number, t: number, dur: number, vol: number, to?: number) => {
-        const o = c.createOscillator()
-        const g = c.createGain()
-        o.type = type
-        o.frequency.setValueAtTime(f, t)
-        if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur)
-        g.gain.setValueAtTime(vol, t)
-        g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
-        o.connect(g).connect(out)
-        o.start(t)
-        o.stop(t + dur + 0.02)
-      }
-      const hat = (t: number) => {
-        const src = c.createBufferSource()
-        const hp = c.createBiquadFilter()
-        const g = c.createGain()
-        src.buffer = noise
-        hp.type = "highpass"
-        hp.frequency.value = 7000
-        g.gain.setValueAtTime(0.25, t)
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05)
-        src.connect(hp).connect(g).connect(out)
-        src.start(t)
-      }
-      const timer = window.setInterval(() => {
-        while (next < c.currentTime + 0.12) {
-          const s = step % 16
-          if (s % 4 === 0) {
-            voice("sine", 150, next, 0.28, 0.9, 45) // kick
-            const beat = step / 4
-            window.setTimeout(() => onBeat(beat), Math.max(0, (next - c.currentTime) * 1000))
-          }
-          if (s % 4 === 2) hat(next)
-          if (bass[s]) voice("sawtooth", hz(bass[s]), next, sixteenth * 1.6, 0.18)
-          if (s === 4 || s === 12) [65, 68, 72].forEach((m) => voice("square", hz(m), next, 0.12, 0.05)) // stabs
-          next += sixteenth
-          step++
-        }
-      }, 25)
+      const timer = beatLoop(c, out, onBeat)
       party = { timer, out }
     },
     stopParty() {
@@ -260,6 +268,178 @@ function createKit() {
         window.setTimeout(() => out.disconnect(), 600)
       }
       party = null
+    },
+    /**
+     * A room's ambience for "Hear the rooms": Eleven's recording when `src` is given (looped), otherwise a
+     * synthesized placeholder by `preset`. Runs through distance (low-pass + level), left/right pan and an
+     * analyser for the meter, on the master bus (so mute works). Fades in; `stop()` fades out.
+     */
+    ambience(preset: RoomPreset, src?: string | null): RoomHandle {
+      if (!ctx || !master) return { setPan() {}, setNear() {}, stop() {}, analyser: null }
+      const c = ctx
+      const t0 = c.currentTime
+      const bus = c.createGain()
+      const distance = c.createBiquadFilter()
+      const pan = c.createStereoPanner()
+      const level = c.createGain()
+      const analyser = c.createAnalyser()
+      distance.type = "lowpass"
+      distance.frequency.value = 6000
+      analyser.fftSize = 1024
+      level.gain.setValueAtTime(0, t0)
+      level.gain.linearRampToValueAtTime(1, t0 + 0.8)
+      bus.connect(distance).connect(pan).connect(level).connect(analyser).connect(master)
+
+      const stops: (() => void)[] = []
+      const noise = (() => {
+        // Pink-ish noise (Paul Kellet's filter), 3 s, looped.
+        const b = c.createBuffer(2, c.sampleRate * 3, c.sampleRate)
+        for (let ch = 0; ch < 2; ch++) {
+          const d = b.getChannelData(ch)
+          let b0 = 0, b1 = 0, b2 = 0
+          for (let i = 0; i < d.length; i++) {
+            const w = Math.random() * 2 - 1
+            b0 = 0.99765 * b0 + w * 0.099046
+            b1 = 0.963 * b1 + w * 0.2965164
+            b2 = 0.57 * b2 + w * 1.0526913
+            d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.12
+          }
+        }
+        return b
+      })()
+      const bed = (type: BiquadFilterType, freq: number, gain: number, q = 0.7) => {
+        const n = c.createBufferSource()
+        const f = c.createBiquadFilter()
+        const g = c.createGain()
+        n.buffer = noise
+        n.loop = true
+        f.type = type
+        f.frequency.value = freq
+        f.Q.value = q
+        g.gain.value = gain
+        n.connect(f).connect(g).connect(bus)
+        n.start()
+        stops.push(() => n.stop())
+        return { f, g }
+      }
+      const tone = (freq: number, gain: number) => {
+        const o = c.createOscillator()
+        const g = c.createGain()
+        o.frequency.value = freq
+        g.gain.value = gain
+        o.connect(g).connect(bus)
+        o.start()
+        stops.push(() => o.stop())
+      }
+      const lfo = (target: AudioParam, rate: number, depth: number) => {
+        const o = c.createOscillator()
+        const g = c.createGain()
+        o.frequency.value = rate
+        g.gain.value = depth
+        o.connect(g).connect(target)
+        o.start()
+        stops.push(() => o.stop())
+      }
+      const every = (ms: () => number, fn: (t: number) => void) => {
+        let id = 0
+        const go = () => {
+          fn(c.currentTime + 0.02)
+          id = window.setTimeout(go, ms())
+        }
+        id = window.setTimeout(go, ms())
+        stops.push(() => window.clearTimeout(id))
+      }
+      const blip = (f0: number, f1: number, dur: number, vol: number, t: number, type: OscillatorType = "sine") => {
+        const o = c.createOscillator()
+        const g = c.createGain()
+        o.type = type
+        o.frequency.setValueAtTime(f0, t)
+        o.frequency.exponentialRampToValueAtTime(f1, t + dur)
+        g.gain.setValueAtTime(vol, t)
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
+        o.connect(g).connect(bus)
+        o.start(t)
+        o.stop(t + dur + 0.02)
+      }
+
+      if (src) {
+        let node: AudioBufferSourceNode | null = null
+        load(src).then((buf) => {
+          if (!buf || !ctx) return
+          node = ctx.createBufferSource()
+          node.buffer = buf
+          node.loop = true
+          node.connect(bus)
+          node.start()
+        })
+        stops.push(() => node?.stop())
+      } else if (preset === "studio") {
+        bed("lowpass", 380, 0.9) // the room's air
+        tone(60, 0.012) // gear hum
+        tone(120, 0.006)
+      } else if (preset === "booth") {
+        bed("lowpass", 220, 0.6) // dead, close
+      } else if (preset === "lobby") {
+        bed("lowpass", 1400, 0.7)
+        const murmur = bed("bandpass", 520, 1.4, 1.6) // voices through a door
+        lfo(murmur.g.gain, 0.35, 0.9)
+        lfo(murmur.f.frequency, 0.13, 180)
+      } else if (preset === "hallway") {
+        bed("lowpass", 800, 0.6)
+        let left = true
+        every(() => 520 + Math.random() * 60, (t) => {
+          // footsteps, alternating feet
+          blip(left ? 95 : 85, 45, 0.12, 0.35, t)
+          left = !left
+        })
+      } else if (preset === "outside") {
+        const wind = bed("bandpass", 600, 1.6, 0.6)
+        lfo(wind.f.frequency, 0.08, 320)
+        lfo(wind.g.gain, 0.05, 0.8)
+        every(() => 1400 + Math.random() * 2600, (t) => {
+          // a bird
+          blip(3200, 4300, 0.09, 0.05, t)
+          blip(3600, 4800, 0.08, 0.04, t + 0.12)
+        })
+      } else if (preset === "party") {
+        // The party, heard through the wall of the building.
+        const wall = c.createBiquadFilter()
+        wall.type = "lowpass"
+        wall.frequency.value = 260
+        wall.connect(bus)
+        const id = beatLoop(c, wall)
+        stops.push(() => window.clearInterval(id))
+        bed("lowpass", 900, 0.35) // street
+      }
+
+      return {
+        analyser,
+        /** -1 (left) … 1 (right) */
+        setPan(x: number) {
+          pan.pan.setTargetAtTime(Math.max(-1, Math.min(1, x)), c.currentTime, 0.08)
+        },
+        /** 0 (far, muffled) … 1 (close, bright and louder) */
+        setNear(y: number) {
+          const k = Math.max(0, Math.min(1, y))
+          distance.frequency.setTargetAtTime(700 + 9000 * k * k, c.currentTime, 0.1)
+          bus.gain.setTargetAtTime(0.45 + 0.85 * k, c.currentTime, 0.1)
+        },
+        stop() {
+          const t = c.currentTime
+          level.gain.cancelScheduledValues(t)
+          level.gain.setValueAtTime(level.gain.value, t)
+          level.gain.linearRampToValueAtTime(0, t + 0.6)
+          window.setTimeout(() => {
+            stops.forEach((f) => {
+              try {
+                f()
+              } catch {}
+            })
+            bus.disconnect()
+            analyser.disconnect()
+          }, 700)
+        },
+      }
     },
     /**
      * Named UI sounds. Each cue plays Eleven's file when one is listed in CUES, otherwise its placeholder.

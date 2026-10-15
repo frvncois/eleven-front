@@ -3,7 +3,7 @@ import about from "@/data/about.json";
 import team from "@/data/team.json";
 import { Chrome } from "@/components/shell/Chrome";
 import { TeamCard } from "@/components/about/TeamCard";
-import { RoomsRow } from "@/components/about/RoomsRow";
+import { RoomTuner } from "@/components/about/RoomTuner";
 import { StorySticker } from "@/components/about/StorySticker";
 
 export const metadata: Metadata = { title: "About" };
@@ -61,13 +61,7 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      {/* Annotation: 100vh, minus the nav and 24 px, so the bar never overlaps it. */}
-      <section className="flex h-[calc(var(--vh)-78px)] min-h-[600px] items-start justify-between overflow-hidden border-t border-neutral-1000 p-margin">
-        <h2 className="t-eyebrow">{rooms.label}</h2>
-        <div className="flex h-full w-[1084px] flex-col">
-          <RoomsRow rooms={rooms.items} />
-        </div>
-      </section>
+      <RoomTuner label={rooms.label} hint={rooms.hint} items={rooms.items} />
 
       <section className="flex h-[1024px] flex-col gap-[53px] px-margin pt-[148px] pb-[290px]">
         <h2 className="t-h6">{about.team.label}</h2>
