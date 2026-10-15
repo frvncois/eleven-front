@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { party, useParty } from "@/lib/party";
 import { sound } from "@/lib/sound";
 import { mixers } from "@/lib/content";
+import { VideoParty } from "./VideoParty";
 
 // Eleven's brand colours, in the order they flash, and the text that reads on each.
 const PALETTE: [string, string][] = [
@@ -28,6 +29,9 @@ type Bouncer = { x: number; y: number; vx: number; vy: number; r: number; vr: nu
 export function PartyMode() {
   const on = useParty();
   const pathname = usePathname();
+  // V2 has its own party: a full-screen film with its soundtrack (VideoParty).
+  const isV2 = pathname === "/v2" || pathname.startsWith("/v2/");
+  const colourOn = on && !isV2;
   const [beat, setBeat] = useState(0);
   const layer = useRef<HTMLDivElement>(null);
 
@@ -38,7 +42,7 @@ export function PartyMode() {
 
   useEffect(() => {
     const root = document.documentElement;
-    if (!on) {
+    if (!colourOn) {
       root.classList.remove("party");
       return;
     }
@@ -56,19 +60,19 @@ export function PartyMode() {
       sound.unduck();
       window.removeEventListener("keydown", onKey);
     };
-  }, [on]);
+  }, [colourOn]);
 
   // Colour on the beat.
   useEffect(() => {
-    if (!on) return;
+    if (!colourOn) return;
     const [bg, ink] = PALETTE[beat % PALETTE.length];
     document.documentElement.style.setProperty("--party-bg", bg);
     document.documentElement.style.setProperty("--party-ink", ink);
-  }, [on, beat]);
+  }, [colourOn, beat]);
 
   // Bouncing icons (DVD-logo style), in design units inside the stage.
   useEffect(() => {
-    if (!on || !layer.current) return;
+    if (!colourOn || !layer.current) return;
     const imgs = Array.from(layer.current.children) as HTMLElement[];
     const vw = 1440;
     const vh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--vh")) || 1024;
@@ -95,8 +99,9 @@ export function PartyMode() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [on]);
+  }, [colourOn]);
 
+  if (isV2) return <VideoParty on={on} />;
   if (!on) return null;
   return (
     <div ref={layer} aria-hidden className="pointer-events-none fixed inset-0 z-[40] overflow-hidden">

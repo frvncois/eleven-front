@@ -1,0 +1,13 @@
+{
+  "note": "V2 butterfly party: a full-screen film with its own sound; each opening plays the next one. Eleven's own music-led spots. Reorder or swap slugs (data/projects.json) freely.",
+  "films": [
+    "adidas-reflections",
+    "g-fore-dance-skate",
+    "nike-from-anywhere",
+    "spotify-trust-in-your-sound",
+    "doordash-world-cup",
+    "cue-the-bird-dancer",
+    "lexus-wicked",
+    "c4-spring"
+  ]
+}

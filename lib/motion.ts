@@ -13,7 +13,7 @@ export const DUR = {
 
 /** Destination colour of the page sweep, by path. Longest prefix wins. */
 export const SWEEP_COLORS: Record<string, string> = {
-  "/": "#0f0d0d",
+  "/": "#d9d9d9", // home: Eleven light grey (Amélie, 15 Oct), not black
   "/mixers": "#ed2024",
   "/longform": "#1a8240",
   "/archive": "#f6eb13",
@@ -32,10 +32,11 @@ export function themeColor(rawPath: string) {
   return SWEEP_COLORS[best];
 }
 
-/** Text that reads on each theme colour: black on the light ones (pink, aqua, yellow), white on the rest. */
+/** Text that reads on each theme colour: black on the light ones (pink, aqua, yellow, light grey), white on the rest. */
 export const THEME_INK: Record<string, string> = {
   "#ff7fe7": "#000000",
   "#f6eb13": "#000000",
+  "#d9d9d9": "#000000",
   "#00a7d9": "#000000",
 };
 
