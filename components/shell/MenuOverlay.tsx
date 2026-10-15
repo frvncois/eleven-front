@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import site from "@/data/site.json";
@@ -9,6 +10,7 @@ import { themeColor } from "@/lib/motion";
 import { SoundToggle } from "./SoundToggle";
 import { MenuColumns } from "./MenuColumns";
 import { Clock } from "./Clock";
+import { useVHref } from "@/lib/version";
 
 const EASE = [0.4, 0, 0.2, 1] as const;
 
@@ -20,6 +22,7 @@ const EASE = [0.4, 0, 0.2, 1] as const;
  */
 export function MenuOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const accent = themeColor(usePathname());
+  const vhref = useVHref();
   const instagram = site.footer.social.find((s) => s.label === "Instagram")!.href;
 
   useEffect(() => {
@@ -67,8 +70,16 @@ export function MenuOverlay({ open, onClose }: { open: boolean; onClose: () => v
                 Close
               </button>
             </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icons/logo-floss.webp" alt="" width={263} height={279.5} className="pointer-events-none absolute top-[438px] left-[-20px]" />
+            {/* The floss logo takes you home (and closes the menu). */}
+            <Link
+              href={vhref("/")}
+              onClick={onClose}
+              aria-label="Eleven, home"
+              className="absolute top-[438px] left-[-20px] block transition-opacity duration-300 ease-out hover:opacity-50"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/logo-floss.webp" alt="" width={263} height={279.5} className="block" />
+            </Link>
             <p className="t-body absolute top-[678px] left-[496px]" style={{ color: accent }}>
               We love making sound.
             </p>
