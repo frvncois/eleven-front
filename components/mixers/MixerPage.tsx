@@ -6,7 +6,7 @@ import { Chrome } from "@/components/shell/Chrome";
 import { SectionColor } from "@/components/shell/SectionColor";
 import { ProjectCard } from "./ProjectCard";
 import { WhosNext } from "./WhosNext";
-import { Player } from "./Player";
+import { Player, openWithSound } from "./Player";
 
 /** V1 · 05 · Mixer · Grid (Figma 7345:1378): name, three-up grid of spots, Who's next. */
 export function MixerPage({ mixer, spots, others }: { mixer: Person; spots: Project[]; others: Person[] }) {
@@ -22,7 +22,7 @@ export function MixerPage({ mixer, spots, others }: { mixer: Person; spots: Proj
         {rows.map((row, i) => (
           <div key={i} className="flex h-[353px] gap-2">
             {row.map((p) => (
-              <ProjectCard key={p.slug} project={p} onOpen={(x) => setPlaying(spots.indexOf(x))} />
+              <ProjectCard key={p.slug} project={p} onOpen={(x) => openWithSound(() => setPlaying(spots.indexOf(x)))} />
             ))}
             {/* Keep the three-column rhythm on a short last row. */}
             {Array.from({ length: 3 - row.length }).map((_, k) => (

@@ -9,6 +9,16 @@ import { sound, useSound } from "@/lib/sound";
 import { EASE_DISSOLVE } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 
+/**
+ * Open a film WITH sound, even if the visitor muted the site before: watching is a deliberate act.
+ * Call it inside the click handler (the gesture lets the browser start audio), before the player opens.
+ */
+export function openWithSound(open: () => void) {
+  sound.setMuted(false);
+  sound.unlock();
+  open();
+}
+
 /** Vimeo share link (vimeo.com/<id>/<hash>) → chrome-less player URL; our own controls drive it. */
 function embedUrl(vimeo: string, muted: boolean) {
   const m = vimeo.match(/vimeo\.com\/(\d+)(?:\/(\w+))?/);

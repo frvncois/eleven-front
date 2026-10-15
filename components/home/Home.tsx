@@ -30,13 +30,11 @@ const readSeen = (v: string) => {
 const SHAPE = {
   gate: { x: 16, y: 621, width: 1400.008, rotate: 0 },
   home: { x: 32, y: 814, width: 915, rotate: 0 },
-  // V2 · 02 · Home (7345:1310): same size, tilted 2.71°.
-  homeV2: { x: 27, y: 836, width: 915, rotate: 2.71 },
 };
 
 /**
  * V1 · 01 · Gate (7449:6439) → V1 · 02 · Home (7345:1333); V2: red gate (7345:1290) → V2 · 02 · Home
- * (7345:1310), the menu laid out over the reel, the shape tilted 2.71°, the LA clock.
+ * (7345:1310), the menu laid out over the reel and the LA clock; the shape lands where V1's does.
  * The gate asks for sound once per visit (session). Choosing lifts the aqua panel away while the
  * ELEVEN shape shrinks into its home position over the reel, 1.2 s ease-in-out, as in the prototype.
  * "Sound on" also unlocks audio (the browser needs that click).
@@ -59,7 +57,8 @@ export function Home() {
     setChosen(true);
   };
 
-  const pos = gate ? SHAPE.gate : v === "v2" ? SHAPE.homeV2 : SHAPE.home;
+  // V2 uses V1's placement and angle too (Amélie, 15 Oct), not the 2.71° tilt of the V2 frame.
+  const pos = gate ? SHAPE.gate : SHAPE.home;
 
   return (
     <main className="relative h-(--vh) min-h-[700px] overflow-hidden bg-ink">

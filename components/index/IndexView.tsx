@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { LayoutGroup, motion, motionValue, type MotionValue } from "framer-motion";
 import type { Project } from "@/lib/content";
 import { Chrome } from "@/components/shell/Chrome";
-import { Player } from "@/components/mixers/Player";
+import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 
 export type Tile = Project & { label: string; client: string; x: number; y: number; w: number; h: number };
@@ -54,9 +54,9 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
     <main className="relative h-(--vh) overflow-hidden bg-neutral-0">
       <LayoutGroup>
         {view === "grid" ? (
-          <GridView tiles={tiles} field={field} onPlay={setPlaying} paused={playing !== null} />
+          <GridView tiles={tiles} field={field} onPlay={(i) => openWithSound(() => setPlaying(i))} paused={playing !== null} />
         ) : (
-          <ListView tiles={tiles} onPlay={setPlaying} />
+          <ListView tiles={tiles} onPlay={(i) => openWithSound(() => setPlaying(i))} />
         )}
       </LayoutGroup>
 

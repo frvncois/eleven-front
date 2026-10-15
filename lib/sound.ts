@@ -306,11 +306,13 @@ function createKit() {
 
   // Returning visitor in the same session: re-unlock on the first gesture if they had sound on.
   if (isBrowser()) {
-    const resume = () => {
+    const resume = (e: Event) => {
+      // A click on the sound toggle itself decides on its own (otherwise it would unlock, then flip back off).
+      if ((e.target as Element | null)?.closest?.("[data-sound-toggle]")) return
       if (!unlocked && sessionStorage.getItem(KEY) === "on") kit.unlock()
     }
-    window.addEventListener("pointerdown", resume, { capture: true, once: true })
-    window.addEventListener("keydown", resume, { capture: true, once: true })
+    window.addEventListener("pointerdown", resume, { capture: true })
+    window.addEventListener("keydown", resume, { capture: true })
   }
   return kit
 }

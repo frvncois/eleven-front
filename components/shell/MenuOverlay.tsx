@@ -62,7 +62,7 @@ export function MenuOverlay({ open, onClose }: { open: boolean; onClose: () => v
               <button
                 type="button"
                 onClick={onClose}
-                className="t-accent bg-neutral-200 px-2 py-1 text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50"
+                className="t-accent flex h-6 items-center bg-neutral-200 px-2 text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50"
               >
                 Close
               </button>

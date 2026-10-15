@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { Project } from "@/lib/content";
 import { Chrome } from "@/components/shell/Chrome";
-import { Player } from "@/components/mixers/Player";
+import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { EASE_SWEEP } from "@/lib/motion";
 
@@ -80,7 +80,7 @@ export function LongformReel({ films }: { films: Film[] }) {
             key={f.slug}
             type="button"
             data-cursor="play"
-            onClick={() => setPlaying(i)}
+            onClick={() => openWithSound(() => setPlaying(i))}
             aria-label={`Play ${f.label}`}
             className="relative block h-(--vh) w-[1440px] cursor-pointer overflow-hidden"
           >

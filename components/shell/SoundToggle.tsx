@@ -85,6 +85,7 @@ export function SoundToggle({ size = 32 }: { size?: number }) {
       type="button"
       aria-label={on ? "Mute sound" : "Turn sound on"}
       aria-pressed={on}
+      data-sound-toggle
       onClick={() => s.toggle()}
       className="block cursor-pointer bg-neutral-100 transition-opacity duration-200 ease-out hover:opacity-50"
       style={{ width: size, height: size }}
