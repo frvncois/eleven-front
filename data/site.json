@@ -10,7 +10,7 @@
       "label": "Index",
       "href": "/index",
       "match": "/index",
-      "color": "red"
+      "color": "yellow"
     },
     {
       "label": "Longform",

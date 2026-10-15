@@ -16,7 +16,7 @@ export const SWEEP_COLORS: Record<string, string> = {
   "/": "#0f0d0d",
   "/mixers": "#032daf",
   "/longform": "#1a8240",
-  "/index": "#ed2024",
+  "/index": "#f6eb13",
   "/about": "#ff7fe7",
   "/contact": "#00a7d9",
   "/terms": "#0f0d0d",
@@ -31,9 +31,10 @@ export function themeColor(path: string) {
   return SWEEP_COLORS[best];
 }
 
-/** Text that reads on each theme colour: black on the light ones (pink, aqua), white on the rest. */
+/** Text that reads on each theme colour: black on the light ones (pink, aqua, yellow), white on the rest. */
 export const THEME_INK: Record<string, string> = {
   "#ff7fe7": "#000000",
+  "#f6eb13": "#000000",
   "#00a7d9": "#000000",
 };
 

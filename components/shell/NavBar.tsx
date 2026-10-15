@@ -9,7 +9,7 @@ import { sound } from "@/lib/sound";
 
 /**
  * Nav/Bar (Figma 7356:3252): five links spread edge to edge, Heading/H4.
- * Hover = the link's colour (Mixers royal blue, Index red, Longform dark green, About pink, Contact aqua),
+ * Hover = the link's colour (Mixers royal blue, Index yellow, Longform dark green, About pink, Contact aqua),
  * 0.3 s ease-out, + a short sound; the current page keeps the hover state (annotation).
  * `tone="light"` (neutral/300) where it sits on video: home, player.
  */
