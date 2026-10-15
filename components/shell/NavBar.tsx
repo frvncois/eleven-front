@@ -32,7 +32,7 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
         // Mixers opens the roster overlay instead of a page (annotation).
         if (item.label === "Mixers")
           return (
-            <button key={item.label} type="button" data-sound="off" onClick={() => setMixersOpen(true)} onPointerEnter={() => sound.cue("navHover")} className={`${cls} uppercase`} style={style}>
+            <button key={item.label} type="button" data-sound="off" aria-current={current ? "page" : undefined} onClick={() => setMixersOpen(true)} onPointerEnter={() => sound.cue("navHover")} className={`${cls} uppercase`} style={style}>
               {item.label}
             </button>
           );

@@ -137,3 +137,9 @@ html.party main :is(h1, h2, h3, p, span, a, li, address, nav button, footer *) {
   50% { transform: scaleX(0.35); }
 }
 .butterfly-flap { animation: butterfly-flap 0.24s ease-in-out infinite; }
+
+/* On a coloured section (Who's next), the current-page link would vanish in the same colour: go black. */
+html[data-section] nav [aria-current="page"] {
+  color: var(--color-neutral-1000) !important;
+  transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}

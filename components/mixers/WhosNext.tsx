@@ -9,13 +9,13 @@ import { useVHref } from "@/lib/version";
 /**
  * Section/Whos Next (Figma 7372:2334): the other mixers in a row. Hovering a name shows that
  * mixer's icon under it (black versions); click goes to their page. The section colours the page
- * yellow while it is on screen (see SectionColor).
+ * red while it is on screen (see SectionColor); was yellow in the Figma, red since 15 Oct (the Mixers accent).
  */
 export function WhosNext({ others }: { others: Person[] }) {
   const [hover, setHover] = useState<string | null>(null);
   const vhref = useVHref();
   return (
-    <section data-section-color="yellow" className="flex h-[1024px] w-[1440px] flex-col px-8">
+    <section data-section-color="red" className="flex h-[1024px] w-[1440px] flex-col px-8">
       <div className="flex h-[550px] items-end justify-center pb-16">
         <h2 className="t-h5">WHO’S NEXT?</h2>
       </div>

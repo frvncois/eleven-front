@@ -18,12 +18,18 @@ export function SectionColor({ base }: { base: string }) {
         for (const e of entries) {
           const c = (e.target as HTMLElement).dataset.sectionColor;
           main.style.backgroundColor = e.isIntersecting ? `var(--color-${c})` : `var(--color-${base})`;
+          // Lets the nav keep its current-page link readable on the coloured section (globals.css).
+          if (e.isIntersecting) document.documentElement.dataset.section = c;
+          else delete document.documentElement.dataset.section;
         }
       },
       { threshold: 0.45 },
     );
     sections.forEach((s) => io.observe(s));
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      delete document.documentElement.dataset.section;
+    };
   }, [base]);
   return null;
 }
