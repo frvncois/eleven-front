@@ -19,7 +19,7 @@ const LAYOUT: Record<string, { x: number; y: number; icon: { x: number; y: numbe
 };
 
 /**
- * The roster over whatever page you are on (annotation): the page blurs behind royal blue at 50 %,
+ * The roster over whatever page you are on (annotation): the page blurs behind red at 50 % (the Mixers accent),
  * background sound fades out, hovering a name shows its icon, clicking one opens that mixer's page.
  * Clicking anywhere else closes; a "close" tag follows the cursor outside the names. Esc closes too.
  */
@@ -59,7 +59,7 @@ export function MixersOverlay({ open, onClose }: { open: boolean; onClose: () =>
             aria-label="Close"
             data-cursor="close"
             onClick={onClose}
-            className="absolute inset-0 cursor-default bg-royal-blue/50 backdrop-blur-[10px]"
+            className="absolute inset-0 cursor-default bg-red/50 backdrop-blur-[10px]"
           />
           {/* Names are laid out on the 1024-high Figma frame, centred vertically on taller screens. */}
           <div className="pointer-events-none absolute inset-x-0 top-[calc(50%-512px)] h-[1024px]">

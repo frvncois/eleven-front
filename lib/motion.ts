@@ -14,7 +14,7 @@ export const DUR = {
 /** Destination colour of the page sweep, by path. Longest prefix wins. */
 export const SWEEP_COLORS: Record<string, string> = {
   "/": "#0f0d0d",
-  "/mixers": "#032daf",
+  "/mixers": "#ed2024",
   "/longform": "#1a8240",
   "/archive": "#f6eb13",
   "/about": "#ff7fe7",
