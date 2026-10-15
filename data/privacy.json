@@ -1,0 +1,39 @@
+{
+  "title": "Privacy Policy",
+  "sections": [
+    {
+      "id": "privacy-policy",
+      "label": "01  Privacy policy",
+      "paragraphs": [
+        "This website is run by Eleven Sound LLC, 2255 Barry Avenue, Los Angeles, CA 90064.",
+        "We only collect what you choose to send us, like your name and email when you write to us. We use it to reply, and that’s it.",
+        "We don’t sell or share your personal information. We may use privacy-friendly analytics to see which pages get visited, without identifying you.",
+        "Under California law you can ask what we hold about you, or ask us to delete it. Write to [privacy contact email]."
+      ]
+    },
+    {
+      "id": "cookies",
+      "label": "02  Cookies",
+      "paragraphs": [
+        "This site only uses the cookies it needs to work, like remembering whether the sound is on or off. No advertising cookies, no tracking across other sites."
+      ]
+    },
+    {
+      "id": "credits",
+      "label": "03  Credits",
+      "paragraphs": [
+        "Design: lab-a",
+        "Development: François Lemieux",
+        "Photography: [photographer]",
+        "Type: Neue Haas Grotesk, Junicode"
+      ]
+    },
+    {
+      "id": "last-updated",
+      "label": "Last updated",
+      "paragraphs": [
+        "October 2026"
+      ]
+    }
+  ]
+}

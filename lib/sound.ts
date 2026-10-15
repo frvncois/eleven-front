@@ -191,7 +191,7 @@ function createKit() {
       src.stop(t + dur + 0.02)
     },
     /**
-     * Party mode music (Contact / Terms butterfly). A synthesized 124 bpm loop (kick, off-beat hat,
+     * Party mode music (Contact / Privacy butterfly). A synthesized 124 bpm loop (kick, off-beat hat,
      * bass line, stabs) scheduled ahead on the master bus, so the mute toggle still works.
      * Placeholder until Eleven picks a track. `onBeat` fires on every quarter note.
      */

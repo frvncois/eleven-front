@@ -22,7 +22,7 @@ const PALETTE: [string, string][] = [
 type Bouncer = { x: number; y: number; vx: number; vy: number; r: number; vr: number; w: number };
 
 /**
- * The butterfly party (Contact, Terms). On: the page flashes through the brand colours on every
+ * The butterfly party (Contact, Privacy). On: the page flashes through the brand colours on every
  * beat, a synthesized loop plays (placeholder track), and the mixers' icons bounce around the
  * screen. Click the butterfly again, press Esc or leave the page to stop.
  */

@@ -19,7 +19,7 @@ export const SWEEP_COLORS: Record<string, string> = {
   "/archive": "#f6eb13",
   "/about": "#ff7fe7",
   "/contact": "#00a7d9",
-  "/terms": "#0f0d0d",
+  "/privacy": "#0f0d0d",
 };
 
 /** The page's theme colour (its sweep colour), longest path prefix wins. */

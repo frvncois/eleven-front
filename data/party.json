@@ -1,5 +1,5 @@
 {
-  "note": "V2 butterfly easter egg (Contact, Terms): a random one of these fills the screen behind the header. Images stand in for Eleven's random videos; `video` replaces `image` when it arrives, `audio` (public/sounds/party/...) plays in a loop while it is open.",
+  "note": "V2 butterfly easter egg (Contact, Privacy): a random one of these fills the screen behind the header. Images stand in for Eleven's random videos; `video` replaces `image` when it arrives, `audio` (public/sounds/party/...) plays in a loop while it is open.",
   "items": [
     { "image": "/media/party/dog-surfing.webp", "video": null, "audio": null },
     { "image": "/media/party/sheep-bucket.webp", "video": null, "audio": null },

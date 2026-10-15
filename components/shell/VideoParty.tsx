@@ -9,7 +9,7 @@ import { sound } from "@/lib/sound";
 const ITEMS = party.items;
 
 /**
- * V2's butterfly easter egg (Contact, Terms). Click the butterfly: a random picture (later a
+ * V2's butterfly easter egg (Contact, Privacy). Click the butterfly: a random picture (later a
  * video) fills the screen behind the header, with its own music when Eleven's audio arrives.
  * No interface at all: the flapping butterfly is the only way out (Esc works too). Each time it
  * opens, a different one appears.

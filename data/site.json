@@ -60,12 +60,8 @@
     "copyright": "©2026 Eleven",
     "legal": [
       {
-        "label": "Terms of use",
-        "href": "/terms#terms-of-use"
-      },
-      {
-        "label": "Legal Policy",
-        "href": "/terms#privacy-policy"
+        "label": "Privacy Policy",
+        "href": "/privacy"
       }
     ],
     "credits": {

@@ -56,11 +56,8 @@ export default function ContactPage() {
 
       <footer>
         <p className="t-mini absolute bottom-[22px] left-[263.5px]">{footer.copyright}</p>
-        <MiniLink href={footer.legal[0].href} className="absolute bottom-[38px] left-[637px]">
+        <MiniLink href={footer.legal[0].href} className="absolute bottom-[23px] left-[637px]">
           {footer.legal[0].label}
-        </MiniLink>
-        <MiniLink href={footer.legal[1].href} className="absolute bottom-[23px] left-[637px]">
-          {footer.legal[1].label}
         </MiniLink>
         <CreditsPopover label={footer.credits.label} items={footer.credits.items} className="absolute bottom-[23px] left-[845.5px]" />
         <MiniLink href={footer.social[0].href} className="absolute bottom-[39px] left-[1080.5px]">
