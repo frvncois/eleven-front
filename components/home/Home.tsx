@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import home from "@/data/home.json";
 import { sound } from "@/lib/sound";
@@ -33,6 +33,12 @@ export function Home() {
   // Seen earlier in this visit (nav link back home, or a reload): no gate. The logo reopens it.
   const v = useVersion();
   const gate = !useSyncExternalStore(subscribeGate, () => gateSeen(v), () => false);
+
+  // The gate always starts silent, even if sound was on earlier in the visit (Amélie, 15 Oct):
+  // the visitor turns it on here, deliberately.
+  useEffect(() => {
+    if (gate) sound.setMuted(true);
+  }, [gate]);
 
   const choose = (on: boolean) => {
     if (on) {
