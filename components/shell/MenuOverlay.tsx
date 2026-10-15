@@ -60,12 +60,12 @@ export function MenuOverlay({ open, onClose }: { open: boolean; onClose: () => v
             transition={{ duration: 0.6, ease: EASE }}
           >
             <MenuColumns onNavigate={onClose} />
-            <div className="absolute top-6 left-[1330px] flex items-center gap-[7px]">
-              <SoundToggle size={24} />
+            <div className="absolute top-6 right-margin flex h-8 items-center gap-2">
+              <SoundToggle />
               <button
                 type="button"
                 onClick={onClose}
-                className="t-accent flex h-6 items-center bg-neutral-200 px-2 text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50"
+                className="t-accent flex h-8 items-center bg-neutral-200 px-2 text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50"
               >
                 Close
               </button>

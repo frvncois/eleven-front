@@ -94,5 +94,9 @@
     "pause": "pause",
     "play": "play",
     "close": "Close"
+  },
+  "desktopOnly": {
+    "title": "Best heard on a bigger screen.",
+    "text": "This prototype is desktop only for now. Open it on your computer, sound on."
   }
 }

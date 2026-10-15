@@ -143,3 +143,10 @@ html[data-section] nav [aria-current="page"] {
   color: var(--color-neutral-1000) !important;
   transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Phones: the prototype is desktop only for now (components/shell/DesktopOnly). */
+@media (max-width: 767px) {
+  .desktop-only { display: flex; }
+  .stage { display: none; }
+  html, body { overflow: hidden; height: 100%; }
+}

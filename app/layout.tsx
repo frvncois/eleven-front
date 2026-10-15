@@ -8,6 +8,7 @@ import { CursorTag } from "@/components/shell/CursorTag";
 import { ClickSound } from "@/components/shell/ClickSound";
 import { PartyMode } from "@/components/shell/PartyMode";
 import { VersionPill } from "@/components/shell/VersionPill";
+import { DesktopOnly } from "@/components/shell/DesktopOnly";
 
 export const metadata: Metadata = {
   title: { default: "Eleven", template: "%s · Eleven" },
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <CursorTag />
         </div>
         <PageTransition />
+        <DesktopOnly />
       </body>
     </html>
   );

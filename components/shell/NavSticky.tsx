@@ -21,15 +21,15 @@ export function NavSticky({ toggles, tone = "dark" }: { toggles?: React.ReactNod
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icons/logo-floss.webp" alt="" width={106.651} height={113.346} className={tone === "light" ? "invert" : ""} />
         </Link>
-        {/* Every control here is 24 px tall: page toggles are scaled down from their 32 px V1 size. */}
-        <div className="pointer-events-auto flex h-6 items-center gap-2">
-          <div className="flex h-6 items-center gap-2 [&_button]:size-6! [&_img]:size-6!">{toggles}</div>
-          <SoundToggle size={24} />
+        {/* Every control here is 32 px tall, same as V1's toggles (Amélie, 15 Oct; was 24). */}
+        <div className="pointer-events-auto flex h-8 items-center gap-2">
+          <div className="flex h-8 items-center gap-2">{toggles}</div>
+          <SoundToggle />
           <button
             type="button"
             data-sound="off"
             onClick={() => setOpen(true)}
-            className="t-accent flex h-6 items-center bg-neutral-200 px-2 text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50"
+            className="t-accent flex h-8 items-center bg-neutral-200 px-2 text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50"
           >
             Menu
           </button>
