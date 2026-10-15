@@ -16,7 +16,7 @@ export const SWEEP_COLORS: Record<string, string> = {
   "/": "#0f0d0d",
   "/mixers": "#032daf",
   "/longform": "#1a8240",
-  "/index": "#f6eb13",
+  "/archive": "#f6eb13",
   "/about": "#ff7fe7",
   "/contact": "#00a7d9",
   "/terms": "#0f0d0d",

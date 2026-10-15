@@ -3,9 +3,10 @@ import index from "@/data/index.json";
 import projects from "@/data/projects.json";
 import { IndexView, type Tile } from "@/components/index/IndexView";
 
-export const metadata: Metadata = { title: "Index" };
+export const metadata: Metadata = { title: "Archive" };
 
-export default function IndexPage() {
+/** Archive (Figma V1 · 08 · Index, renamed by Amélie 2026-10-15). */
+export default function ArchivePage() {
   const tiles = index.tiles
     .map((t) => {
       const p = projects.find((x) => x.slug === t.slug);

@@ -7,9 +7,9 @@
       "color": "royal-blue"
     },
     {
-      "label": "Index",
-      "href": "/index",
-      "match": "/index",
+      "label": "Archive",
+      "href": "/archive",
+      "match": "/archive",
       "color": "yellow"
     },
     {
