@@ -29,7 +29,7 @@ const loadFrames = () =>
  * Drawn frame by frame from the exported SVG animation, so each state change starts from
  * wherever the wave currently is.
  */
-export function SoundToggle() {
+export function SoundToggle({ size = 32 }: { size?: number }) {
   const s = useSound();
   const on = s.unlocked && !s.muted;
   const [frames, setFrames] = useState<Frames | null>(null);
@@ -86,9 +86,10 @@ export function SoundToggle() {
       aria-label={on ? "Mute sound" : "Turn sound on"}
       aria-pressed={on}
       onClick={() => s.toggle()}
-      className="block size-8 cursor-pointer bg-neutral-100 transition-opacity duration-200 ease-out hover:opacity-50"
+      className="block cursor-pointer bg-neutral-100 transition-opacity duration-200 ease-out hover:opacity-50"
+      style={{ width: size, height: size }}
     >
-      <svg viewBox="0 0 100 100" className="block size-8" aria-hidden>
+      <svg viewBox="0 0 100 100" className="block size-full" aria-hidden>
         <path ref={pathRef} fill="#0e1116" />
       </svg>
     </button>

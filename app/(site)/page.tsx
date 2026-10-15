@@ -1,5 +1,6 @@
-import { Home } from "@/components/home/Home";
+import { Chooser } from "@/components/chooser/Chooser";
 
-export default function HomePage() {
-  return <Home />;
+/** "/": pick V1 (inline nav) or V2 (overlay nav). */
+export default function ChooserPage() {
+  return <Chooser />;
 }

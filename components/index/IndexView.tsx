@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { LayoutGroup, motion, motionValue, type MotionValue } from "framer-motion";
 import type { Project } from "@/lib/content";
-import { NavBar } from "@/components/shell/NavBar";
-import { NavSub } from "@/components/shell/NavSub";
+import { Chrome } from "@/components/shell/Chrome";
 import { Player } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 
@@ -61,8 +60,7 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
         )}
       </LayoutGroup>
 
-      <NavBar />
-      <NavSub
+      <Chrome
         toggles={
           <button
             type="button"

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import site from "@/data/site.json";
-import { NavBar } from "@/components/shell/NavBar";
-import { NavSub } from "@/components/shell/NavSub";
+import { Chrome } from "@/components/shell/Chrome";
 import { ContactLink } from "@/components/ui/ContactLink";
 import { MiniLink } from "@/components/ui/MiniLink";
 import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
@@ -16,7 +15,6 @@ export default function ContactPage() {
   const [jordan, adrea] = contact.people;
   return (
     <main className="relative h-[max(var(--vh),1024px)] bg-neutral-0">
-      <NavBar />
 
       <h1 className="t-h2-indent absolute top-[149px] left-[32px] w-[822px]">{contact.title}</h1>
 
@@ -71,7 +69,7 @@ export default function ContactPage() {
         </MiniLink>
       </footer>
 
-      <NavSub toggles={<ToggleButterfly />} />
+      <Chrome toggles={<ToggleButterfly />} />
     </main>
   );
 }

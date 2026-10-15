@@ -23,7 +23,8 @@ export const SWEEP_COLORS: Record<string, string> = {
 };
 
 /** The page's theme colour (its sweep colour), longest path prefix wins. */
-export function themeColor(path: string) {
+export function themeColor(rawPath: string) {
+  const path = rawPath.replace(/^\/v[12](?=\/|$)/, "") || "/"; // versions share the accents
   let best = "/";
   for (const k of Object.keys(SWEEP_COLORS)) {
     if (k !== "/" && (path === k || path.startsWith(k + "/")) && k.length > best.length) best = k;

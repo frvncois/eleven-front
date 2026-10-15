@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import about from "@/data/about.json";
 import team from "@/data/team.json";
-import { NavBar } from "@/components/shell/NavBar";
-import { NavSub } from "@/components/shell/NavSub";
+import { Chrome } from "@/components/shell/Chrome";
 import { TeamCard } from "@/components/about/TeamCard";
 import { RoomsRow } from "@/components/about/RoomsRow";
 import { StorySticker } from "@/components/about/StorySticker";
@@ -16,7 +15,6 @@ export default function AboutPage() {
   const { story, services, rooms } = about;
   return (
     <main className="bg-bg">
-      <NavBar />
 
       {/* Story. The sticker starts just above the first paragraph (x 264, the second paragraph's edge), 134 × 81. */}
       <section className="relative flex flex-col items-end px-[22px] pt-[604px]">
@@ -84,7 +82,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <NavSub />
+      <Chrome />
     </main>
   );
 }

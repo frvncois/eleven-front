@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { Project } from "@/lib/content";
-import { NavBar } from "@/components/shell/NavBar";
-import { NavSub } from "@/components/shell/NavSub";
+import { Chrome } from "@/components/shell/Chrome";
 import { Player } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { EASE_SWEEP } from "@/lib/motion";
@@ -135,8 +134,7 @@ export function LongformReel({ films }: { films: Film[] }) {
         ))}
       </nav>
 
-      <NavBar tone="light" />
-      <NavSub />
+      <Chrome tone="light" />
       <Player films={films} index={playing} onIndex={setPlaying} onClose={() => setPlaying(null)} />
     </main>
   );

@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import type { Person, Project } from "@/lib/content";
-import { NavBar } from "@/components/shell/NavBar";
-import { NavSub } from "@/components/shell/NavSub";
+import { Chrome } from "@/components/shell/Chrome";
 import { SectionColor } from "@/components/shell/SectionColor";
 import { ProjectCard } from "./ProjectCard";
 import { WhosNext } from "./WhosNext";
@@ -17,7 +16,6 @@ export function MixerPage({ mixer, spots, others }: { mixer: Person; spots: Proj
 
   return (
     <main data-page className="flex flex-col items-center gap-[88px] bg-neutral-0 pt-[308px] pb-[120px]">
-      <NavBar />
       <SectionColor base="neutral-0" />
       <h1 className="t-display-big w-full text-center">{mixer.name}</h1>
       <section className="flex w-full flex-col gap-2 px-margin">
@@ -34,7 +32,7 @@ export function MixerPage({ mixer, spots, others }: { mixer: Person; spots: Proj
         ))}
       </section>
       <WhosNext others={others} />
-      <NavSub />
+      <Chrome />
       <Player films={spots} index={playing} onIndex={setPlaying} onClose={() => setPlaying(null)} />
     </main>
   );

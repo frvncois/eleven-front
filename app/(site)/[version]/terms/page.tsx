@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import terms from "@/data/terms.json";
-import { NavBar } from "@/components/shell/NavBar";
-import { NavSub } from "@/components/shell/NavSub";
+import { Chrome } from "@/components/shell/Chrome";
 import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
 
 export const metadata: Metadata = { title: "Terms & Policy" };
@@ -10,7 +9,6 @@ export const metadata: Metadata = { title: "Terms & Policy" };
 export default function TermsPage() {
   return (
     <main className="bg-bg">
-      <NavBar />
       <section className="px-[22px] pt-[240px] pb-[160px]">
         <h1 className="t-h2">{terms.title}</h1>
       </section>
@@ -24,7 +22,7 @@ export default function TermsPage() {
           </div>
         </section>
       ))}
-      <NavSub toggles={<ToggleButterfly />} />
+      <Chrome toggles={<ToggleButterfly />} />
     </main>
   );
 }
