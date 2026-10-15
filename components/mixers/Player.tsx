@@ -8,6 +8,9 @@ import { mixerBySlug } from "@/lib/content";
 import { sound, useSound } from "@/lib/sound";
 import { EASE_DISSOLVE } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
+import site from "@/data/site.json";
+
+const labels = site.player;
 
 /**
  * Open a film WITH sound, even if the visitor muted the site before: watching is a deliberate act.
@@ -30,16 +33,27 @@ function embedUrl(vimeo: string, muted: boolean) {
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
-type Props = { films: Project[]; index: number | null; onIndex: (i: number) => void; onClose: () => void };
+type Props = {
+  films: Project[];
+  index: number | null;
+  onIndex: (i: number) => void;
+  onClose: () => void;
+  /**
+   * Longform (annotation on Longform/Reel + Player/Info Panel Description): the info panel also shows
+   * the film's description, and pausing leaves the player, back to the reel with its preview running.
+   */
+  longform?: boolean;
+};
 
 /**
  * V1 · 06 · Project player (Figma 7345:1485, Player/Stage 7356:4931). An overlay over the mixer page,
  * so closing is instant. The film fills the screen; the films of this mixer sit on a horizontal strip
  * and the next one slides in when a film ends. Over it: title + mixer top-left, the credits "+" panel
  * mid-left (Player/Info Panel), time / scrub / duration bottom-left, Close top-right, sound
- * bottom-right. Clicking the film pauses / plays (annotation), with a play / pause cursor tag.
+ * bottom-right. Pause / play is a "pause" / "play" label left of the time, and clicking the film does
+ * the same (annotation on Player/Stage), with a play / pause cursor tag.
  */
-export function Player({ films, index, onIndex, onClose }: Props) {
+export function Player({ films, index, onIndex, onClose, longform = false }: Props) {
   const open = index !== null;
   const film = open ? films[index] : null;
   const s = useSound();
@@ -106,8 +120,10 @@ export function Player({ films, index, onIndex, onClose }: Props) {
   const toggle = useCallback(() => {
     const p = playerRef.current;
     if (!p) return;
+    // Longform: pause = back to the reel (its preview takes over), not a frozen frame.
+    if (playing && longform) return onClose();
     (playing ? p.pause() : p.play()).catch(() => {});
-  }, [playing]);
+  }, [playing, longform, onClose]);
 
   const seek = (e: React.PointerEvent<HTMLDivElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
@@ -185,23 +201,34 @@ export function Player({ films, index, onIndex, onClose }: Props) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={info ? "/icons/icon-minus.svg" : "/icons/icon-plus.svg"} alt="" width={24} height={24} />
               </button>
-              <motion.ul
-                className="flex flex-col overflow-hidden pt-4 text-neutral-1000"
+              <motion.div
+                className="flex flex-col gap-4 overflow-hidden pt-4 text-neutral-1000"
                 initial={false}
                 animate={{ height: info ? "auto" : 16, opacity: info ? 1 : 0 }}
                 transition={{ duration: 0.3, ease: EASE_DISSOLVE }}
               >
-                {credits.map(([name, role]) => (
-                  <li key={role} className="flex w-max items-start gap-2 bg-bg-alt px-2 py-1 whitespace-nowrap">
-                    <span className="t-body-lg">{name}</span>
-                    <span className="t-caption">{role}</span>
-                  </li>
-                ))}
-              </motion.ul>
+                {/* Player/Info Panel Description: longform films carry a description above the credits. */}
+                {longform && film.description && <p className="t-body w-[304px] bg-bg-alt px-2 py-1">{film.description}</p>}
+                <ul className="flex flex-col">
+                  {credits.map(([name, role]) => (
+                    <li key={role} className="flex w-max items-start gap-2 bg-bg-alt px-2 py-1 whitespace-nowrap">
+                      <span className="t-body-lg">{name}</span>
+                      <span className="t-caption">{role}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
             </div>
 
-            {/* Controls: 0:12 ——— 0:30 (pause / play lives on the cursor tag) */}
+            {/* Film player: pause | 0:12 ——— 0:30. The label is a button (Figma film-player 7439:3578). */}
             <div className="pointer-events-auto absolute right-0 left-0 flex h-3 items-center gap-[25px]" style={{ top: "calc(var(--vh) - 60px)" }}>
+              <button
+                type="button"
+                onClick={toggle}
+                className="t-h6 w-[39px] text-left text-neutral-0 transition-opacity duration-200 ease-out hover:opacity-50"
+              >
+                {playing ? labels.pause : labels.play}
+              </button>
               <div className="flex w-[397px] items-center gap-4 text-bg-alt">
                 <span className="t-h6 tabular-nums">{fmt(time)}</span>
                 <div onPointerDown={seek} className="relative flex h-3 flex-1 cursor-pointer items-center">
@@ -219,7 +246,7 @@ export function Player({ films, index, onIndex, onClose }: Props) {
             onClick={onClose}
             className="t-accent absolute top-[24.38px] left-[1359.5px] bg-neutral-200 px-2 py-1 text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50"
           >
-            Close
+            {labels.close}
           </button>
           <div className="absolute left-[1383.5px] border border-neutral-0" style={{ top: "calc(var(--vh) - 56px)" }}>
             <SoundToggle />

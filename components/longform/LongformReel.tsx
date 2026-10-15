@@ -135,7 +135,7 @@ export function LongformReel({ films }: { films: Film[] }) {
       </nav>
 
       <Chrome tone="light" />
-      <Player films={films} index={playing} onIndex={setPlaying} onClose={() => setPlaying(null)} />
+      <Player films={films} index={playing} onIndex={setPlaying} onClose={() => setPlaying(null)} longform />
     </main>
   );
 }

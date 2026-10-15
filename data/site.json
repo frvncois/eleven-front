@@ -89,5 +89,10 @@
         "href": "https://www.instagram.com/eleven_sound"
       }
     ]
+  },
+  "player": {
+    "pause": "pause",
+    "play": "play",
+    "close": "Close"
   }
 }

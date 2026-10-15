@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useVersion } from "@/lib/version";
+import { StickerHop } from "./StickerHop";
 
 type Props = { src: string; width: number; height: number; top: number; left: number; end: number };
 
@@ -10,8 +12,15 @@ type Props = { src: string; width: number; height: number; top: number; left: nu
  * on screen while the story scrolls past, wobbling with the scroll speed (a lagging slide and a tilt,
  * after ascension.pegassi.be/about), and fades out as the text ends, before the snow globe comes in.
  * `top`/`left`: resting slot in the section; `end`: section y where it must be gone.
+ * V2 has its own behaviour (annotation on the V2 ointment): it hops from one "Eleven" to the next.
  */
-export function StorySticker({ src, width, height, top, left, end }: Props) {
+export function StorySticker(props: Props) {
+  const version = useVersion();
+  return version === "v2" ? <StickerHop src={props.src} width={props.width} height={props.height} /> : <StickyWobble {...props} />;
+}
+
+/** V1: holds at 42 % of the screen and wobbles with the scroll speed. */
+function StickyWobble({ src, width, height, top, left, end }: Props) {
   const slot = useRef<HTMLDivElement>(null);
   const sticker = useRef<HTMLDivElement>(null);
   const velocity = useMotionValue(0);

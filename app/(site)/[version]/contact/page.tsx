@@ -5,6 +5,7 @@ import { ContactLink } from "@/components/ui/ContactLink";
 import { MiniLink } from "@/components/ui/MiniLink";
 import { CreditsPopover } from "@/components/ui/CreditsPopover";
 import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
+import { Clock } from "@/components/shell/Clock";
 
 export const metadata: Metadata = { title: "Contact" };
 
@@ -13,8 +14,12 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, "")}`;
 /**
  * V1 · 10 · Contact (Figma 7345:1649). Always exactly one screen, never scrolls: positions use the
  * Figma frame's own percentages of the height, so the layout breathes with any screen; footer on the bottom.
+ * V2 (Figma 7451:2292, annotation "time machine" on 7642:2397): the footer row also runs the studio's
+ * LA clock, in the credits' column; Credits move one column left, like the V2 frame.
  */
-export default function ContactPage() {
+export default async function ContactPage({ params }: { params: Promise<{ version: string }> }) {
+  const { version } = await params;
+  const v2 = version === "v2";
   const { contact, footer } = site;
   const [jordan, adrea] = contact.people;
   return (
@@ -59,7 +64,12 @@ export default function ContactPage() {
         <MiniLink href={footer.legal[0].href} className="absolute bottom-[23px] left-[637px]">
           {footer.legal[0].label}
         </MiniLink>
-        <CreditsPopover label={footer.credits.label} items={footer.credits.items} className="absolute bottom-[23px] left-[845.5px]" />
+        <CreditsPopover
+          label={footer.credits.label}
+          items={footer.credits.items}
+          className={`absolute bottom-[23px] ${v2 ? "left-[493px]" : "left-[845.5px]"}`}
+        />
+        {v2 && <Clock className="t-mini absolute bottom-[23px] left-[845.5px]" />}
         <MiniLink href={footer.social[0].href} className="absolute bottom-[39px] left-[1080.5px]">
           {footer.social[0].label}
         </MiniLink>
