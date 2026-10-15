@@ -220,15 +220,9 @@ export function Player({ films, index, onIndex, onClose, longform = false }: Pro
               </motion.div>
             </div>
 
-            {/* Film player: pause | 0:12 ——— 0:30. The label is a button (Figma film-player 7439:3578). */}
+            {/* Film player: 0:12 ——— 0:30. No pause / play label (Amélie, 14 Oct: the cursor tag says it,
+                overriding the Figma film-player annotation); clicking the film pauses / plays. */}
             <div className="pointer-events-auto absolute right-0 left-0 flex h-3 items-center gap-[25px]" style={{ top: "calc(var(--vh) - 60px)" }}>
-              <button
-                type="button"
-                onClick={toggle}
-                className="t-h6 w-[39px] text-left text-neutral-0 transition-opacity duration-200 ease-out hover:opacity-50"
-              >
-                {playing ? labels.pause : labels.play}
-              </button>
               <div className="flex w-[397px] items-center gap-4 text-bg-alt">
                 <span className="t-h6 tabular-nums">{fmt(time)}</span>
                 <div onPointerDown={seek} className="relative flex h-3 flex-1 cursor-pointer items-center">
