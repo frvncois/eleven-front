@@ -9,6 +9,8 @@ import { useSyncExternalStore } from "react";
 const listeners = new Set<() => void>();
 let on = false;
 let plays = -1;
+let pick = -1; // V2: which item shows, random but never the same twice in a row
+let size = 1;
 const KEY = "eleven-party-plays";
 
 export const party = {
@@ -18,6 +20,10 @@ export const party = {
   get plays() {
     return plays;
   },
+  /** V2 registers how many items it can show, so each switch-on picks a new random one. */
+  setSize(n: number) {
+    size = Math.max(1, n);
+  },
   set(v: boolean) {
     if (v && !on) {
       try {
@@ -26,6 +32,9 @@ export const party = {
       } catch {
         plays += 1;
       }
+      let next = Math.floor(Math.random() * size);
+      if (size > 1 && next === pick) next = (next + 1 + Math.floor(Math.random() * (size - 1))) % size;
+      pick = next;
     }
     on = v;
     listeners.forEach((l) => l());
@@ -46,4 +55,8 @@ export function useParty() {
 
 export function usePartyPlays() {
   return useSyncExternalStore(subscribe, () => plays, () => -1);
+}
+
+export function usePartyPick() {
+  return useSyncExternalStore(subscribe, () => pick, () => -1);
 }
