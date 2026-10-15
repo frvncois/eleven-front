@@ -70,7 +70,18 @@
     ],
     "credits": {
       "label": "Credits",
-      "href": "/terms#credits"
+      "items": [
+        {
+          "name": "Amélie Labrosse",
+          "role": "Web Design",
+          "href": "https://lab-a.me"
+        },
+        {
+          "name": "François Lemieux",
+          "role": "Dev",
+          "href": null
+        }
+      ]
     },
     "social": [
       {

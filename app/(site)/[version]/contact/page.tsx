@@ -3,6 +3,7 @@ import site from "@/data/site.json";
 import { Chrome } from "@/components/shell/Chrome";
 import { ContactLink } from "@/components/ui/ContactLink";
 import { MiniLink } from "@/components/ui/MiniLink";
+import { CreditsPopover } from "@/components/ui/CreditsPopover";
 import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
 
 export const metadata: Metadata = { title: "Contact" };
@@ -61,9 +62,7 @@ export default function ContactPage() {
         <MiniLink href={footer.legal[1].href} className="absolute bottom-[23px] left-[637px]">
           {footer.legal[1].label}
         </MiniLink>
-        <MiniLink href={footer.credits.href} className="absolute bottom-[23px] left-[845.5px]">
-          {footer.credits.label}
-        </MiniLink>
+        <CreditsPopover label={footer.credits.label} items={footer.credits.items} className="absolute bottom-[23px] left-[845.5px]" />
         <MiniLink href={footer.social[0].href} className="absolute bottom-[39px] left-[1080.5px]">
           {footer.social[0].label}
         </MiniLink>

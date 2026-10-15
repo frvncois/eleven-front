@@ -30,7 +30,7 @@ export function VersionPill() {
   if (!current) return null;
   const chip = "t-accent px-2 py-1 transition-opacity duration-200 ease-out hover:opacity-50";
   return (
-    <nav aria-label="Prototype versions" className="fixed bottom-4 left-1/2 z-[55] flex -translate-x-1/2 items-center gap-px">
+    <nav aria-label="Prototype versions" className="fixed bottom-16 left-1/2 z-[55] flex -translate-x-1/2 items-center gap-px">
       {VERSIONS.map((v) =>
         v === current ? (
           <span key={v} aria-current="page" className={`${chip} bg-neutral-1000 text-neutral-0 hover:opacity-100`}>
