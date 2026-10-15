@@ -17,6 +17,7 @@ export function NavSub({ toggles, wordmark = true }: { toggles?: React.ReactNode
       {wordmark && (
       <Link
         href={vhref("/")}
+        data-gate
         aria-label="Eleven, home"
         className="fixed bottom-4 left-margin z-50 flex h-[27.341px] w-[101.18px] items-center justify-center mix-blend-difference transition-opacity duration-300 ease-out hover:opacity-50"
       >

@@ -73,6 +73,7 @@ export function MenuOverlay({ open, onClose }: { open: boolean; onClose: () => v
             {/* The floss logo takes you home (and closes the menu). */}
             <Link
               href={vhref("/")}
+              data-gate
               onClick={onClose}
               aria-label="Eleven, home"
               className="absolute top-[438px] left-[-20px] block transition-opacity duration-300 ease-out hover:opacity-50"

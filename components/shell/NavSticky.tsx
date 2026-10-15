@@ -17,7 +17,7 @@ export function NavSticky({ toggles, tone = "dark" }: { toggles?: React.ReactNod
   return (
     <>
       <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-between p-margin">
-        <Link href={vhref("/")} aria-label="Eleven, home" className="pointer-events-auto block transition-opacity duration-300 ease-out hover:opacity-50">
+        <Link href={vhref("/")} data-gate aria-label="Eleven, home" className="pointer-events-auto block transition-opacity duration-300 ease-out hover:opacity-50">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icons/logo-floss.webp" alt="" width={106.651} height={113.346} className={tone === "light" ? "invert" : ""} />
         </Link>

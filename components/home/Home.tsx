@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import home from "@/data/home.json";
 import { sound } from "@/lib/sound";
@@ -10,21 +10,11 @@ import { MenuColumns } from "@/components/shell/MenuColumns";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 import { Clock } from "@/components/shell/Clock";
 import { useVersion } from "@/lib/version";
+import { gateSeen, setGateSeen, subscribeGate } from "@/lib/gate";
 import { HomeReel } from "./HomeReel";
 
-// One gate per version per visit (V1 aqua, V2 red), so both can be seen when comparing.
-const gateKey = (v: string) => `eleven-gate-${v}`;
 const EASE = [0.42, 0, 0.58, 1] as const; // Figma "ease in and out", the gate → home smart animate
 const DURATION = 1.2;
-
-const noop = () => () => {};
-const readSeen = (v: string) => {
-  try {
-    return sessionStorage.getItem(gateKey(v)) === "1";
-  } catch {
-    return false;
-  }
-};
 
 // The ELEVEN shape: big on the gate (Figma 7449:6447), bottom-left on the home (7427:6782).
 const SHAPE = {
@@ -35,26 +25,21 @@ const SHAPE = {
 /**
  * V1 · 01 · Gate (7449:6439) → V1 · 02 · Home (7345:1333); V2: red gate (7345:1290) → V2 · 02 · Home
  * (7345:1310), the menu laid out over the reel and the LA clock; the shape lands where V1's does.
- * The gate asks for sound once per visit (session). Choosing lifts the aqua panel away while the
+ * The gate asks for sound once per visit (session), and again whenever the logo takes you home. Choosing lifts the aqua panel away while the
  * ELEVEN shape shrinks into its home position over the reel, 1.2 s ease-in-out, as in the prototype.
  * "Sound on" also unlocks audio (the browser needs that click).
  */
 export function Home() {
-  // Seen earlier in this visit (client navigation back home, or a reload): no gate.
+  // Seen earlier in this visit (nav link back home, or a reload): no gate. The logo reopens it.
   const v = useVersion();
-  const seen = useSyncExternalStore(noop, () => readSeen(v), () => false);
-  const [chosen, setChosen] = useState(false);
-  const gate = !seen && !chosen;
+  const gate = !useSyncExternalStore(subscribeGate, () => gateSeen(v), () => false);
 
   const choose = (on: boolean) => {
     if (on) {
       sound.setMuted(false);
       sound.unlock();
     } else sound.setMuted(true);
-    try {
-      sessionStorage.setItem(gateKey(v), "1");
-    } catch {}
-    setChosen(true);
+    setGateSeen(v, true);
   };
 
   // V2 uses V1's placement and angle too (Amélie, 15 Oct), not the 2.71° tilt of the V2 frame.
