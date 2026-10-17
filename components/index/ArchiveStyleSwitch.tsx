@@ -4,10 +4,12 @@ import Link from "next/link";
 export const ARCHIVE_STYLES = [
   { key: "ball", href: "/archive", label: "Fisheye" },
   { key: "vanish", href: "/archive/vanish", label: "Vanish" },
-  { key: "lanes", href: "/archive/lanes", label: "Lanes" },
-  { key: "corridor", href: "/archive/corridor", label: "Corridor" },
-  { key: "floor", href: "/archive/floor", label: "Floor" },
-  { key: "fly", href: "/archive/fly", label: "Fly" },
+  { key: "tilt", href: "/archive/tilt", label: "Tilt" },
+  // Too much (Amélie, Oct 17: the projects don't read): out of the chips, pages kept.
+  { key: "lanes", href: "/archive/lanes", label: "Lanes", hidden: true },
+  { key: "corridor", href: "/archive/corridor", label: "Corridor", hidden: true },
+  { key: "floor", href: "/archive/floor", label: "Floor", hidden: true },
+  { key: "fly", href: "/archive/fly", label: "Fly", hidden: true },
 ] as const;
 
 export type ArchiveStyle = (typeof ARCHIVE_STYLES)[number]["key"];
@@ -15,12 +17,12 @@ export type ArchiveStyle = (typeof ARCHIVE_STYLES)[number]["key"];
 /**
  * Switch between the Archive versions (Amélie, Oct 17): one grey chip per version next to the view
  * toggle, the current one in the selected grey (neutral 300), as on every toggle of the site.
- * Lanes, Corridor, Floor and Fly are prototypes of the vanishing point on a sample of projects.
+ * Tilt is the subtle vanishing point; Lanes, Corridor, Floor and Fly (too much) only show on their own page.
  */
 export function ArchiveStyleSwitch({ current }: { current: ArchiveStyle }) {
   return (
     <div className="flex gap-1">
-      {ARCHIVE_STYLES.map((s) =>
+      {ARCHIVE_STYLES.filter((s) => s.key === current || !("hidden" in s)).map((s) =>
         s.key === current ? (
           <span key={s.key} aria-current="page" className="t-accent block bg-neutral-300 px-2 py-1 whitespace-nowrap">
             {s.label}
