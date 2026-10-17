@@ -3,7 +3,7 @@
 import { party, useParty } from "@/lib/party";
 
 /**
- * Toggle/Butterfly (Figma 7439:5652). Click to throw a party (PartyMode): Still = the butterfly,
+ * Toggle/Butterfly (Figma 7439:5652). Click for the funny-animals easter egg (PartyMode → VideoParty): Still = the butterfly,
  * Active = grey chip with the butterfly flapping.
  */
 export function ToggleButterfly() {

@@ -122,15 +122,6 @@ html.lenis body { height: auto; }
 }
 
 
-/* Party mode (butterfly toggle): the page takes the beat's colour, text follows for contrast. */
-html.party main,
-html.party body {
-  background-color: var(--party-bg) !important;
-  transition: none !important;
-}
-html.party main :is(h1, h2, h3, p, span, a, li, address, nav button, footer *) {
-  color: var(--party-ink) !important;
-}
 
 @keyframes butterfly-flap {
   0%, 100% { transform: scaleX(1); }

@@ -5,18 +5,21 @@ import { AnimatePresence, motion } from "framer-motion";
 import party from "@/data/party.json";
 import { party as partyStore, usePartyPick } from "@/lib/party";
 import { sound } from "@/lib/sound";
+import { useVersion } from "@/lib/version";
 
 const ITEMS = party.items;
 
 /**
- * V2's butterfly easter egg (Contact, Privacy). Click the butterfly: a random picture (later a
- * video) fills the screen behind the header, with its own music when Eleven's audio arrives.
+ * The butterfly easter egg (Contact, Privacy), both versions. Click the butterfly: a random picture
+ * (later a video) fills the screen behind the nav, with its own music when Eleven's audio arrives.
  * No interface at all: the flapping butterfly is the only way out (Esc works too). Each time it
  * opens, a different one appears.
  */
 export function VideoParty({ on }: { on: boolean }) {
   const pick = usePartyPick();
   const item = ITEMS[Math.max(0, pick) % ITEMS.length];
+  // The reveal opens from the butterfly: V2 header top right, V1 Nav/Sub bottom right.
+  const origin = useVersion() === "v2" ? "96% 3%" : "97% 97%";
 
   useEffect(() => partyStore.setSize(ITEMS.length), []);
 
@@ -50,10 +53,10 @@ export function VideoParty({ on }: { on: boolean }) {
         <motion.div
           key={pick}
           aria-hidden
-          // Under the sticky header (z-50), so the butterfly stays on top and closes it.
+          // Under the navs (z-50), so the butterfly stays on top and closes it.
           className="fixed inset-0 z-[45] overflow-hidden bg-neutral-1000"
-          initial={{ clipPath: "circle(0% at 96% 3%)" }}
-          animate={{ clipPath: "circle(160% at 96% 3%)" }}
+          initial={{ clipPath: `circle(0% at ${origin})` }}
+          animate={{ clipPath: `circle(160% at ${origin})` }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: [0.62, 0.05, 0.01, 0.99] }}
         >

@@ -32,7 +32,7 @@ const CUES = {
 } satisfies Record<string, Cue>
 const seqPos = new Map<string, number>()
 
-/** The party loop: 124 bpm kick, off-beat hat, bass line, stabs, scheduled ahead into `out`. Returns the timer id. */
+/** A party loop (used through the wall by the "party" room preset): 124 bpm kick, off-beat hat, bass line, stabs, scheduled ahead into `out`. Returns the timer id. */
 function beatLoop(c: AudioContext, out: AudioNode, onBeat?: (beat: number) => void) {
   const bpm = 124
   const sixteenth = 60 / bpm / 4
@@ -102,7 +102,6 @@ function createKit() {
   const buffers = new Map<string, Promise<AudioBuffer | null>>()
   const lastTake = new Map<string, number>()
   const media = new Set<HTMLMediaElement>()
-  let party: { timer: number; out: GainNode } | null = null
   const emit = () => listeners.forEach((l) => l())
 
   const ramp = (g: GainNode | null, to: number, dur = FADE) => {
@@ -243,31 +242,6 @@ function createKit() {
       src.connect(bp).connect(g).connect(master)
       src.start(t)
       src.stop(t + dur + 0.02)
-    },
-    /**
-     * Party mode music (Contact / Privacy butterfly). A synthesized 124 bpm loop (kick, off-beat hat,
-     * bass line, stabs) scheduled ahead on the master bus, so the mute toggle still works.
-     * Placeholder until Eleven picks a track. `onBeat` fires on every quarter note.
-     */
-    startParty(onBeat: (beat: number) => void) {
-      kit.stopParty()
-      if (!ctx || !master) return
-      const c = ctx
-      const out = c.createGain()
-      out.gain.value = 0.55
-      out.connect(master)
-      const timer = beatLoop(c, out, onBeat)
-      party = { timer, out }
-    },
-    stopParty() {
-      if (!party) return
-      window.clearInterval(party.timer)
-      const { out } = party
-      if (ctx) {
-        out.gain.setTargetAtTime(0, ctx.currentTime, 0.08)
-        window.setTimeout(() => out.disconnect(), 600)
-      }
-      party = null
     },
     /**
      * A room's ambience for "Hear the rooms": Eleven's recording when `src` is given (looped), otherwise a
