@@ -4,32 +4,26 @@ import { useState } from "react";
 import type { Person, Project } from "@/lib/content";
 import { Chrome } from "@/components/shell/Chrome";
 import { SectionColor } from "@/components/shell/SectionColor";
-import { ProjectCard } from "./ProjectCard";
+import { VanishStrip } from "@/components/lab/VanishStrip";
 import { WhosNext } from "./WhosNext";
 import { Player, openWithSound } from "./Player";
 
-/** V1 · 05 · Mixer · Grid (Figma 7345:1378): name, three-up grid of spots, Who's next. */
+/**
+ * Mixer page: name, the spots on the Warp carousel, Who's next. The carousel (Figma 7654:1821) is
+ * flat at rest and bends into the ELEVEN wordmark's perspective as it moves (depth 1.25, titles on
+ * hover only), picked by Amélie from the carousel lab on Oct 17. Replaces the three-up grid.
+ */
 export function MixerPage({ mixer, spots, others }: { mixer: Person; spots: Project[]; others: Person[] }) {
   const [playing, setPlaying] = useState<number | null>(null);
-  const rows: Project[][] = [];
-  for (let i = 0; i < spots.length; i += 3) rows.push(spots.slice(i, i + 3));
 
   return (
     <main data-page className="flex flex-col items-center gap-[88px] bg-neutral-0 pt-[308px] pb-[120px]">
       <SectionColor base="neutral-0" />
       <h1 className="t-display-big w-full text-center">{mixer.name}</h1>
-      <section className="flex w-full flex-col gap-2 px-margin">
-        {rows.map((row, i) => (
-          <div key={i} className="flex h-[353px] gap-2">
-            {row.map((p) => (
-              <ProjectCard key={p.slug} project={p} onOpen={(x) => openWithSound(() => setPlaying(spots.indexOf(x)))} />
-            ))}
-            {/* Keep the three-column rhythm on a short last row. */}
-            {Array.from({ length: 3 - row.length }).map((_, k) => (
-              <div key={`pad-${k}`} className="flex-1" />
-            ))}
-          </div>
-        ))}
+      <section aria-label="Projects" className="relative h-[440px] w-full overflow-x-clip">
+        <div className="absolute inset-x-0 top-1/2">
+          <VanishStrip inPage films={spots} mode="warp" depth={1.25} titles={false} onOpen={(i) => openWithSound(() => setPlaying(i))} />
+        </div>
       </section>
       <WhosNext others={others} />
       <Chrome />

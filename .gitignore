@@ -57,3 +57,4 @@ deno.lock
 
 # Raw Figma exports (masters, kept locally). The site ships the WebP/MP4 in public/images/figma
 /design/exports
+/.next-lab/
