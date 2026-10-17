@@ -19,13 +19,14 @@ const MID_W = 448;
 const BIG_W = 564;
 const GAP = 16;
 const STEP = 300; // wheel distance from one project to the next
-// Grid: the Figma field spread out so there is air between projects (Amélie, Oct 17). Tile sizes stay.
-const SPREAD = 1.2;
+// Grid: the Figma field spread out a little so there is air between projects (Amélie, Oct 17). Tile sizes stay.
+const SPREAD = 1.1;
 // On arrival the nav must read clearly: the opening view settles where the fewest tiles sit under
-// the top nav and the bottom bar, searched within NUDGE px of project 01 in the middle.
+// the top nav, the bottom bar and the floss; the field wraps, so the search spans all of it and keeps
+// the clear spot closest to project 01 in the middle.
 const NAV_TOP = 96;
 const NAV_BOTTOM = 88;
-const NUDGE = 720;
+const FLOSS = { w: 160, h: 145 }; // the floss logo rises above the bottom bar, bottom-left
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 /** Width for a row `d` rows away from the middle: L at 0, M at 1, S from 2, eased in between. */
@@ -58,7 +59,7 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
   };
 
   return (
-    <main className="relative h-(--vh) overflow-hidden bg-neutral-0">
+    <main className="relative h-(--vh) overflow-hidden bg-neutral-0 select-none">
       <LayoutGroup>
         {view === "grid" ? (
           <GridView tiles={tiles} field={field} onPlay={(i) => openWithSound(() => setPlaying(i))} paused={playing !== null} />
@@ -106,26 +107,35 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
     // Open with project 01 near the middle, nudged so the navs sit in the gaps between projects.
     const first = tiles[0];
     const base = { x: 720 - (first.x + first.w / 2), y: h / 2 - (first.y + first.h / 2) };
-    const navOverlap = (ox: number, oy: number) => {
-      let area = 0;
-      tiles.forEach((t) => {
+    // Rule: nothing under the top nav, the bottom bar's ends or the floss. Among the clear views,
+    // keep the fullest (the arrival should feel like the Figma grid), then the closest to project 01.
+    const bands = [
+      { x0: 0, x1: 1440, y0: 0, y1: NAV_TOP },
+      { x0: 0, x1: FLOSS.w, y0: h - FLOSS.h, y1: h },
+      { x0: 1440 - 200, x1: 1440, y0: h - NAV_BOTTOM, y1: h },
+    ];
+    const score = (ox: number, oy: number) => {
+      let fill = 0;
+      for (const t of tiles) {
         const x = wrap(t.x + ox, field.w, t.w + 40);
         const y = wrap(t.y + oy, field.h, t.h + 40);
         const w = Math.max(0, Math.min(x + t.w, 1440) - Math.max(x, 0));
-        if (!w) return;
-        const top = Math.max(0, Math.min(y + t.h, NAV_TOP) - Math.max(y, 0));
-        const bottom = Math.max(0, Math.min(y + t.h, h) - Math.max(y, h - NAV_BOTTOM));
-        // Any tile under a nav counts heavily, even a sliver: the links must sit on white.
-        if (top + bottom) area += 100000 + w * (top + bottom);
-      });
-      return area;
+        const v = Math.max(0, Math.min(y + t.h, h) - Math.max(y, 0));
+        if (!w || !v) continue;
+        for (const b of bands) {
+          if (x < b.x1 && x + t.w > b.x0 && y < b.y1 && y + t.h > b.y0) return Infinity;
+        }
+        fill += w * v;
+      }
+      return -fill / 1000;
     };
     let best = { ...base, score: Infinity };
-    for (let dy = -NUDGE; dy <= NUDGE; dy += 8) {
-      for (let dx = -NUDGE; dx <= NUDGE; dx += 16) {
-        // Prefer the closest clear spot, so project 01 stays near the middle.
-        const score = navOverlap(base.x + dx, base.y + dy) + Math.hypot(dx, dy) * 4;
-        if (score < best.score) best = { x: base.x + dx, y: base.y + dy, score };
+    for (let dy = -field.h / 2; dy <= field.h / 2; dy += 12) {
+      for (let dx = -field.w / 2; dx <= field.w / 2; dx += 16) {
+        const sc = score(base.x + dx, base.y + dy);
+        if (sc === Infinity) continue;
+        const total = sc + Math.hypot(dx, dy) / 20;
+        if (total < best.score) best = { x: base.x + dx, y: base.y + dy, score: total };
       }
     }
     target.current = { x: best.x, y: best.y };

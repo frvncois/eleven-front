@@ -13,7 +13,7 @@ export function Chrome({ tone = "dark", toggles, wordmark = true }: Props) {
   return (
     <>
       <NavBar tone={tone} />
-      <NavSub toggles={toggles} wordmark={wordmark} />
+      <NavSub toggles={toggles} wordmark={wordmark} tone={tone} />
     </>
   );
 }

@@ -70,7 +70,7 @@ export function LongformReel({ films }: { films: Film[] }) {
   useEffect(() => () => window.__lenis?.start(), []);
 
   return (
-    <main className="relative h-(--vh) overflow-hidden bg-neutral-1000">
+    <main className="relative h-(--vh) overflow-hidden bg-neutral-1000 select-none">
       <div
         className="absolute inset-x-0 top-0"
         style={{ transform: `translateY(calc(${-index} * var(--vh)))`, transition: `transform ${SLIDE_MS}ms ${EASE_SWEEP}` }}
