@@ -13,7 +13,7 @@ type Group = { title: string; settings: Setting[] };
 
 // Defaults toned down (Amélie, Oct 17: "a bit too much"): softer taper and near side, a slight
 // tilt that stays at rest, less bend and less travel per scroll. Was depth 1.25, near 1.55, rest 0,
-// full bend at 26, scroll distance 1.
+// full bend at 26, scroll distance 1, turn speed 0.08.
 export const GROUPS: Group[] = [
   {
     title: "Shape",
@@ -31,7 +31,7 @@ export const GROUPS: Group[] = [
       { key: "fullSpeed", label: "Speed for full bend", hint: "Lower = bends fully with a gentle scroll", min: 4, max: 60, step: 1, value: 45 },
       { key: "attack", label: "Bend in", hint: "How fast it bends when you start", min: 0.02, max: 0.5, step: 0.01, value: 0.02 },
       { key: "release", label: "Settle back", hint: "How fast it goes flat when you stop", min: 0.01, max: 0.3, step: 0.01, value: 0.03 },
-      { key: "turn", label: "Turn speed", hint: "How fast the point follows a change of direction", min: 0.01, max: 0.4, step: 0.01, value: 0.08 },
+      { key: "turn", label: "Turn speed", hint: "How fast the point follows a change of direction", min: 0.01, max: 0.4, step: 0.01, value: 0.04 },
       { key: "glide", label: "Scroll ease", hint: "Low = long soft glide, high = sticks to your finger", min: 0.03, max: 0.3, step: 0.01, value: 0.09 },
       { key: "wheel", label: "Scroll distance", hint: "How far one scroll moves the grid", min: 0.2, max: 3, step: 0.1, value: 0.6 },
       { key: "fling", label: "Drag throw", hint: "How far a flicked drag keeps travelling", min: 0, max: 30, step: 1, value: 0 },

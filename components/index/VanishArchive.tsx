@@ -257,17 +257,25 @@ function VanishGrid({
 
     // Bend state: amount 0 (flat) → 1 (the logo's taper), and the heading as a smoothed vector,
     // so a reversal passes through flat instead of swinging the vanishing point across the screen.
-    const bend = { amount: 0, want: 0, hx: 0, hy: 1 };
+    const bend = { amount: 0, want: 0, hx: 0, hy: 1, speed: 0 };
 
     const draw = (vx: number, vy: number) => {
-      const speed = Math.hypot(vx, vy);
+      // Anti-jiggle (Amélie, Oct 17): wheel events arrive unevenly, so the raw speed flickers and the
+      // bend pumped in and out with it. The bend now follows a slow average of the speed.
+      const raw = Math.hypot(vx, vy);
+      bend.speed += (raw - bend.speed) * 0.06;
+      const speed = bend.speed;
       // The camera heads opposite to the content: scroll down, the field moves up, you travel down.
-      // "Point behind you" flips it to the side you come from.
+      // "Point behind you" flips it to the side you come from. The heading snaps to the dominant axis,
+      // so the small sideways drift of a trackpad scroll no longer wobbles the vanishing point.
       const side = tune.behind ? -1 : 1;
-      if (speed > 0.6) {
-        const k = tune.turn * Math.min(1, speed / 4);
-        bend.hx += ((-side * vx) / speed - bend.hx) * k;
-        bend.hy += ((-side * vy) / speed - bend.hy) * k;
+      if (raw > 0.6) {
+        const k = tune.turn * Math.min(1, raw / 4);
+        const horizontal = Math.abs(vx) > Math.abs(vy) * 1.5;
+        const tx = horizontal ? -side * Math.sign(vx) : 0;
+        const ty = horizontal ? 0 : -side * Math.sign(vy || 1);
+        bend.hx += (tx - bend.hx) * k;
+        bend.hy += (ty - bend.hy) * k;
       }
       const hl = Math.hypot(bend.hx, bend.hy);
       const want = Math.max(tune.preview, tune.rest, Math.min(1, speed / tune.fullSpeed)) * smooth(Math.min(1, hl));
