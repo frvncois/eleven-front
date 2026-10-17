@@ -8,6 +8,7 @@ import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { BallCanvas } from "./BallCanvas";
 import { preloadArchive } from "@/lib/archive-preload";
+import { ArchiveStyleSwitch } from "./ArchiveStyleSwitch";
 
 export type Tile = Project & { label: string; client: string; x: number; y: number; w: number; h: number };
 
@@ -82,6 +83,8 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
 
       <Chrome
         toggles={
+          <>
+            <ArchiveStyleSwitch current="ball" />
           <button
             type="button"
             onClick={toggle}
@@ -93,6 +96,7 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={view === "grid" ? "/icons/view-list.svg" : "/icons/view-grid.svg"} alt="" width={32} height={32} />
           </button>
+          </>
         }
       />
       <Player films={tiles} index={playing} onIndex={setPlaying} onClose={() => setPlaying(null)} />

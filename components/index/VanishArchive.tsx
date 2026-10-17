@@ -6,6 +6,7 @@ import { Chrome } from "@/components/shell/Chrome";
 import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { preloadArchive } from "@/lib/archive-preload";
+import { ArchiveStyleSwitch } from "./ArchiveStyleSwitch";
 import { rectToQuadCss, type Pt, type Quad } from "@/lib/perspective";
 import type { Tile } from "./IndexView";
 import { VanishTuner, tune } from "./VanishTuner";
@@ -68,6 +69,8 @@ export function VanishArchive({ tiles, field }: { tiles: Tile[]; field: { w: num
 
       <Chrome
         toggles={
+          <>
+            <ArchiveStyleSwitch current="vanish" />
           <button
             type="button"
             onClick={toggle}
@@ -78,6 +81,7 @@ export function VanishArchive({ tiles, field }: { tiles: Tile[]; field: { w: num
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={view === "grid" ? "/icons/view-list.svg" : "/icons/view-grid.svg"} alt="" width={32} height={32} />
           </button>
+          </>
         }
       />
       <VanishTuner />
