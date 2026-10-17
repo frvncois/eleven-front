@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { mixers } from "@/lib/content";
 import { sound } from "@/lib/sound";
 import { DUR, EASE_OUT } from "@/lib/motion";
-import { useVHref } from "@/lib/version";
 
 // Figma "V1 · Mixers · overlay" (7455:4292) / Section/Mixers Overlay (7401:2016): each name's spot,
 // and where its white icon appears on hover.
@@ -26,7 +25,6 @@ const LAYOUT: Record<string, { x: number; y: number; icon: { x: number; y: numbe
  */
 export function MixersOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [hover, setHover] = useState<string | null>(null);
-  const vhref = useVHref();
 
   useEffect(() => {
     if (!open) return;
@@ -79,7 +77,7 @@ export function MixersOverlay({ open, onClose }: { open: boolean; onClose: () =>
                     />
                   )}
                   <Link
-                    href={vhref(`/mixers/${m.slug}`)}
+                    href={`/mixers/${m.slug}`}
                     onClick={onClose}
                     onPointerEnter={() => {
                       setHover(m.slug);

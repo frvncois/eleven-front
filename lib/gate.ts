@@ -1,26 +1,25 @@
 "use client";
 
 /**
- * The sound gate, one per version per visit (V1 aqua, V2 red), so both can be seen when comparing.
- * V1's ELEVEN wordmark reopens it (Amélie, 15 Oct): going "home" by it asks for sound again, like
- * arriving on the site. V2's floss logo does not (home with the choice kept), nor do nav links.
+ * The sound gate, once per visit. The ELEVEN wordmark reopens it (Amélie, 15 Oct): going "home" by it
+ * asks for sound again, like arriving on the site; nav links do not.
  * The wordmark carries `data-gate`; PageTransition (which intercepts every link click) reopens it.
  */
-const key = (v: string) => `eleven-gate-${v}`;
+const KEY = "eleven-gate";
 const EVENT = "eleven-gate";
 
-export function gateSeen(v: string) {
+export function gateSeen() {
   try {
-    return sessionStorage.getItem(key(v)) === "1";
+    return sessionStorage.getItem(KEY) === "1";
   } catch {
     return false;
   }
 }
 
-export function setGateSeen(v: string, seen: boolean) {
+export function setGateSeen(seen: boolean) {
   try {
-    if (seen) sessionStorage.setItem(key(v), "1");
-    else sessionStorage.removeItem(key(v));
+    if (seen) sessionStorage.setItem(KEY, "1");
+    else sessionStorage.removeItem(KEY);
   } catch {}
   window.dispatchEvent(new Event(EVENT));
 }

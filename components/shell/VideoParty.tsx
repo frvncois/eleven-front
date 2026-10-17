@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import party from "@/data/party.json";
 import { party as partyStore, usePartyPick } from "@/lib/party";
 import { sound } from "@/lib/sound";
-import { useVersion } from "@/lib/version";
 
 const ITEMS = party.items;
 
@@ -18,8 +17,8 @@ const ITEMS = party.items;
 export function VideoParty({ on }: { on: boolean }) {
   const pick = usePartyPick();
   const item = ITEMS[Math.max(0, pick) % ITEMS.length];
-  // The reveal opens from the butterfly: V2 header top right, V1 Nav/Sub bottom right.
-  const origin = useVersion() === "v2" ? "96% 3%" : "97% 97%";
+  // The reveal opens from the butterfly, bottom right in Nav/Sub.
+  const origin = "97% 97%";
 
   useEffect(() => partyStore.setSize(ITEMS.length), []);
 

@@ -7,7 +7,6 @@ import { PageTransition } from "@/components/shell/PageTransition";
 import { CursorTag } from "@/components/shell/CursorTag";
 import { ClickSound } from "@/components/shell/ClickSound";
 import { PartyMode } from "@/components/shell/PartyMode";
-import { VersionPill } from "@/components/shell/VersionPill";
 import { DesktopOnly } from "@/components/shell/DesktopOnly";
 
 export const metadata: Metadata = {
@@ -44,7 +43,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <div className="stage">
           {children}
           <PartyMode />
-          <VersionPill />
           <CursorTag />
         </div>
         <PageTransition />

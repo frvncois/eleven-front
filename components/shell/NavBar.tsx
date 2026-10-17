@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { MixersOverlay } from "@/components/mixers/MixersOverlay";
-import { stripVersion, useVHref } from "@/lib/version";
 import { usePathname } from "next/navigation";
 import site from "@/data/site.json";
 import { sound } from "@/lib/sound";
@@ -15,8 +14,7 @@ import { sound } from "@/lib/sound";
  * `tone="light"` (neutral/300) where it sits on video: home, player.
  */
 export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
-  const pathname = stripVersion(usePathname());
-  const vhref = useVHref();
+  const pathname = usePathname();
   const [mixersOpen, setMixersOpen] = useState(false);
   return (
     <>
@@ -39,7 +37,7 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
         return (
           <Link
             key={item.label}
-            href={vhref(item.href)}
+            href={item.href}
             aria-current={current ? "page" : undefined}
             onPointerEnter={() => sound.cue("navHover")}
             className={cls}

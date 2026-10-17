@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useVHref } from "@/lib/version";
 import { SoundToggle } from "./SoundToggle";
 
 /**
@@ -11,12 +10,11 @@ import { SoundToggle } from "./SoundToggle";
  * so it must not sit inside the (z-indexed) toggle bar.
  */
 export function NavSub({ toggles, wordmark = true }: { toggles?: React.ReactNode; wordmark?: boolean }) {
-  const vhref = useVHref();
   return (
     <>
       {wordmark && (
       <Link
-        href={vhref("/")}
+        href={"/"}
         data-gate
         aria-label="Eleven, home"
         className="fixed bottom-4 left-margin z-50 flex h-[27.341px] w-[101.18px] items-center justify-center mix-blend-difference transition-opacity duration-300 ease-out hover:opacity-50"

@@ -49,7 +49,7 @@ export function PageTransition() {
       if (!a || a.target === "_blank" || a.hasAttribute("download") || a.hasAttribute("data-no-sweep")) return;
       const url = new URL(a.href, location.href);
       // Logo links home reopen the sound gate (lib/gate). Done here: this handler stops the click.
-      if (a.hasAttribute("data-gate")) setGateSeen(url.pathname.split("/")[1] || "v1", false);
+      if (a.hasAttribute("data-gate")) setGateSeen(false);
       if (url.origin !== location.origin || url.pathname === location.pathname) return;
       e.preventDefault();
       e.stopImmediatePropagation();

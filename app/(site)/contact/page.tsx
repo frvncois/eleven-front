@@ -5,51 +5,30 @@ import { ContactLink } from "@/components/ui/ContactLink";
 import { MiniLink } from "@/components/ui/MiniLink";
 import { CreditsPopover } from "@/components/ui/CreditsPopover";
 import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
-import { Clock } from "@/components/shell/Clock";
 
 export const metadata: Metadata = { title: "Contact" };
 
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, "")}`;
 
 /**
- * Contact, one layout per version, each from its own Figma frame. Always exactly one screen, never
- * scrolls: vertical positions use the frame's own percentages of the height, the footer sits on the bottom.
- * V1 · 10 · Contact (7345:1649): contacts stacked in the 637 column, footer © / privacy / credits / socials.
- * V2 · 10 · Contact (7451:2292): title lower, gif level with three contact columns (493 / 845 / 1197),
- * footer © · Credits · LA clock ("time machine", 7642:2397) · Instagram + LinkedIn · Privacy at the far right.
+ * Contact (V1 · 10 · Contact, 7345:1649). Always exactly one screen, never scrolls: vertical positions
+ * use the frame's own percentages of the height, the footer sits on the bottom. Contacts stacked in the
+ * 637 column, footer © / privacy / credits / socials.
  */
-const LAYOUT = {
-  v1: {
-    title: "top-[calc(8.33%+63.67px)] left-[32px]",
-    gif: "top-[calc(25%+24px)]",
-    jordan: "top-[calc(41.67%+7.33px)] left-[637px]",
-    adrea: "top-[calc(50%+44px)] left-[637px] pt-3",
-    studio: "top-[calc(66.67%+6.33px)] left-[637px] pt-3",
-    copyright: "bottom-[22px] left-[263.5px]",
-    privacy: "bottom-[23px] left-[637px]",
-    credits: "bottom-[23px] left-[845.5px]",
-    clock: null,
-    linkedin: "bottom-[39px] left-[1080.5px]",
-    instagram: "bottom-[23px] left-[1080.5px]",
-  },
-  v2: {
-    title: "top-[calc(16.67%+56.33px)] left-[24px]",
-    gif: "top-[calc(41.67%+10.33px)]",
-    jordan: "top-[calc(41.67%+10.33px)] left-[493px]",
-    adrea: "top-[calc(41.67%+10.33px)] left-[845px]",
-    studio: "top-[calc(41.67%+10.33px)] left-[1197px]",
-    copyright: "bottom-[22px] left-[24px]",
-    privacy: "bottom-[23px] left-[1341px]",
-    credits: "bottom-[23px] left-[493px]",
-    clock: "bottom-[22px] left-[845px]",
-    linkedin: "bottom-[23px] left-[1197px]",
-    instagram: "bottom-[39px] left-[1197px]",
-  },
+const L = {
+  title: "top-[calc(8.33%+63.67px)] left-[32px]",
+  gif: "top-[calc(25%+24px)]",
+  jordan: "top-[calc(41.67%+7.33px)] left-[637px]",
+  adrea: "top-[calc(50%+44px)] left-[637px] pt-3",
+  studio: "top-[calc(66.67%+6.33px)] left-[637px] pt-3",
+  copyright: "bottom-[22px] left-[263.5px]",
+  privacy: "bottom-[23px] left-[637px]",
+  credits: "bottom-[23px] left-[845.5px]",
+  linkedin: "bottom-[39px] left-[1080.5px]",
+  instagram: "bottom-[23px] left-[1080.5px]",
 };
 
-export default async function ContactPage({ params }: { params: Promise<{ version: string }> }) {
-  const { version } = await params;
-  const L = version === "v2" ? LAYOUT.v2 : LAYOUT.v1;
+export default function ContactPage() {
   const { contact, footer } = site;
   const [jordan, adrea] = contact.people;
   const social = (label: string) => footer.social.find((x) => x.label === label)!;
@@ -95,7 +74,6 @@ export default async function ContactPage({ params }: { params: Promise<{ versio
           {footer.legal[0].label}
         </MiniLink>
         <CreditsPopover label={footer.credits.label} items={footer.credits.items} className={`absolute ${L.credits}`} />
-        {L.clock && <Clock className={`t-mini absolute uppercase ${L.clock}`} />}
         <MiniLink href={social("LinkedIn").href} className={`absolute ${L.linkedin}`}>
           {social("LinkedIn").label}
         </MiniLink>

@@ -6,10 +6,6 @@ import home from "@/data/home.json";
 import { sound } from "@/lib/sound";
 import { NavBar } from "@/components/shell/NavBar";
 import { NavSub } from "@/components/shell/NavSub";
-import { MenuColumns } from "@/components/shell/MenuColumns";
-import { SoundToggle } from "@/components/shell/SoundToggle";
-import { Clock } from "@/components/shell/Clock";
-import { useVersion } from "@/lib/version";
 import { gateSeen, setGateSeen, subscribeGate } from "@/lib/gate";
 import { HomeReel } from "./HomeReel";
 
@@ -23,16 +19,14 @@ const SHAPE = {
 };
 
 /**
- * V1 · 01 · Gate (7449:6439) → V1 · 02 · Home (7345:1333); V2: red gate (7345:1290) → V2 · 02 · Home
- * (7345:1310), the menu laid out over the reel and the LA clock; the shape lands where V1's does.
+ * Gate (V1 · 01 · Gate, 7449:6439) → Home (V1 · 02 · Home, 7345:1333).
  * The gate asks for sound once per visit (session), and again whenever the logo takes you home. Choosing lifts the aqua panel away while the
  * ELEVEN shape shrinks into its home position over the reel, 1.2 s ease-in-out, as in the prototype.
  * "Sound on" also unlocks audio (the browser needs that click).
  */
 export function Home() {
   // Seen earlier in this visit (nav link back home, or a reload): no gate. The logo reopens it.
-  const v = useVersion();
-  const gate = !useSyncExternalStore(subscribeGate, () => gateSeen(v), () => false);
+  const gate = !useSyncExternalStore(subscribeGate, () => gateSeen(), () => false);
 
   // The gate always starts silent, even if sound was on earlier in the visit (Amélie, 15 Oct):
   // the visitor turns it on here, deliberately.
@@ -45,10 +39,9 @@ export function Home() {
       sound.setMuted(false);
       sound.unlock();
     } else sound.setMuted(true);
-    setGateSeen(v, true);
+    setGateSeen(true);
   };
 
-  // V2 uses V1's placement and angle too (Amélie, 15 Oct), not the 2.71° tilt of the V2 frame.
   const pos = gate ? SHAPE.gate : SHAPE.home;
 
   return (
@@ -58,21 +51,8 @@ export function Home() {
       <AnimatePresence>
         {!gate && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: DURATION * 0.6 }}>
-            {v === "v2" ? (
-              // V2 · 02 · Home: the whole menu over the reel, sound top-right, the LA clock bottom-right.
-              <div className="absolute inset-0 z-20">
-                <MenuColumns tone="light" />
-                <div className="absolute top-[30.5px] left-[1380px]">
-                  <SoundToggle />
-                </div>
-                <Clock className="t-accent absolute bottom-[17px] left-[1317px] text-neutral-0 uppercase" />
-              </div>
-            ) : (
-              <>
-                <NavBar tone="light" />
-                <NavSub wordmark={false} />
-              </>
-            )}
+            <NavBar tone="light" />
+            <NavSub wordmark={false} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -98,7 +78,7 @@ export function Home() {
           <motion.section
             key="gate"
             aria-label="Sound"
-            className={`absolute inset-x-0 top-0 z-[5] h-[calc(100%-92px)] ${v === "v2" ? "bg-red" : "bg-aqua"}`}
+            className={`absolute inset-x-0 top-0 z-[5] h-[calc(100%-92px)] bg-aqua`}
             exit={{ y: "-101%" }}
             transition={{ duration: DURATION, ease: EASE }}
           >

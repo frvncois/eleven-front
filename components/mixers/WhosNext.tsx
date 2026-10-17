@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { sound } from "@/lib/sound";
 import type { Person } from "@/lib/content";
-import { useVHref } from "@/lib/version";
 
 /**
  * Section/Whos Next (Figma 7372:2334): the other mixers in a row. Hovering a name shows that
@@ -13,7 +12,6 @@ import { useVHref } from "@/lib/version";
  */
 export function WhosNext({ others }: { others: Person[] }) {
   const [hover, setHover] = useState<string | null>(null);
-  const vhref = useVHref();
   return (
     <section data-section-color="red" className="flex h-[1024px] w-[1440px] flex-col px-8">
       <div className="flex h-[550px] items-end justify-center pb-16">
@@ -23,7 +21,7 @@ export function WhosNext({ others }: { others: Person[] }) {
         {others.map((m) => (
           <Link
             key={m.slug}
-            href={vhref(`/mixers/${m.slug}`)}
+            href={`/mixers/${m.slug}`}
             onPointerEnter={() => {
               setHover(m.slug);
               sound.cue("navHover");

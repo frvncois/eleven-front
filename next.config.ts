@@ -11,6 +11,15 @@ const nextConfig: NextConfig = {
   // Screenshots are compared against Figma: keep the dev badge out of the bottom-left wordmark.
   devIndicators: false,
   // Client review prototype: every response, the password page and redirects included, is noindex.
+  // One site now (inline nav only, Oct 17): old versioned links land on the same page.
+  async redirects() {
+    return [
+      { source: "/v1", destination: "/", permanent: false },
+      { source: "/v2", destination: "/", permanent: false },
+      { source: "/v1/:path*", destination: "/:path*", permanent: false },
+      { source: "/v2/:path*", destination: "/:path*", permanent: false },
+    ];
+  },
   async headers() {
     return [{ source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] }];
   },
