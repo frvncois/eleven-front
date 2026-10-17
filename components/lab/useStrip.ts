@@ -31,7 +31,10 @@ export function useStrip(
     drift?: number;
     friction?: number;
     wheel?: number;
-    /** In a scrolling page: a vertical wheel still scrolls the page and only nudges the strip. */
+    /**
+     * On a page (mixer pages): the wheel is read anywhere on the page, not only over the strip, and
+     * is never swallowed, so the page keeps its own scroll.
+     */
     passVertical?: boolean;
   } = {},
 ) {
@@ -50,8 +53,9 @@ export function useStrip(
 
     const onWheel = (e: WheelEvent) => {
       const horizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
-      if (passVertical && !horizontal) {
-        push += e.deltaY * wheel * 0.5;
+      if (passVertical) {
+        push += (horizontal ? e.deltaX : e.deltaY) * wheel;
+        lastInput = performance.now();
         return;
       }
       e.preventDefault();
@@ -93,14 +97,15 @@ export function useStrip(
       raf = requestAnimationFrame(tick);
     };
 
-    el.addEventListener("wheel", onWheel, { passive: false });
+    const wheelOn: HTMLElement | Window = passVertical ? window : el;
+    wheelOn.addEventListener("wheel", onWheel as EventListener, { passive: false });
     el.addEventListener("pointerdown", onDown);
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
     raf = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(raf);
-      el.removeEventListener("wheel", onWheel);
+      wheelOn.removeEventListener("wheel", onWheel as EventListener);
       el.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
