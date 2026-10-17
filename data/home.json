@@ -1,10 +1,6 @@
 {
   "gate": {
-    "line": [
-      "We’re a sound studio.",
-      "Of course this site makes noise."
-    ],
-    "hint": "commitment issues? we get it... but you need to make a choice",
+    "line": ["We’re a sound studio.", "Of course this site makes noise."],
     "on": "Sound on",
     "off": "Sound off"
   },

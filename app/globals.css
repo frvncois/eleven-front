@@ -123,30 +123,6 @@ html.lenis body { height: auto; }
 
 
 
-/* Sound gate (Jordan, Oct 15): once the hint shows, the two choices glow through the brand colours
-   and a light sweeps across them, so nobody feels stuck on the page. */
-@keyframes gate-glow {
-  0%, 100% { box-shadow: 0 0 0 0 transparent; }
-  25% { box-shadow: 0 0 40px 10px var(--color-yellow); }
-  50% { box-shadow: 0 0 40px 10px var(--color-pink); }
-  75% { box-shadow: 0 0 40px 10px var(--color-bright-green); }
-}
-@keyframes gate-shine {
-  0% { transform: translateX(-120%) skewX(-20deg); }
-  45%, 100% { transform: translateX(320%) skewX(-20deg); }
-}
-.gate-glow { animation: gate-glow 2.4s ease-in-out infinite; }
-.gate-glow::after {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 40%;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.85), transparent);
-  animation: gate-shine 2.4s cubic-bezier(0.62, 0.05, 0.01, 0.99) infinite;
-  animation-delay: inherit;
-  pointer-events: none;
-}
-
 @keyframes butterfly-flap {
   0%, 100% { transform: scaleX(1); }
   50% { transform: scaleX(0.35); }
