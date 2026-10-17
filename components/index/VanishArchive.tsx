@@ -29,8 +29,9 @@ const r169 = (w: number) => Math.round((w * 9) / 16);
 // Field: IndexView's evened-out layout, then packed into even rows (Amélie, Oct 17: no channels of
 // white between groups). Gaps are image to image: the 30 px title line counts in the vertical one.
 const SPREAD = 0.95;
-const MIN_GAP = 64;
-const FIELD_GAP = 80;
+// More air (Amélie, Oct 17: "not too much at one spot"): 150 between images, was 80 (min 64 → 120).
+const MIN_GAP = 120;
+const FIELD_GAP = 150;
 const ROWS = 9;
 // Arrival (Amélie, Oct 17): C4 · Winter at this spot, with its neighbours around it.
 const ARRIVE = { slug: "c4-winter", x: 615, y: 554 };
