@@ -50,16 +50,48 @@ const DEFAULTS: Record<string, number> = Object.fromEntries(ALL.map((s) => [s.ke
 /** The live values. The grid reads them every frame; `rev` changes on every edit so it redraws. */
 export const tune: Record<string, number> & { rev: number; preview: number } = { ...DEFAULTS, rev: 0, preview: 0 };
 
-/** Read the URL once (and reduced motion, which starts flat). */
+/** Settings survive a reload or a visit to another page (Amélie, Oct 17), per browser. */
+const STORE = "eleven-vanish-tune";
+const readStore = (): Record<string, number> => {
+  try {
+    return JSON.parse(localStorage.getItem(STORE) ?? "{}");
+  } catch {
+    return {};
+  }
+};
+const writeStore = (v: Record<string, number> | null) => {
+  try {
+    if (v) localStorage.setItem(STORE, JSON.stringify(v));
+    else localStorage.removeItem(STORE);
+  } catch {}
+};
+
+/** Only the values that differ from the defaults go in the URL and in this browser's memory. */
+function persist(next: Record<string, number>) {
+  const changed = ALL.filter((s) => next[s.key] !== s.value);
+  const q = new URLSearchParams(changed.map((s) => [s.key, String(next[s.key])]));
+  const qs = q.toString();
+  window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+  // Defaults again (Reset) = nothing to remember.
+  writeStore(changed.length ? Object.fromEntries(changed.map((s) => [s.key, next[s.key]])) : null);
+}
+
+/** Read the values once: a shared link (URL) first, then what this browser saved, then the defaults. */
 export function loadTune() {
   const q = new URLSearchParams(window.location.search);
+  const saved = readStore();
   for (const s of ALL) {
     const v = parseFloat(q.get(s.key) ?? "");
-    tune[s.key] = Number.isFinite(v) ? v : s.value;
+    const k = saved[s.key];
+    tune[s.key] = Number.isFinite(v) ? v : typeof k === "number" && Number.isFinite(k) ? k : s.value;
   }
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) tune.depth = 0;
   tune.rev++;
 }
+
+/** How long the bend stays after letting go of a Shape slider. */
+const HOLD_MS = 1600;
+let holdTimer = 0;
 
 const decimals = (step: number) => (step >= 1 ? 0 : String(step).split(".")[1].length);
 
@@ -70,20 +102,27 @@ export function VanishTuner() {
 
   useEffect(() => {
     loadTune();
-    setValues(Object.fromEntries(ALL.map((s) => [s.key, tune[s.key]])));
+    const loaded = Object.fromEntries(ALL.map((s) => [s.key, tune[s.key]]));
+    setValues(loaded);
+    // Remembered values also land in the URL, so "Copy link" carries them.
+    persist(loaded);
     const onKey = (e: KeyboardEvent) => {
       if ((e.target as Element)?.closest?.("input")) return;
       if (e.key === "s" || e.key === "S") setOpen((o) => !o);
     };
-    // Letting go of a Shape slider lets the grid settle back.
+    // Letting go of a Shape slider keeps the bend on screen a moment, then lets the grid settle back.
     const onUp = () => {
       if (!tune.preview) return;
-      tune.preview = 0;
-      tune.rev++;
+      window.clearTimeout(holdTimer);
+      holdTimer = window.setTimeout(() => {
+        tune.preview = 0;
+        tune.rev++;
+      }, HOLD_MS);
     };
     window.addEventListener("keydown", onKey);
     window.addEventListener("pointerup", onUp);
     return () => {
+      window.clearTimeout(holdTimer);
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("pointerup", onUp);
     };
@@ -93,11 +132,7 @@ export function VanishTuner() {
     Object.assign(tune, next);
     tune.rev++;
     setValues(next);
-    // Only the values that differ from the defaults go in the URL.
-    const q = new URLSearchParams();
-    for (const s of ALL) if (next[s.key] !== s.value) q.set(s.key, String(next[s.key]));
-    const qs = q.toString();
-    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+    persist(next);
   };
 
   const copy = async () => {
@@ -154,6 +189,7 @@ export function VanishTuner() {
                     // Shape sliders hold the grid at full bend while dragged, so the shape shows at rest.
                     onPointerDown={() => {
                       if (g.title !== "Shape") return;
+                      window.clearTimeout(holdTimer);
                       tune.preview = 1;
                       tune.rev++;
                     }}
@@ -169,7 +205,7 @@ export function VanishTuner() {
       ))}
 
       <p className="border-t border-neutral-200 pt-3 pb-3 text-neutral-500">
-        At rest the grid is flat: Shape sliders hold the full bend while you drag them. Feel settings only show when you scroll over the images.
+        At rest the grid is flat: Shape sliders hold the full bend while you drag them and a moment after. Your settings are remembered in this browser; Reset forgets them. Feel settings only show when you scroll over the images.
       </p>
       <div className="flex gap-2">
         <button type="button" onClick={() => write({ ...DEFAULTS })} className={chip}>
