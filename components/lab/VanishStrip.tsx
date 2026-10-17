@@ -70,7 +70,7 @@ export function VanishStrip({
       const field = taperField({ midY: 0, hLeft: 236, depth });
       const w = 330, pitch = w + 14, total = n * pitch;
       for (let k = 0; k < n; k++) {
-        const x = wrap(k * pitch - s.offset, total) - pitch;
+        const x = wrap(k * pitch - s.offset + pitch, total) - pitch * 2;
         place(k, x > field.vanishX ? null : field.quad(x, x + w));
       }
     }
@@ -102,14 +102,18 @@ export function VanishStrip({
       const fwd = taperField({ midY: 0, hLeft: h * 1.45, depth });
       const back = taperField({ midY: 0, hLeft: h * 1.45, depth, mirror: true });
       for (let k = 0; k < n; k++) {
-        const x = wrap(k * pitch - s.offset, total) - pitch;
+        // Loop seam two cards past the left edge: at one, the bent card's leaning top corner was still
+        // on screen when it jumped to the far end, so it vanished instead of sliding off (Oct 17).
+        const x = wrap(k * pitch - s.offset + pitch, total) - pitch * 2;
         const flat: Quad = [[x, -h / 2], [x + w, -h / 2], [x + w, h / 2], [x, h / 2]];
         const bent = lerpQuad(back.quad(x, x + w), fwd.quad(x, x + w), (wv.dir + 1) / 2);
         place(k, lerpQuad(flat, bent, wv.amount));
       }
     }
     },
-    { passVertical: inPage },
+    // On the mixer pages (Amélie, Oct 17: too fast): the strip moves ~0.8× the scroll instead of
+    // ~1.6×, and never faster than ~3.5 cards a second, so every title can be read as it passes.
+    inPage ? { passVertical: true, wheel: 0.5, maxSpeed: 24 } : {},
   );
 
   return (
