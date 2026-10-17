@@ -6,6 +6,7 @@ import type { Project } from "@/lib/content";
 import { Chrome } from "@/components/shell/Chrome";
 import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
+import { BallCanvas } from "./BallCanvas";
 
 export type Tile = Project & { label: string; client: string; x: number; y: number; w: number; h: number };
 
@@ -19,19 +20,21 @@ const MID_W = 448;
 const BIG_W = 564;
 const GAP = 16;
 const STEP = 300; // wheel distance from one project to the next
-// Grid: the Figma field spread out a little so there is air between projects (Amélie, Oct 17). Tile sizes stay.
-const SPREAD = 1.1;
-// On arrival the nav must read clearly: the opening view settles where the fewest tiles sit under
-// the top nav, the bottom bar and the floss; the field wraps, so the search spans all of it and keeps
-// the clear spot closest to project 01 in the middle.
+// Grid: the Figma field spread out a little so there is air between projects (Amélie, Oct 17), then
+// evened out (relax) so there are no big holes. Tile sizes stay.
+const SPREAD = 0.95;
+const MIN_GAP = 64; // smallest space between two projects after evening out
+// On arrival the nav must read clearly: the opening view (searched over the whole wrapped field)
+// keeps the top nav clear, avoids the floss and toggle corners, and fills the screen.
 const NAV_TOP = 96;
 const NAV_BOTTOM = 88;
 const FLOSS = { w: 160, h: 145 };
-// The screen as a ball (Amélie, Oct 17): the field wraps over a sphere, so projects roll over it
-// and turn away as they near the edges and corners. Flat in the middle, a gentle bulge all around.
-const BALL_RADIUS = 1900; // larger = flatter
-const BALL_HORIZON = 1.25; // radians from the centre: beyond it a tile is round the back of the ball, hidden
-const BALL_PERSPECTIVE = 1600; // the floss logo rises above the bottom bar, bottom-left
+// The screen as a ball (Amélie, Oct 17): the flat grid is drawn bent over a sphere (BallCanvas,
+// WebGL), so thumbnails themselves curve, flat in the middle and rolling away at the edges.
+// A point at distance s from the centre on the flat grid shows at r = R·sin(s / R) on screen.
+const BALL_RADIUS = 1150; // smaller = rounder
+const toScreen = (s: number) => BALL_RADIUS * Math.sin(Math.min(s, BALL_RADIUS * 1.5) / BALL_RADIUS);
+const toFlat = (r: number) => BALL_RADIUS * Math.asin(Math.min(r / BALL_RADIUS, 0.999));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 /** Width for a row `d` rows away from the middle: L at 0, M at 1, S from 2, eased in between. */
@@ -95,74 +98,123 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
 
 /* ------------------------------------------------------------------ */
 
+/** Even out the field: push projects apart until every gap is at least MIN_GAP, and let them drift
+ *  into empty areas, on the wrapping field. Deterministic, so the layout is the same on every visit. */
+function relax(tiles: Tile[], field: { w: number; h: number }) {
+  const c = tiles.map((t) => ({ x: t.x + t.w / 2, y: t.y + t.h / 2 }));
+  const near = (d: number, size: number) => d - size * Math.round(d / size);
+  for (let it = 0; it < 220; it++) {
+    const f = c.map(() => ({ x: 0, y: 0 }));
+    for (let i = 0; i < c.length; i++) {
+      for (let j = i + 1; j < c.length; j++) {
+        const dx = near(c[j].x - c[i].x, field.w);
+        const dy = near(c[j].y - c[i].y, field.h);
+        const ox = (tiles[i].w + tiles[j].w) / 2 + MIN_GAP - Math.abs(dx);
+        const oy = (tiles[i].h + tiles[j].h) / 2 + MIN_GAP - Math.abs(dy);
+        if (ox > 0 && oy > 0) {
+          // Overlapping (gap included): separate along the shallower axis.
+          if (ox < oy) {
+            const p = (Math.sign(dx) || 1) * ox * 0.5;
+            f[i].x -= p;
+            f[j].x += p;
+          } else {
+            const p = (Math.sign(dy) || 1) * oy * 0.5;
+            f[i].y -= p;
+            f[j].y += p;
+          }
+        } else {
+          // Soft long-range push so crowded areas spill into the holes.
+          const d2 = dx * dx + dy * dy;
+          if (d2 < 900 * 900) {
+            const k = (it < 160 ? 9000 : 0) / Math.max(d2, 1e4);
+            f[i].x -= dx * k * 0.02;
+            f[i].y -= dy * k * 0.02;
+            f[j].x += dx * k * 0.02;
+            f[j].y += dy * k * 0.02;
+          }
+        }
+      }
+    }
+    c.forEach((p, i) => {
+      p.x = (p.x + f[i].x + field.w) % field.w;
+      p.y = (p.y + f[i].y + field.h) % field.h;
+    });
+  }
+  return tiles.map((t, i) => ({ ...t, x: c[i].x - t.w / 2, y: c[i].y - t.h / 2 }));
+}
+
 function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { tiles: Tile[]; field: { w: number; h: number }; onPlay: (i: number) => void; paused: boolean }) {
-  const tiles = useMemo(() => figmaTiles.map((t) => ({ ...t, x: t.x * SPREAD, y: t.y * SPREAD })), [figmaTiles]);
   const field = useMemo(() => ({ w: figmaField.w * SPREAD, h: figmaField.h * SPREAD }), [figmaField.w, figmaField.h]);
-  // Each tile's on-screen position, written every frame (no re-render).
-  const [pos] = useState(() =>
-    tiles.map(() => ({ left: motionValue(0), top: motionValue(0), x: motionValue(0), y: motionValue(0), z: motionValue(0), rotateX: motionValue(0), rotateY: motionValue(0), opacity: motionValue(1) })),
-  );
+  const tiles = useMemo(() => relax(figmaTiles.map((t) => ({ ...t, x: t.x * SPREAD, y: t.y * SPREAD })), field), [figmaTiles, field]);
+  // Each tile's position on the flat grid (screen coordinates), written every frame (no re-render).
+  const [pos] = useState(() => tiles.map(() => ({ left: motionValue(0), top: motionValue(0) })));
   const drag = useRef<{ x: number; y: number; tx: number; ty: number; moved: boolean } | null>(null);
   const target = useRef({ x: 0, y: 0 });
+  const box = useRef<HTMLDivElement>(null);
+  const [hover, setHover] = useState<number | null>(null);
+  const hoverRef = useRef<number | null>(null);
+  const label = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState(1024);
+  useEffect(() => setHeight(vhOf()), []);
+  // The page's own tiles stay in place (hit areas, and the morph to and from the list): visible
+  // while the morph plays, then the ball takes over.
+  const [morphing, setMorphing] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setMorphing(false), MORPH.duration * 1000 + 50);
+    return () => clearTimeout(t);
+  }, []);
+  const items = useMemo(() => tiles.map((t) => ({ poster: t.poster ?? null, w: t.w, h: r169(t.w) })), [tiles]);
 
   useEffect(() => {
     window.__lenis?.stop();
     window.scrollTo(0, 0);
     const h = vhOf();
-    // The field repeats in every direction (neu.team): wrap each tile into the window around the screen.
-    const wrap = (v: number, size: number, span: number) => ((((v + span) % size) + size) % size) - span;
-    // Open with project 01 near the middle, nudged so the navs sit in the gaps between projects.
+    const wrapC = (v: number, size: number) => ((((v + size / 2) % size) + size) % size) - size / 2;
+    // A flat point → where the ball shows it on screen.
+    const onScreen = (x: number, y: number) => {
+      const dx = x - 720;
+      const dy = y - h / 2;
+      const s = Math.hypot(dx, dy);
+      const k = s ? toScreen(s) / s : 1;
+      return { x: 720 + dx * k, y: h / 2 + dy * k };
+    };
     const first = tiles[0];
     const base = { x: 720 - (first.x + first.w / 2), y: h / 2 - (first.y + first.h / 2) };
-    // Rule: nothing under the top nav, the bottom bar's ends or the floss. Among the clear views,
-    // keep the fullest (the arrival should feel like the Figma grid), then the closest to project 01.
     const bands = [
       { x0: 0, x1: 1440, y0: 0, y1: NAV_TOP },
       { x0: 0, x1: FLOSS.w, y0: h - FLOSS.h, y1: h },
       { x0: 1440 - 200, x1: 1440, y0: h - NAV_BOTTOM, y1: h },
     ];
-    // Where a tile ends up on screen once laid on the ball (centre-wrapped, curved, foreshortened).
-    const onBall = (t: Tile, ox: number, oy: number) => {
-      const dx = wrap(t.x + ox + t.w / 2 - 720, field.w, field.w / 2);
-      const dy = wrap(t.y + oy + t.h / 2 - h / 2, field.h, field.h / 2);
-      const ax = dx / BALL_RADIUS;
-      const ay = dy / BALL_RADIUS;
-      if (Math.abs(ax) > BALL_HORIZON || Math.abs(ay) > BALL_HORIZON) return null;
-      const z = BALL_RADIUS * (Math.cos(ax) * Math.cos(ay) - 1);
-      const k = BALL_PERSPECTIVE / (BALL_PERSPECTIVE - z); // perspective shrink with depth
-      const cx = 720 + BALL_RADIUS * Math.sin(ax) * k;
-      const cy = h / 2 + BALL_RADIUS * Math.sin(ay) * Math.cos(ax) * k;
-      const w = t.w * k;
-      const hh = t.h * k;
-      return { x: cx - w / 2, y: cy - hh / 2, w, h: hh };
-    };
-    // How much of the navs a view covers (0 = clear) and how full it is.
+    // How much of the navs a view covers (0 = clear) and how full it is, as seen on the ball.
     const score = (ox: number, oy: number) => {
       let cover = 0;
       let fill = 0;
-      for (const tile of tiles) {
-        const r = onBall(tile, ox, oy);
-        if (!r) continue;
-        const w = Math.max(0, Math.min(r.x + r.w, 1440) - Math.max(r.x, 0));
-        const v = Math.max(0, Math.min(r.y + r.h, h) - Math.max(r.y, 0));
+      for (const t of tiles) {
+        const fx = 720 + wrapC(t.x + ox + t.w / 2 - 720, field.w) - t.w / 2;
+        const fy = h / 2 + wrapC(t.y + oy + t.h / 2 - h / 2, field.h) - t.h / 2;
+        const a = onScreen(fx, fy);
+        const b = onScreen(fx + t.w, fy + t.h);
+        const r = { x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y0: Math.min(a.y, b.y), y1: Math.max(a.y, b.y) };
+        const w = Math.max(0, Math.min(r.x1, 1440) - Math.max(r.x0, 0));
+        const v = Math.max(0, Math.min(r.y1, h) - Math.max(r.y0, 0));
         if (!w || !v) continue;
-        for (const b of bands) {
-          const bw = Math.max(0, Math.min(r.x + r.w, b.x1) - Math.max(r.x, b.x0));
-          const bh = Math.max(0, Math.min(r.y + r.h, b.y1) - Math.max(r.y, b.y0));
-          cover += bw * bh;
-        }
+        // The top nav must stay clear; the floss and toggle corners count less.
+        bands.forEach((band, k) => {
+          const a = Math.max(0, Math.min(r.x1, band.x1) - Math.max(r.x0, band.x0)) * Math.max(0, Math.min(r.y1, band.y1) - Math.max(r.y0, band.y0));
+          cover += a * (k === 0 ? 20 : 1);
+        });
         fill += w * v;
       }
       return { cover, fill };
     };
-    // Clear views first; among those the fullest, then the closest to project 01. If nothing is
-    // fully clear, the least covered view wins.
-    let best = { ...base, cover: Infinity, rank: Infinity };
+    // Lowest cost wins: nav cover (top nav heavily), minus how full the screen is, plus a little
+    // distance from project 01.
+    let best = { ...base, cost: Infinity };
     for (let dy = -field.h / 2; dy <= field.h / 2; dy += 12) {
       for (let dx = -field.w / 2; dx <= field.w / 2; dx += 16) {
         const { cover, fill } = score(base.x + dx, base.y + dy);
-        const rank = -fill / 1000 + Math.hypot(dx, dy) / 20;
-        if (cover < best.cover || (cover === best.cover && rank < best.rank)) best = { x: base.x + dx, y: base.y + dy, cover, rank };
+        const cost = cover - fill * 0.25 + Math.hypot(dx, dy) * 2;
+        if (cost < best.cost) best = { x: base.x + dx, y: base.y + dy, cost };
       }
     }
     target.current = { x: best.x, y: best.y };
@@ -171,25 +223,9 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
     let raf = 0;
     const place = () => {
       tiles.forEach((t, i) => {
-        // Wrap around the screen centre, so the ball shows the nearest copy of every project.
-        const x = wrap(t.x + cur.x + t.w / 2 - 720, field.w, field.w / 2) + 720 - t.w / 2;
-        const y = wrap(t.y + cur.y + t.h / 2 - h / 2, field.h, field.h / 2) + h / 2 - t.h / 2;
-        pos[i].left.set(x);
-        pos[i].top.set(y);
-        // Lay the tile's centre on the ball: its flat distance from the screen centre becomes an
-        // arc, so it slides in toward the centre, sinks back and turns to follow the curve.
-        const dx = x + t.w / 2 - 720;
-        const dy = y + t.h / 2 - h / 2;
-        const ax = dx / BALL_RADIUS;
-        const ay = dy / BALL_RADIUS;
-        const hidden = Math.abs(ax) > BALL_HORIZON || Math.abs(ay) > BALL_HORIZON;
-        pos[i].opacity.set(hidden ? 0 : 1);
-        if (hidden) return;
-        pos[i].x.set(BALL_RADIUS * Math.sin(ax) - dx);
-        pos[i].y.set(BALL_RADIUS * Math.sin(ay) * Math.cos(ax) - dy);
-        pos[i].z.set(BALL_RADIUS * (Math.cos(ax) * Math.cos(ay) - 1));
-        pos[i].rotateY.set((ax * 180) / Math.PI);
-        pos[i].rotateX.set((-ay * 180) / Math.PI);
+        // The nearest copy of each project around the screen centre (the field repeats endlessly).
+        pos[i].left.set(720 + wrapC(t.x + cur.x + t.w / 2 - 720, field.w) - t.w / 2);
+        pos[i].top.set(h / 2 + wrapC(t.y + cur.y + t.h / 2 - h / 2, field.h) - t.h / 2);
       });
     };
     const tick = () => {
@@ -235,31 +271,76 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
     };
   }, [tiles, field.w, field.h, pos, paused]);
 
+  // The ball is only drawn: find the project under the pointer by mapping it back to the flat grid.
+  const tileAt = (clientX: number, clientY: number) => {
+    const el = box.current;
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    const s = scaleOf();
+    const h = vhOf();
+    const dx = (clientX - r.left) / s - 720;
+    const dy = (clientY - r.top) / s - h / 2;
+    const d = Math.hypot(dx, dy);
+    const k = d ? toFlat(d) / d : 1;
+    const fx = 720 + dx * k;
+    const fy = h / 2 + dy * k;
+    for (let i = tiles.length - 1; i >= 0; i--) {
+      const x = pos[i].left.get();
+      const y = pos[i].top.get();
+      if (fx >= x && fx <= x + tiles[i].w && fy >= y && fy <= y + r169(tiles[i].w)) return i;
+    }
+    return null;
+  };
+  const track = (e: React.PointerEvent) => {
+    const i = drag.current?.moved ? null : tileAt(e.clientX, e.clientY);
+    // Set synchronously so the cursor tag (which reads data-cursor on this same move) sees it.
+    if (i === null) box.current?.removeAttribute("data-cursor");
+    else box.current?.setAttribute("data-cursor", "play");
+    hoverRef.current = i;
+    setHover(i);
+  };
+
   return (
     <div
-      className="absolute inset-0 cursor-grab overflow-hidden active:cursor-grabbing"
-      style={{ perspective: BALL_PERSPECTIVE, perspectiveOrigin: "50% 50%" }}
+      ref={box}
+      className={`absolute inset-0 overflow-hidden ${hover === null ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"}`}
       onPointerDown={(e) => (drag.current = { x: e.clientX, y: e.clientY, tx: target.current.x, ty: target.current.y, moved: false })}
+      onPointerMove={track}
+      onPointerLeave={() => {
+        box.current?.removeAttribute("data-cursor");
+        hoverRef.current = null;
+        setHover(null);
+      }}
+      onClick={(e) => {
+        if (drag.current?.moved) return;
+        const i = tileAt(e.clientX, e.clientY);
+        if (i !== null) onPlay(i);
+      }}
     >
-      {tiles.map((t, i) => (
-        <motion.button
-          key={t.slug}
-          layoutId={t.slug}
-          transition={MORPH}
-          type="button"
-          data-cursor="play"
-          onClick={() => !drag.current?.moved && onPlay(i)}
-          className="group absolute flex cursor-pointer flex-col gap-2 text-left"
-          style={{ left: pos[i].left, top: pos[i].top, width: t.w, x: pos[i].x, y: pos[i].y, z: pos[i].z, rotateX: pos[i].rotateX, rotateY: pos[i].rotateY, opacity: pos[i].opacity }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={t.poster ?? ""} alt={`${t.client}, ${t.label}`} loading="lazy" draggable={false} className="block w-full object-cover" style={{ height: r169(t.w) }} />
-          <span className="t-h5 flex justify-between gap-4 whitespace-nowrap opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100">
-            <span className="truncate">{t.label}</span>
-            <span>{t.client}</span>
-          </span>
-        </motion.button>
-      ))}
+      <div className="pointer-events-none absolute inset-0 transition-opacity duration-300 ease-out" style={{ opacity: morphing ? 1 : 0 }}>
+        {tiles.map((t, i) => (
+          <motion.div
+            key={t.slug}
+            layoutId={t.slug}
+            transition={MORPH}
+            className="absolute flex flex-col gap-2 text-left"
+            style={{ left: pos[i].left, top: pos[i].top, width: t.w }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={t.poster ?? ""} alt={`${t.client}, ${t.label}`} loading="lazy" draggable={false} className="block w-full object-cover" style={{ height: r169(t.w) }} />
+          </motion.div>
+        ))}
+      </div>
+      <BallCanvas items={items} pos={pos} height={height} radius={BALL_RADIUS} visible={!morphing} hover={hoverRef} label={label} />
+      {/* Title / client of the hovered project, laid along its bent bottom edge (BallCanvas moves it). */}
+      <div ref={label} aria-live="polite" className="t-h5 pointer-events-none absolute top-0 left-0 flex origin-top-left justify-between gap-4 whitespace-nowrap opacity-0 transition-opacity duration-300 ease-out">
+        {hover !== null && (
+          <>
+            <span className="truncate">{tiles[hover].label}</span>
+            <span>{tiles[hover].client}</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }
