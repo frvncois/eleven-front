@@ -11,26 +11,29 @@ import { useEffect, useState } from "react";
 type Setting = { key: string; label: string; hint: string; min: number; max: number; step: number; value: number };
 type Group = { title: string; settings: Setting[] };
 
+// Defaults toned down (Amélie, Oct 17: "a bit too much"): softer taper and near side, a slight
+// tilt that stays at rest, less bend and less travel per scroll. Was depth 1.25, near 1.55, rest 0,
+// full bend at 26, scroll distance 1.
 export const GROUPS: Group[] = [
   {
     title: "Shape",
     settings: [
-      { key: "depth", label: "Depth", hint: "How far the grid falls away. 1 = the logo, 1.25 = the mixer strip", min: 0, max: 2.5, step: 0.05, value: 1.25 },
-      { key: "near", label: "Near size", hint: "How big the side you come from gets", min: 0.6, max: 2, step: 0.05, value: 1.55 },
+      { key: "depth", label: "Depth", hint: "How far the grid falls away. 1 = the logo, 1.25 = the mixer strip", min: 0, max: 2.5, step: 0.05, value: 0.75 },
+      { key: "near", label: "Near size", hint: "How big the side you come from gets", min: 0.6, max: 2, step: 0.05, value: 1.2 },
       { key: "length", label: "Taper length", hint: "Distance over which it narrows. Shorter brings the vanishing point on screen", min: 800, max: 3000, step: 20, value: 2780 },
-      { key: "rest", label: "Bend at rest", hint: "0 = flat when you stop. Above 0 it keeps a tilt towards the last direction", min: 0, max: 0.8, step: 0.02, value: 0 },
+      { key: "rest", label: "Bend at rest", hint: "0 = flat when you stop. Above 0 it keeps a tilt towards the last direction", min: 0, max: 0.8, step: 0.02, value: 0.35 },
       { key: "behind", label: "Point behind you", hint: "0 = the point is where you head to, 1 = where you come from", min: 0, max: 1, step: 1, value: 0 },
     ],
   },
   {
     title: "Feel",
     settings: [
-      { key: "fullSpeed", label: "Speed for full bend", hint: "Lower = bends fully with a gentle scroll", min: 4, max: 60, step: 1, value: 26 },
+      { key: "fullSpeed", label: "Speed for full bend", hint: "Lower = bends fully with a gentle scroll", min: 4, max: 60, step: 1, value: 45 },
       { key: "attack", label: "Bend in", hint: "How fast it bends when you start", min: 0.02, max: 0.5, step: 0.01, value: 0.02 },
       { key: "release", label: "Settle back", hint: "How fast it goes flat when you stop", min: 0.01, max: 0.3, step: 0.01, value: 0.03 },
       { key: "turn", label: "Turn speed", hint: "How fast the point follows a change of direction", min: 0.01, max: 0.4, step: 0.01, value: 0.08 },
       { key: "glide", label: "Scroll ease", hint: "Low = long soft glide, high = sticks to your finger", min: 0.03, max: 0.3, step: 0.01, value: 0.09 },
-      { key: "wheel", label: "Scroll distance", hint: "How far one scroll moves the grid", min: 0.2, max: 3, step: 0.1, value: 1 },
+      { key: "wheel", label: "Scroll distance", hint: "How far one scroll moves the grid", min: 0.2, max: 3, step: 0.1, value: 0.6 },
       { key: "fling", label: "Drag throw", hint: "How far a flicked drag keeps travelling", min: 0, max: 30, step: 1, value: 0 },
     ],
   },
