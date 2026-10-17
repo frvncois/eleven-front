@@ -26,7 +26,11 @@ const SPREAD = 1.1;
 // the clear spot closest to project 01 in the middle.
 const NAV_TOP = 96;
 const NAV_BOTTOM = 88;
-const FLOSS = { w: 160, h: 145 }; // the floss logo rises above the bottom bar, bottom-left
+const FLOSS = { w: 160, h: 145 };
+// Mini fisheye (Amélie, Oct 17): tiles shrink and draw slightly in toward the centre as they reach
+// the corners. 0 in the middle, full strength in the corners.
+const FISHEYE_SCALE = 0.28; // corner tiles at 72 % size
+const FISHEYE_PULL = 0.07; // and 7 % closer to the centre // the floss logo rises above the bottom bar, bottom-left
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 /** Width for a row `d` rows away from the middle: L at 0, M at 1, S from 2, eased in between. */
@@ -94,7 +98,7 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
   const tiles = useMemo(() => figmaTiles.map((t) => ({ ...t, x: t.x * SPREAD, y: t.y * SPREAD })), [figmaTiles]);
   const field = useMemo(() => ({ w: figmaField.w * SPREAD, h: figmaField.h * SPREAD }), [figmaField.w, figmaField.h]);
   // Each tile's on-screen position, written every frame (no re-render).
-  const [pos] = useState(() => tiles.map(() => ({ left: motionValue(0), top: motionValue(0) })));
+  const [pos] = useState(() => tiles.map(() => ({ left: motionValue(0), top: motionValue(0), scale: motionValue(1) })));
   const drag = useRef<{ x: number; y: number; tx: number; ty: number; moved: boolean } | null>(null);
   const target = useRef({ x: 0, y: 0 });
 
@@ -144,8 +148,17 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
     let raf = 0;
     const place = () => {
       tiles.forEach((t, i) => {
-        pos[i].left.set(wrap(t.x + cur.x, field.w, t.w + 40));
-        pos[i].top.set(wrap(t.y + cur.y, field.h, t.h + 40));
+        const x = wrap(t.x + cur.x, field.w, t.w + 40);
+        const y = wrap(t.y + cur.y, field.h, t.h + 40);
+        // Distance of the tile's centre from the screen centre, 1 = a corner.
+        const dx = x + t.w / 2 - 720;
+        const dy = y + t.h / 2 - h / 2;
+        const f = Math.min(1, ((dx / 720) ** 2 + (dy / (h / 2)) ** 2) / 2);
+        const ease = f * f; // stays flat in the middle, bends near the corners
+        const pull = 1 - FISHEYE_PULL * ease;
+        pos[i].left.set(720 + dx * pull - t.w / 2);
+        pos[i].top.set(h / 2 + dy * pull - t.h / 2);
+        pos[i].scale.set(1 - FISHEYE_SCALE * ease);
       });
     };
     const tick = () => {
@@ -205,7 +218,7 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
           data-cursor="play"
           onClick={() => !drag.current?.moved && onPlay(i)}
           className="group absolute flex cursor-pointer flex-col gap-2 text-left"
-          style={{ left: pos[i].left, top: pos[i].top, width: t.w }}
+          style={{ left: pos[i].left, top: pos[i].top, width: t.w, scale: pos[i].scale }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={t.poster ?? ""} alt={`${t.client}, ${t.label}`} loading="lazy" draggable={false} className="block w-full object-cover" style={{ height: r169(t.w) }} />
