@@ -24,8 +24,8 @@ const GAP = 16;
 const STEP = 300; // wheel distance from one project to the next
 // Grid: the Figma field spread out a little so there is air between projects (Amélie, Oct 17), then
 // evened out (relax) so there are no big holes. Tile sizes stay.
-const SPREAD = 0.95;
-const MIN_GAP = 64; // smallest space between two projects after evening out
+const SPREAD = 1.12; // was 0.95: more room so projects sit further apart (Amélie, Oct 17)
+const MIN_GAP = 104; // smallest space between two projects after evening out (was 64)
 // On arrival the nav must read clearly: the opening view (searched over the whole wrapped field)
 // keeps the top nav clear, avoids the floss and toggle corners, and fills the screen.
 const NAV_TOP = 96;

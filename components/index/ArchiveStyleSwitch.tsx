@@ -4,7 +4,8 @@ import Link from "next/link";
 export const ARCHIVE_STYLES = [
   { key: "ball", href: "/archive", label: "Fisheye" },
   { key: "vanish", href: "/archive/vanish", label: "Vanish" },
-  { key: "tilt", href: "/archive/tilt", label: "Tilt" },
+  // Dropped for the eclectic grid (Amélie, Oct 17): out of the chips, page kept.
+  { key: "tilt", href: "/archive/tilt", label: "Tilt", hidden: true },
   // Too much (Amélie, Oct 17: the projects don't read): out of the chips, pages kept.
   { key: "lanes", href: "/archive/lanes", label: "Lanes", hidden: true },
   { key: "corridor", href: "/archive/corridor", label: "Corridor", hidden: true },
@@ -17,7 +18,7 @@ export type ArchiveStyle = (typeof ARCHIVE_STYLES)[number]["key"];
 /**
  * Switch between the Archive versions (Amélie, Oct 17): one grey chip per version next to the view
  * toggle, the current one in the selected grey (neutral 300), as on every toggle of the site.
- * Tilt is the subtle vanishing point; Lanes, Corridor, Floor and Fly (too much) only show on their own page.
+ * Tilt, Lanes, Corridor, Floor and Fly were dropped: they only show on their own page.
  */
 export function ArchiveStyleSwitch({ current }: { current: ArchiveStyle }) {
   return (

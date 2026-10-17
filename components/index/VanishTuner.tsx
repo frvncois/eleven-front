@@ -12,16 +12,17 @@ type Setting = { key: string; label: string; hint: string; min: number; max: num
 type Group = { title: string; settings: Setting[] };
 
 // Defaults toned down (Amélie, Oct 17: "a bit too much"): softer taper and near side, a slight
-// tilt that stays at rest, less bend and less travel per scroll. Was depth 1.25, near 1.55, rest 0,
+// tilt that stays at rest, less bend and less travel per scroll. Later the same day: flat at rest
+// again, depth 0.6 ("just a little vanishing point when you scroll"). Was depth 1.25, near 1.55, rest 0,
 // full bend at 26, scroll distance 1, turn speed 0.08.
 export const GROUPS: Group[] = [
   {
     title: "Shape",
     settings: [
-      { key: "depth", label: "Depth", hint: "How far the grid falls away. 1 = the logo, 1.25 = the mixer strip", min: 0, max: 2.5, step: 0.05, value: 0.75 },
+      { key: "depth", label: "Depth", hint: "How far the grid falls away. 1 = the logo, 1.25 = the mixer strip", min: 0, max: 2.5, step: 0.05, value: 0.6 },
       { key: "near", label: "Near size", hint: "How big the side you come from gets", min: 0.6, max: 2, step: 0.05, value: 1.2 },
       { key: "length", label: "Taper length", hint: "Distance over which it narrows. Shorter brings the vanishing point on screen", min: 800, max: 3000, step: 20, value: 2780 },
-      { key: "rest", label: "Bend at rest", hint: "0 = flat when you stop. Above 0 it keeps a tilt towards the last direction", min: 0, max: 0.8, step: 0.02, value: 0.35 },
+      { key: "rest", label: "Bend at rest", hint: "0 = flat when you stop. Above 0 it keeps a tilt towards the last direction", min: 0, max: 0.8, step: 0.02, value: 0 },
       { key: "behind", label: "Point behind you", hint: "0 = the point is where you head to, 1 = where you come from", min: 0, max: 1, step: 1, value: 0 },
     ],
   },
