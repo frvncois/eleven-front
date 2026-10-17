@@ -7,6 +7,7 @@ import { Chrome } from "@/components/shell/Chrome";
 import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { BallCanvas } from "./BallCanvas";
+import { preloadArchive } from "@/lib/archive-preload";
 
 export type Tile = Project & { label: string; client: string; x: number; y: number; w: number; h: number };
 
@@ -59,10 +60,13 @@ const vhOf = () => parseFloat(getComputedStyle(document.documentElement).getProp
  */
 export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number; h: number } }) {
   const [view, setView] = useState<"grid" | "list">("grid");
+  // The grid only plays its flat morph phase when it comes back from the list.
+  const fromList = useRef(false);
   const [playing, setPlaying] = useState<number | null>(null);
 
   const toggle = () => {
     sound.cue(view === "grid" ? "gather" : "explode");
+    fromList.current = view === "list";
     setView(view === "grid" ? "list" : "grid");
   };
 
@@ -70,7 +74,7 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
     <main className="relative h-(--vh) overflow-hidden bg-neutral-0 select-none">
       <LayoutGroup>
         {view === "grid" ? (
-          <GridView tiles={tiles} field={field} onPlay={(i) => openWithSound(() => setPlaying(i))} paused={playing !== null} />
+          <GridView tiles={tiles} field={field} fromList={fromList.current} onPlay={(i) => openWithSound(() => setPlaying(i))} paused={playing !== null} />
         ) : (
           <ListView tiles={tiles} onPlay={(i) => openWithSound(() => setPlaying(i))} />
         )}
@@ -143,9 +147,29 @@ function relax(tiles: Tile[], field: { w: number; h: number }) {
   return tiles.map((t, i) => ({ ...t, x: c[i].x - t.w / 2, y: c[i].y - t.h / 2 }));
 }
 
-function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { tiles: Tile[]; field: { w: number; h: number }; onPlay: (i: number) => void; paused: boolean }) {
+// The opening view per screen height and the evened-out layout, worked out once per visit.
+const arrival = new Map<number, { x: number; y: number }>();
+let relaxed: { source: Tile[]; tiles: Tile[] } | null = null;
+
+function GridView({
+  tiles: figmaTiles,
+  field: figmaField,
+  fromList,
+  onPlay,
+  paused,
+}: {
+  tiles: Tile[];
+  field: { w: number; h: number };
+  fromList: boolean;
+  onPlay: (i: number) => void;
+  paused: boolean;
+}) {
   const field = useMemo(() => ({ w: figmaField.w * SPREAD, h: figmaField.h * SPREAD }), [figmaField.w, figmaField.h]);
-  const tiles = useMemo(() => relax(figmaTiles.map((t) => ({ ...t, x: t.x * SPREAD, y: t.y * SPREAD })), field), [figmaTiles, field]);
+  const tiles = useMemo(() => {
+    // Evened out once per visit (the layout is the same every time).
+    if (!relaxed || relaxed.source !== figmaTiles) relaxed = { source: figmaTiles, tiles: relax(figmaTiles.map((t) => ({ ...t, x: t.x * SPREAD, y: t.y * SPREAD })), field) };
+    return relaxed.tiles;
+  }, [figmaTiles, field]);
   // Each tile's position on the flat grid (screen coordinates), written every frame (no re-render).
   const [pos] = useState(() => tiles.map(() => ({ left: motionValue(0), top: motionValue(0) })));
   const drag = useRef<{ x: number; y: number; tx: number; ty: number; moved: boolean } | null>(null);
@@ -158,11 +182,13 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
   useEffect(() => setHeight(vhOf()), []);
   // The page's own tiles stay in place (hit areas, and the morph to and from the list): visible
   // while the morph plays, then the ball takes over.
-  const [morphing, setMorphing] = useState(true);
+  const [morphing, setMorphing] = useState(fromList);
   useEffect(() => {
+    preloadArchive();
+    if (!fromList) return;
     const t = setTimeout(() => setMorphing(false), MORPH.duration * 1000 + 50);
     return () => clearTimeout(t);
-  }, []);
+  }, [fromList]);
   const items = useMemo(() => tiles.map((t) => ({ poster: t.poster ?? null, w: t.w, h: r169(t.w) })), [tiles]);
 
   useEffect(() => {
@@ -208,14 +234,30 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
       return { cover, fill };
     };
     // Lowest cost wins: nav cover (top nav heavily), minus how full the screen is, plus a little
-    // distance from project 01.
-    let best = { ...base, cost: Infinity };
-    for (let dy = -field.h / 2; dy <= field.h / 2; dy += 12) {
-      for (let dx = -field.w / 2; dx <= field.w / 2; dx += 16) {
-        const { cover, fill } = score(base.x + dx, base.y + dy);
-        const cost = cover - fill * 0.25 + Math.hypot(dx, dy) * 2;
-        if (cost < best.cost) best = { x: base.x + dx, y: base.y + dy, cost };
+    // distance from project 01. Coarse pass over the whole field, then a fine pass around the best
+    // spot; remembered for the visit, so coming back is instant.
+    const cost = (dx: number, dy: number) => {
+      const { cover, fill } = score(base.x + dx, base.y + dy);
+      return cover - fill * 0.25 + Math.hypot(dx, dy) * 2;
+    };
+    let best = arrival.get(h);
+    if (!best) {
+      let b = { dx: 0, dy: 0, c: Infinity };
+      for (let dy = -field.h / 2; dy <= field.h / 2; dy += 96) {
+        for (let dx = -field.w / 2; dx <= field.w / 2; dx += 128) {
+          const c = cost(dx, dy);
+          if (c < b.c) b = { dx, dy, c };
+        }
       }
+      const coarse = b;
+      for (let dy = coarse.dy - 96; dy <= coarse.dy + 96; dy += 12) {
+        for (let dx = coarse.dx - 128; dx <= coarse.dx + 128; dx += 16) {
+          const c = cost(dx, dy);
+          if (c < b.c) b = { dx, dy, c };
+        }
+      }
+      best = { x: base.x + b.dx, y: base.y + b.dy };
+      arrival.set(h, best);
     }
     target.current = { x: best.x, y: best.y };
     const cur = { ...target.current };

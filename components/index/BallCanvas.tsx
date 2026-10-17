@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { MotionValue } from "framer-motion";
+import { posterBitmap } from "@/lib/archive-preload";
 
 type Item = { poster: string | null; w: number; h: number };
 
@@ -104,30 +105,31 @@ export function BallCanvas({
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
-    // Textures load in the background; a tile draws once its poster is in.
-    const tex = items.map((it) => {
-      const t: { tex: WebGLTexture | null; crop: [number, number, number, number] } = { tex: null, crop: [1, 1, 0, 0] };
-      if (!it.poster) return t;
-      const img = new Image();
-      img.decoding = "async";
-      img.onload = () => {
-        const tx = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, tx);
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        // object-fit: cover into the tile's 16:9 box.
-        const box = it.w / it.h;
-        const pic = img.naturalWidth / img.naturalHeight;
-        t.crop = pic > box ? [box / pic, 1, (1 - box / pic) / 2, 0] : [1, pic / box, 0, (1 - pic / box) / 2];
-        t.tex = tx;
-      };
-      img.src = it.poster;
-      return t;
+    // Posters were usually decoded before the page opened (lib/archive-preload). They go to the GPU
+    // a few per frame, those on screen first, so opening the page never stalls. A tile draws once
+    // its poster is in.
+    type Tex = { tex: WebGLTexture | null; crop: [number, number, number, number]; pic: ImageBitmap | HTMLImageElement | null };
+    const tex: Tex[] = items.map(() => ({ tex: null, crop: [1, 1, 0, 0], pic: null }));
+    let alive = true;
+    items.forEach((it, i) => {
+      if (it.poster) posterBitmap(it.poster).then((pic) => alive && (tex[i].pic = pic));
     });
+    const upload = (it: Item, t: Tex) => {
+      const pic = t.pic!;
+      const tx = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, tx);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, pic);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      // object-fit: cover into the tile's 16:9 box.
+      const box = it.w / it.h;
+      const ratio = pic.width / pic.height;
+      t.crop = ratio > box ? [box / ratio, 1, (1 - box / ratio) / 2, 0] : [1, ratio / box, 0, (1 - ratio / box) / 2];
+      t.tex = tx;
+    };
+    const PER_FRAME = 3;
 
     const toScreen = (x: number, y: number) => {
       const dx = x - 720;
@@ -142,6 +144,13 @@ export function BallCanvas({
     const reach = radius * 1.4; // beyond this a tile is round the back of the ball
     const frame = () => {
       raf = requestAnimationFrame(frame);
+      // Hand ready posters to the GPU, nearest the centre first, a few per frame.
+      let budget = PER_FRAME;
+      items
+        .map((it, i) => ({ i, d: Math.hypot(pos[i].left.get() + it.w / 2 - 720, pos[i].top.get() + it.h / 2 - height / 2) }))
+        .filter(({ i }) => !tex[i].tex && tex[i].pic)
+        .sort((a, b) => a.d - b.d)
+        .forEach(({ i }) => budget-- > 0 && upload(items[i], tex[i]));
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       items.forEach((it, i) => {
@@ -173,6 +182,7 @@ export function BallCanvas({
     };
     raf = requestAnimationFrame(frame);
     return () => {
+      alive = false;
       cancelAnimationFrame(raf);
       tex.forEach((t) => t.tex && gl.deleteTexture(t.tex));
       gl.deleteBuffer(buf);

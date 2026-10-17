@@ -6,6 +6,7 @@ import { MixersOverlay } from "@/components/mixers/MixersOverlay";
 import { usePathname } from "next/navigation";
 import site from "@/data/site.json";
 import { sound } from "@/lib/sound";
+import { preloadArchive } from "@/lib/archive-preload";
 
 /**
  * Nav/Bar (Figma 7356:3252): five links spread edge to edge, Heading/H4.
@@ -39,7 +40,10 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
             key={item.label}
             href={item.href}
             aria-current={current ? "page" : undefined}
-            onPointerEnter={() => sound.cue("navHover")}
+            onPointerEnter={() => {
+              sound.cue("navHover");
+              if (item.href === "/archive") preloadArchive();
+            }}
             className={cls}
             style={style}
           >

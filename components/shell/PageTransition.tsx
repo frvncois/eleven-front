@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { DUR, EASE_SWEEP, prefersReducedMotion, themeColor } from "@/lib/motion";
 import { setGateSeen } from "@/lib/gate";
+import { preloadArchive } from "@/lib/archive-preload";
 import { sound } from "@/lib/sound";
 
 const CARRY_KEY = "eleven-sweep";
@@ -57,6 +58,8 @@ export function PageTransition() {
       if (prefersReducedMotion()) return router.push(href);
 
       busy.current = true;
+      // Archive opens on the ball: get its thumbnails in during the sweep (keyboard clicks too).
+      if (url.pathname === "/archive") preloadArchive();
       const color = themeColor(url.pathname);
       window.__lenis?.stop();
       sound.cue("sweepIn");
