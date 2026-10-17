@@ -20,5 +20,5 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
   const mixer = mixerBySlug(slug);
   if (!mixer) notFound();
-  return <MixerPage mixer={mixer} spots={spotsOf(slug)} others={mixers.filter((m) => m.slug !== slug)} />;
+  return <MixerPage mixer={mixer} spots={spotsOf(slug)} />;
 }
