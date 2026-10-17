@@ -27,10 +27,11 @@ const SPREAD = 1.1;
 const NAV_TOP = 96;
 const NAV_BOTTOM = 88;
 const FLOSS = { w: 160, h: 145 };
-// Mini fisheye (Amélie, Oct 17): tiles shrink and draw slightly in toward the centre as they reach
-// the corners. 0 in the middle, full strength in the corners.
-const FISHEYE_SCALE = 0.28; // corner tiles at 72 % size
-const FISHEYE_PULL = 0.07; // and 7 % closer to the centre // the floss logo rises above the bottom bar, bottom-left
+// The screen as a ball (Amélie, Oct 17): the field wraps over a sphere, so projects roll over it
+// and turn away as they near the edges and corners. Flat in the middle, a gentle bulge all around.
+const BALL_RADIUS = 1900; // larger = flatter
+const BALL_HORIZON = 1.25; // radians from the centre: beyond it a tile is round the back of the ball, hidden
+const BALL_PERSPECTIVE = 1600; // the floss logo rises above the bottom bar, bottom-left
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 /** Width for a row `d` rows away from the middle: L at 0, M at 1, S from 2, eased in between. */
@@ -98,7 +99,9 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
   const tiles = useMemo(() => figmaTiles.map((t) => ({ ...t, x: t.x * SPREAD, y: t.y * SPREAD })), [figmaTiles]);
   const field = useMemo(() => ({ w: figmaField.w * SPREAD, h: figmaField.h * SPREAD }), [figmaField.w, figmaField.h]);
   // Each tile's on-screen position, written every frame (no re-render).
-  const [pos] = useState(() => tiles.map(() => ({ left: motionValue(0), top: motionValue(0), scale: motionValue(1) })));
+  const [pos] = useState(() =>
+    tiles.map(() => ({ left: motionValue(0), top: motionValue(0), x: motionValue(0), y: motionValue(0), z: motionValue(0), rotateX: motionValue(0), rotateY: motionValue(0), opacity: motionValue(1) })),
+  );
   const drag = useRef<{ x: number; y: number; tx: number; ty: number; moved: boolean } | null>(null);
   const target = useRef({ x: 0, y: 0 });
 
@@ -118,28 +121,48 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
       { x0: 0, x1: FLOSS.w, y0: h - FLOSS.h, y1: h },
       { x0: 1440 - 200, x1: 1440, y0: h - NAV_BOTTOM, y1: h },
     ];
+    // Where a tile ends up on screen once laid on the ball (centre-wrapped, curved, foreshortened).
+    const onBall = (t: Tile, ox: number, oy: number) => {
+      const dx = wrap(t.x + ox + t.w / 2 - 720, field.w, field.w / 2);
+      const dy = wrap(t.y + oy + t.h / 2 - h / 2, field.h, field.h / 2);
+      const ax = dx / BALL_RADIUS;
+      const ay = dy / BALL_RADIUS;
+      if (Math.abs(ax) > BALL_HORIZON || Math.abs(ay) > BALL_HORIZON) return null;
+      const z = BALL_RADIUS * (Math.cos(ax) * Math.cos(ay) - 1);
+      const k = BALL_PERSPECTIVE / (BALL_PERSPECTIVE - z); // perspective shrink with depth
+      const cx = 720 + BALL_RADIUS * Math.sin(ax) * k;
+      const cy = h / 2 + BALL_RADIUS * Math.sin(ay) * Math.cos(ax) * k;
+      const w = t.w * k;
+      const hh = t.h * k;
+      return { x: cx - w / 2, y: cy - hh / 2, w, h: hh };
+    };
+    // How much of the navs a view covers (0 = clear) and how full it is.
     const score = (ox: number, oy: number) => {
+      let cover = 0;
       let fill = 0;
-      for (const t of tiles) {
-        const x = wrap(t.x + ox, field.w, t.w + 40);
-        const y = wrap(t.y + oy, field.h, t.h + 40);
-        const w = Math.max(0, Math.min(x + t.w, 1440) - Math.max(x, 0));
-        const v = Math.max(0, Math.min(y + t.h, h) - Math.max(y, 0));
+      for (const tile of tiles) {
+        const r = onBall(tile, ox, oy);
+        if (!r) continue;
+        const w = Math.max(0, Math.min(r.x + r.w, 1440) - Math.max(r.x, 0));
+        const v = Math.max(0, Math.min(r.y + r.h, h) - Math.max(r.y, 0));
         if (!w || !v) continue;
         for (const b of bands) {
-          if (x < b.x1 && x + t.w > b.x0 && y < b.y1 && y + t.h > b.y0) return Infinity;
+          const bw = Math.max(0, Math.min(r.x + r.w, b.x1) - Math.max(r.x, b.x0));
+          const bh = Math.max(0, Math.min(r.y + r.h, b.y1) - Math.max(r.y, b.y0));
+          cover += bw * bh;
         }
         fill += w * v;
       }
-      return -fill / 1000;
+      return { cover, fill };
     };
-    let best = { ...base, score: Infinity };
+    // Clear views first; among those the fullest, then the closest to project 01. If nothing is
+    // fully clear, the least covered view wins.
+    let best = { ...base, cover: Infinity, rank: Infinity };
     for (let dy = -field.h / 2; dy <= field.h / 2; dy += 12) {
       for (let dx = -field.w / 2; dx <= field.w / 2; dx += 16) {
-        const sc = score(base.x + dx, base.y + dy);
-        if (sc === Infinity) continue;
-        const total = sc + Math.hypot(dx, dy) / 20;
-        if (total < best.score) best = { x: base.x + dx, y: base.y + dy, score: total };
+        const { cover, fill } = score(base.x + dx, base.y + dy);
+        const rank = -fill / 1000 + Math.hypot(dx, dy) / 20;
+        if (cover < best.cover || (cover === best.cover && rank < best.rank)) best = { x: base.x + dx, y: base.y + dy, cover, rank };
       }
     }
     target.current = { x: best.x, y: best.y };
@@ -148,17 +171,25 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
     let raf = 0;
     const place = () => {
       tiles.forEach((t, i) => {
-        const x = wrap(t.x + cur.x, field.w, t.w + 40);
-        const y = wrap(t.y + cur.y, field.h, t.h + 40);
-        // Distance of the tile's centre from the screen centre, 1 = a corner.
+        // Wrap around the screen centre, so the ball shows the nearest copy of every project.
+        const x = wrap(t.x + cur.x + t.w / 2 - 720, field.w, field.w / 2) + 720 - t.w / 2;
+        const y = wrap(t.y + cur.y + t.h / 2 - h / 2, field.h, field.h / 2) + h / 2 - t.h / 2;
+        pos[i].left.set(x);
+        pos[i].top.set(y);
+        // Lay the tile's centre on the ball: its flat distance from the screen centre becomes an
+        // arc, so it slides in toward the centre, sinks back and turns to follow the curve.
         const dx = x + t.w / 2 - 720;
         const dy = y + t.h / 2 - h / 2;
-        const f = Math.min(1, ((dx / 720) ** 2 + (dy / (h / 2)) ** 2) / 2);
-        const ease = f * f; // stays flat in the middle, bends near the corners
-        const pull = 1 - FISHEYE_PULL * ease;
-        pos[i].left.set(720 + dx * pull - t.w / 2);
-        pos[i].top.set(h / 2 + dy * pull - t.h / 2);
-        pos[i].scale.set(1 - FISHEYE_SCALE * ease);
+        const ax = dx / BALL_RADIUS;
+        const ay = dy / BALL_RADIUS;
+        const hidden = Math.abs(ax) > BALL_HORIZON || Math.abs(ay) > BALL_HORIZON;
+        pos[i].opacity.set(hidden ? 0 : 1);
+        if (hidden) return;
+        pos[i].x.set(BALL_RADIUS * Math.sin(ax) - dx);
+        pos[i].y.set(BALL_RADIUS * Math.sin(ay) * Math.cos(ax) - dy);
+        pos[i].z.set(BALL_RADIUS * (Math.cos(ax) * Math.cos(ay) - 1));
+        pos[i].rotateY.set((ax * 180) / Math.PI);
+        pos[i].rotateX.set((-ay * 180) / Math.PI);
       });
     };
     const tick = () => {
@@ -207,6 +238,7 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
   return (
     <div
       className="absolute inset-0 cursor-grab overflow-hidden active:cursor-grabbing"
+      style={{ perspective: BALL_PERSPECTIVE, perspectiveOrigin: "50% 50%" }}
       onPointerDown={(e) => (drag.current = { x: e.clientX, y: e.clientY, tx: target.current.x, ty: target.current.y, moved: false })}
     >
       {tiles.map((t, i) => (
@@ -218,7 +250,7 @@ function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { ti
           data-cursor="play"
           onClick={() => !drag.current?.moved && onPlay(i)}
           className="group absolute flex cursor-pointer flex-col gap-2 text-left"
-          style={{ left: pos[i].left, top: pos[i].top, width: t.w, scale: pos[i].scale }}
+          style={{ left: pos[i].left, top: pos[i].top, width: t.w, x: pos[i].x, y: pos[i].y, z: pos[i].z, rotateX: pos[i].rotateX, rotateY: pos[i].rotateY, opacity: pos[i].opacity }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={t.poster ?? ""} alt={`${t.client}, ${t.label}`} loading="lazy" draggable={false} className="block w-full object-cover" style={{ height: r169(t.w) }} />
