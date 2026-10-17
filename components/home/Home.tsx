@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import home from "@/data/home.json";
 import { sound } from "@/lib/sound";
@@ -9,6 +9,7 @@ import { NavSub } from "@/components/shell/NavSub";
 import { gateSeen, setGateSeen, subscribeGate } from "@/lib/gate";
 import { HomeReel } from "./HomeReel";
 
+const HINT_FALLBACK_MS = 6000; // no mouse move at all: show the hint anyway
 const EASE = [0.42, 0, 0.58, 1] as const; // Figma "ease in and out", the gate → home smart animate
 const DURATION = 1.2;
 
@@ -32,6 +33,21 @@ export function Home() {
   // the visitor turns it on here, deliberately.
   useEffect(() => {
     if (gate) sound.setMuted(true);
+  }, [gate]);
+
+  // Jordan (Oct 15): people may not know what to do here. The first mouse move brings up the hint
+  // and makes both choices glow, so nobody feels stuck.
+  const [nudge, setNudge] = useState(false);
+  useEffect(() => {
+    if (!gate) return;
+    setNudge(false);
+    const show = () => setNudge(true);
+    const timer = window.setTimeout(show, HINT_FALLBACK_MS);
+    window.addEventListener("pointermove", show, { once: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("pointermove", show);
+    };
   }, [gate]);
 
   const choose = (on: boolean) => {
@@ -88,18 +104,33 @@ export function Home() {
                 <br />
                 {home.gate.line[1]}
               </p>
-              <div className="flex gap-3">
-                {[true, false].map((on) => (
+              <div className="flex gap-4">
+                {[true, false].map((on, i) => (
                   <button
                     key={String(on)}
                     type="button"
                     onClick={() => choose(on)}
-                    className="t-accent bg-neutral-200 px-2 py-1 text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50"
+                    style={{ animationDelay: `${i * 0.3}s` }}
+                    className={`t-h3 relative overflow-hidden bg-neutral-200 px-7 py-4 text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50 ${nudge ? "gate-glow" : ""}`}
                   >
                     {on ? home.gate.on : home.gate.off}
                   </button>
                 ))}
               </div>
+              <AnimatePresence>
+                {nudge && (
+                  <motion.p
+                    key="hint"
+                    className="t-lead absolute top-full mt-10 w-[900px] text-center text-balance text-neutral-1000"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.6, ease: [0.62, 0.05, 0.01, 0.99] }}
+                  >
+                    {home.gate.hint}
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </div>
           </motion.section>
         )}
