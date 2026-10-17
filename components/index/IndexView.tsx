@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { LayoutGroup, motion, motionValue, type MotionValue } from "framer-motion";
 import type { Project } from "@/lib/content";
 import { Chrome } from "@/components/shell/Chrome";
@@ -19,6 +19,13 @@ const MID_W = 448;
 const BIG_W = 564;
 const GAP = 16;
 const STEP = 300; // wheel distance from one project to the next
+// Grid: the Figma field spread out so there is air between projects (Amélie, Oct 17). Tile sizes stay.
+const SPREAD = 1.2;
+// On arrival the nav must read clearly: the opening view settles where the fewest tiles sit under
+// the top nav and the bottom bar, searched within NUDGE px of project 01 in the middle.
+const NAV_TOP = 96;
+const NAV_BOTTOM = 88;
+const NUDGE = 720;
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 /** Width for a row `d` rows away from the middle: L at 0, M at 1, S from 2, eased in between. */
@@ -82,7 +89,9 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
 
 /* ------------------------------------------------------------------ */
 
-function GridView({ tiles, field, onPlay, paused }: { tiles: Tile[]; field: { w: number; h: number }; onPlay: (i: number) => void; paused: boolean }) {
+function GridView({ tiles: figmaTiles, field: figmaField, onPlay, paused }: { tiles: Tile[]; field: { w: number; h: number }; onPlay: (i: number) => void; paused: boolean }) {
+  const tiles = useMemo(() => figmaTiles.map((t) => ({ ...t, x: t.x * SPREAD, y: t.y * SPREAD })), [figmaTiles]);
+  const field = useMemo(() => ({ w: figmaField.w * SPREAD, h: figmaField.h * SPREAD }), [figmaField.w, figmaField.h]);
   // Each tile's on-screen position, written every frame (no re-render).
   const [pos] = useState(() => tiles.map(() => ({ left: motionValue(0), top: motionValue(0) })));
   const drag = useRef<{ x: number; y: number; tx: number; ty: number; moved: boolean } | null>(null);
@@ -92,12 +101,35 @@ function GridView({ tiles, field, onPlay, paused }: { tiles: Tile[]; field: { w:
     window.__lenis?.stop();
     window.scrollTo(0, 0);
     const h = vhOf();
-    // Open with project 01 in the middle of the screen.
-    const first = tiles[0];
-    target.current = { x: 720 - (first.x + first.w / 2), y: h / 2 - (first.y + first.h / 2) };
-    const cur = { ...target.current };
     // The field repeats in every direction (neu.team): wrap each tile into the window around the screen.
     const wrap = (v: number, size: number, span: number) => ((((v + span) % size) + size) % size) - span;
+    // Open with project 01 near the middle, nudged so the navs sit in the gaps between projects.
+    const first = tiles[0];
+    const base = { x: 720 - (first.x + first.w / 2), y: h / 2 - (first.y + first.h / 2) };
+    const navOverlap = (ox: number, oy: number) => {
+      let area = 0;
+      tiles.forEach((t) => {
+        const x = wrap(t.x + ox, field.w, t.w + 40);
+        const y = wrap(t.y + oy, field.h, t.h + 40);
+        const w = Math.max(0, Math.min(x + t.w, 1440) - Math.max(x, 0));
+        if (!w) return;
+        const top = Math.max(0, Math.min(y + t.h, NAV_TOP) - Math.max(y, 0));
+        const bottom = Math.max(0, Math.min(y + t.h, h) - Math.max(y, h - NAV_BOTTOM));
+        // Any tile under a nav counts heavily, even a sliver: the links must sit on white.
+        if (top + bottom) area += 100000 + w * (top + bottom);
+      });
+      return area;
+    };
+    let best = { ...base, score: Infinity };
+    for (let dy = -NUDGE; dy <= NUDGE; dy += 8) {
+      for (let dx = -NUDGE; dx <= NUDGE; dx += 16) {
+        // Prefer the closest clear spot, so project 01 stays near the middle.
+        const score = navOverlap(base.x + dx, base.y + dy) + Math.hypot(dx, dy) * 4;
+        if (score < best.score) best = { x: base.x + dx, y: base.y + dy, score };
+      }
+    }
+    target.current = { x: best.x, y: best.y };
+    const cur = { ...target.current };
 
     let raf = 0;
     const place = () => {
