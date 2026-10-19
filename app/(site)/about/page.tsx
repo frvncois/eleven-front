@@ -28,17 +28,19 @@ export default function AboutPage() {
       <div className="relative">
         {/* 9-col grid: the sticker starts on col 3. */}
         <StorySticker src={story.sticker.src} width={134} height={81} top={120} left={336.89} hold="12%" />
-        {/* 9-col grid: text on the 24 margin, the notes 1 col wide, paragraph 1 from col 3, paragraph 2 from col 4, both to 1416. */}
+        {/* 9-col grid: text on the 24 margin, the notes 1 col wide, paragraph 1 from col 3, paragraph 2 from col 4, both to 1416.
+            Each first line is indented one column step (indent-col), so it starts on the next column:
+            intro col 2, paragraph 1 col 4, paragraph 2 col 5 (Amélie, Oct 19; was a flat 120). */}
         <section className="relative flex flex-col px-margin pt-[calc(var(--vh)-449.35px)]">
           <div className="relative flex w-full flex-col items-end">
-            <p className="t-h2-indent w-full">{story.intro}</p>
+            <p className="t-h2 indent-col w-full">{story.intro}</p>
             {story.paragraphs.map((p, i) => (
               <div key={p.note.n} className={`flex w-full justify-between ${i === 0 ? "items-end" : "items-center"}`}>
                 <aside className="t-body-sm flex w-span-1 shrink-0 gap-2">
                   <span className="w-[15px] shrink-0">{p.note.n}</span>
                   <span className="w-[151.8px]">{p.note.text}</span>
                 </aside>
-                <p className={`t-h2-indent shrink-0 ${i === 0 ? "w-span-7" : "w-span-6"}`}>
+                <p className={`t-h2 indent-col shrink-0 ${i === 0 ? "w-span-7" : "w-span-6"}`}>
                   {p.text}
                 </p>
               </div>

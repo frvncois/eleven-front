@@ -52,6 +52,7 @@
   /* 9-column site grid (Oct 19): col 140.44, step 156.44 at 1440, odd spans centre on 720 */
   --grid-cols: 9;
   --grid-col: calc((1440px - 2 * var(--spacing-margin) - (var(--grid-cols) - 1) * var(--spacing-gutter)) / var(--grid-cols));
+  --grid-step: calc(var(--grid-col) + var(--spacing-gutter)); /* one column + one gutter, 156.44 */
 
   /* Motion, from the mockup prototype */
   --ease-out-soft: cubic-bezier(0, 0, 0.58, 1);
@@ -105,6 +106,8 @@
 @utility left-col-* {
   left: calc(var(--spacing-margin) + (--value(integer) - 1) * (var(--grid-col) + var(--spacing-gutter)));
 }
+/* indent-col: first line indented by one column step, so it starts on the next column's line. */
+@utility indent-col { text-indent: var(--grid-step); }
 /* right-col-N: the right edge sits on the end of column N (like a justify-self: end cell). */
 @utility right-col-* {
   right: calc(var(--spacing-margin) + (var(--grid-cols) - --value(integer)) * (var(--grid-col) + var(--spacing-gutter)));
