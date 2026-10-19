@@ -397,7 +397,7 @@ function GridView({
 
 /* ------------------------------------------------------------------ */
 
-type Row = { left: MotionValue<number>; top: MotionValue<number>; width: MotionValue<number>; name: MotionValue<number>; label: MotionValue<number>; fade: MotionValue<number> };
+type Row = { left: MotionValue<number>; top: MotionValue<number>; width: MotionValue<number>; fade: MotionValue<number> };
 
 function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => void }) {
   const [middle, setMiddle] = useState(0);
@@ -407,8 +407,6 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
       left: motionValue(LIST_RIGHT - SMALL_W),
       top: motionValue(0),
       width: motionValue(SMALL_W),
-      name: motionValue(0),
-      label: motionValue(0),
       fade: motionValue(0),
     })),
   );
@@ -453,9 +451,6 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
         r.width.set(widths[j]);
         r.left.set(LIST_RIGHT - widths[j]);
         r.top.set(centers[j] - heights[j] / 2);
-        r.name.set(centers[j]);
-        // Revision: only the middle project's title shows; it fades out by half a row away.
-        r.label.set(clamp(1 - 2 * Math.abs(d), 0, 1));
         r.fade.set(clamp(3.6 - Math.abs(d), 0, 1));
       });
       rows.forEach((r, i) => !shown.has(i) && r.fade.set(0));
@@ -517,6 +512,15 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
 
   return (
     <div className="absolute inset-0 overflow-hidden">
+      {/* Revision (V2 · 08 · Index · List · 9-col): one title at a time, the middle project's. It stays
+          put in the middle of the screen (level with the big image's centre) and only its text changes
+          as projects pass (Amélie, Oct 19): the client on the left margin, the title ending on the right. */}
+      <p className="t-h5 pointer-events-none absolute top-[calc(var(--vh)/2)] left-margin z-20 -translate-y-1/2 whitespace-nowrap">
+        {tiles[middle]?.client}
+      </p>
+      <p className="t-h5 pointer-events-none absolute top-[calc(var(--vh)/2)] right-margin z-20 -translate-y-1/2 whitespace-nowrap">
+        {tiles[middle]?.label}
+      </p>
       {/* Revision: the middle project's number, level with the LIST / GRID switch, ending on the margin. */}
       <p aria-live="polite" className="t-h6 absolute top-[calc(var(--vh)/2-148px)] right-margin z-20">
         {middle + 1}/{tiles.length}
@@ -537,26 +541,6 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={t.poster ?? ""} alt={`${t.client}, ${t.label}`} loading="lazy" draggable={false} className="block aspect-video w-full object-cover" />
             </motion.button>
-            {/* Revision (V2 · 08 · Index · List · 9-col): one title at a time, the middle project's,
-                level with its image: the client on the left margin, the title ending on the right one. */}
-            <motion.p
-              className="t-h5 pointer-events-none absolute left-margin -translate-y-1/2 whitespace-nowrap"
-              style={{ top: r.name, opacity: r.label }}
-              initial={{ x: -16 }}
-              animate={{ x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3, ease: [0, 0, 0.58, 1] }}
-            >
-              {t.client}
-            </motion.p>
-            <motion.p
-              className="t-h5 pointer-events-none absolute right-margin -translate-y-1/2 whitespace-nowrap"
-              style={{ top: r.name, opacity: r.label }}
-              initial={{ x: 16 }}
-              animate={{ x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3, ease: [0, 0, 0.58, 1] }}
-            >
-              {t.label}
-            </motion.p>
           </div>
         );
       })}
