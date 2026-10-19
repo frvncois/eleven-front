@@ -3,16 +3,15 @@
 import { useEffect, useState } from "react";
 
 /**
- * Dev only: press G to show the 9-column grid (24 margin, 16 gutter at 1440) and the centre axis,
- * the same as the Figma "9-col overlay" layer. Mounted in app/layout.tsx, inside the stage, so it
- * scales with --app-scale. Not rendered in production builds.
+ * Shift + G shows the 9-column grid (24 margin, 16 gutter at 1440) and the centre axis, the same as
+ * the Figma "9-col overlay" layer; Shift + G again hides it. On every build, the deployed site too
+ * (Amélie, Oct 19). Mounted in app/layout.tsx, inside the stage, so it scales with --app-scale.
  */
-function Overlay() {
+export function GridOverlay() {
   const [on, setOn] = useState(false);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "g" && e.key !== "G") return;
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.code !== "KeyG" || !e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
       const t = e.target as HTMLElement | null;
       if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
       setOn((v) => !v);
@@ -32,5 +31,3 @@ function Overlay() {
     </div>
   );
 }
-
-export const GridOverlay = process.env.NODE_ENV === "production" ? () => null : Overlay;
