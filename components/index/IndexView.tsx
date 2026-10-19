@@ -10,6 +10,7 @@ import { BallCanvas } from "./BallCanvas";
 import { preloadArchive } from "@/lib/archive-preload";
 import { ArchiveStyleSwitch } from "./ArchiveStyleSwitch";
 import { colEnd, span } from "@/lib/grid";
+import { TextToggle } from "@/components/ui/TextToggle";
 
 export type Tile = Project & { label: string; client: string; x: number; y: number; w: number; h: number };
 
@@ -17,9 +18,10 @@ const MORPH = { duration: 0.6, ease: [0.4, 0, 0.2, 1] as const };
 const r169 = (w: number) => Math.round((w * 9) / 16);
 
 // List: three sizes, S / M / L.
-// 9-col grid (Oct 19): S / M / L = 2 / 3 / 4 columns, every card ends on col 6 (946.67), so the
-// left edges land on cols 5, 4 and 3.
-const LIST_RIGHT = colEnd(6);
+// 9-col grid (Oct 19): S / M / L = 2 / 3 / 4 columns, every card ends on col 7 (1103), so the left
+// edges land on cols 6, 5 and 4 (Revision on V2 · 08 · Index · List · 9-col: the column moved right;
+// Figma draws it ending at 1119, snapped to the col 7 line).
+const LIST_RIGHT = colEnd(7);
 const SMALL_W = span(2);
 const MID_W = span(3);
 const BIG_W = span(4);
@@ -62,16 +64,21 @@ const vhOf = () => parseFloat(getComputedStyle(document.documentElement).getProp
  * reach the middle and shrink after. After the last project comes the first again.
  * The toggle morphs one view into the other (gather / explode sounds). Click a tile to play it.
  */
+const VIEWS: { value: "grid" | "list"; label: string }[] = [
+  { value: "list", label: "List" },
+  { value: "grid", label: "Grid" },
+];
+
 export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number; h: number } }) {
   const [view, setView] = useState<"grid" | "list">("grid");
   // The grid only plays its flat morph phase when it comes back from the list.
   const fromList = useRef(false);
   const [playing, setPlaying] = useState<number | null>(null);
 
-  const toggle = () => {
-    sound.cue(view === "grid" ? "gather" : "explode");
-    fromList.current = view === "list";
-    setView(view === "grid" ? "list" : "grid");
+  const choose = (v: "grid" | "list") => {
+    sound.cue(v === "list" ? "gather" : "explode");
+    fromList.current = v === "grid";
+    setView(v);
   };
 
   return (
@@ -84,24 +91,18 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
         )}
       </LayoutGroup>
 
-      <Chrome
-        toggles={
-          <>
-            <ArchiveStyleSwitch current="ball" />
-          <button
-            type="button"
-            onClick={toggle}
-            data-sound="off"
-            aria-label={view === "grid" ? "Show as list" : "Show as grid"}
-            className="block size-8 transition-opacity duration-200 ease-out hover:opacity-50"
-          >
-            {/* One button = an action: it shows the view you will switch to. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={view === "grid" ? "/icons/view-list.svg" : "/icons/view-grid.svg"} alt="" width={32} height={32} />
-          </button>
-          </>
-        }
+      {/* Revision (V2 · 08 · Index · List / Grid · 9-col): LIST / GRID on the left margin, 148 above
+          the middle of the screen, in Archive yellow; replaces the icon toggle bottom right. */}
+      <TextToggle
+        label="View"
+        options={VIEWS}
+        value={view}
+        onChange={choose}
+        accent="yellow"
+        className="absolute top-[calc(var(--vh)/2-148px)] left-margin z-20 gap-2"
       />
+
+      <Chrome toggles={<ArchiveStyleSwitch current="ball" />} />
       <Player films={tiles} index={playing} onIndex={setPlaying} onClose={() => setPlaying(null)} />
     </main>
   );
@@ -396,9 +397,10 @@ function GridView({
 
 /* ------------------------------------------------------------------ */
 
-type Row = { left: MotionValue<number>; top: MotionValue<number>; width: MotionValue<number>; name: MotionValue<number>; color: MotionValue<string>; fade: MotionValue<number> };
+type Row = { left: MotionValue<number>; top: MotionValue<number>; width: MotionValue<number>; name: MotionValue<number>; label: MotionValue<number>; fade: MotionValue<number> };
 
 function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => void }) {
+  const [middle, setMiddle] = useState(0);
   // One set of motion values per row, written every frame from the scroll position (no re-render).
   const [rows] = useState<Row[]>(() =>
     tiles.map(() => ({
@@ -406,7 +408,7 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
       top: motionValue(0),
       width: motionValue(SMALL_W),
       name: motionValue(0),
-      color: motionValue("#bdbdbd"),
+      label: motionValue(0),
       fade: motionValue(0),
     })),
   );
@@ -452,9 +454,8 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
         r.left.set(LIST_RIGHT - widths[j]);
         r.top.set(centers[j] - heights[j] / 2);
         r.name.set(centers[j]);
-        // Name: black in the middle, mid grey for the neighbours, light grey further out.
-        const g = Math.round(0xbd * smooth(clamp(Math.abs(d), 0, 2) / 2));
-        r.color.set(`rgb(${g},${g},${g})`);
+        // Revision: only the middle project's title shows; it fades out by half a row away.
+        r.label.set(clamp(1 - 2 * Math.abs(d), 0, 1));
         r.fade.set(clamp(3.6 - Math.abs(d), 0, 1));
       });
       rows.forEach((r, i) => !shown.has(i) && r.fade.set(0));
@@ -472,6 +473,7 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
       if (middle !== centred) {
         sound.cue("step");
         centred = middle;
+        setMiddle(middle);
       }
       draw();
     };
@@ -515,6 +517,10 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
 
   return (
     <div className="absolute inset-0 overflow-hidden">
+      {/* Revision: the middle project's number, level with the LIST / GRID switch, ending on the margin. */}
+      <p aria-live="polite" className="t-h6 absolute top-[calc(var(--vh)/2-148px)] right-margin z-20">
+        {middle + 1}/{tiles.length}
+      </p>
       {tiles.map((t, i) => {
         const r = rows[i];
         return (
@@ -531,17 +537,24 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={t.poster ?? ""} alt={`${t.client}, ${t.label}`} loading="lazy" draggable={false} className="block aspect-video w-full object-cover" />
             </motion.button>
-            {/* The row's name, level with its image; black in the middle, grey elsewhere. */}
+            {/* Revision (V2 · 08 · Index · List · 9-col): one title at a time, the middle project's,
+                level with its image: the client on the left margin, the title ending on the right one. */}
             <motion.p
               className="t-h5 pointer-events-none absolute left-margin -translate-y-1/2 whitespace-nowrap"
-              style={{ top: r.name, color: r.color, opacity: r.fade }}
+              style={{ top: r.name, opacity: r.label }}
               initial={{ x: -16 }}
               animate={{ x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 + Math.min(i, 8) * 0.04, ease: [0, 0, 0.58, 1] }}
+              transition={{ duration: 0.6, delay: 0.3, ease: [0, 0, 0.58, 1] }}
             >
-              {/* Revision (Figma V2 · 08 · Index · List): client first, the title on its own line. */}
-              {t.client} /
-              <br />
+              {t.client}
+            </motion.p>
+            <motion.p
+              className="t-h5 pointer-events-none absolute right-margin -translate-y-1/2 whitespace-nowrap"
+              style={{ top: r.name, opacity: r.label }}
+              initial={{ x: 16 }}
+              animate={{ x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: [0, 0, 0.58, 1] }}
+            >
               {t.label}
             </motion.p>
           </div>
