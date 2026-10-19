@@ -43,9 +43,8 @@ export function RoomTuner({ label, hint, items }: Props) {
   };
 
   const choose = (i: number) => {
-    // Listening is deliberate: bring the sound back even if the site was muted (as for films).
-    sound.setMuted(false);
-    sound.unlock();
+    // Revision (V2 · 09 · About): rooms only play when the site's sound is on. The ambience runs on the
+    // master bus, so with sound off the room still opens, silently.
     preview.current?.stop();
     preview.current = null;
     if (i !== active) {

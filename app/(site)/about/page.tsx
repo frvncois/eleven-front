@@ -16,9 +16,10 @@ export default function AboutPage() {
   return (
     <main className="bg-bg">
 
-      {/* Story. The sticker starts just above the first paragraph (x 264, the second paragraph's edge), 134 × 81. */}
-      <section className="relative flex flex-col items-end px-[22px] pt-[604px]">
-        <StorySticker src={story.sticker.src} width={134} height={81} top={499} left={264} end={1560} />
+      {/* Story. The sticker starts just above the first paragraph (x 264, the second paragraph's edge), 134 × 81.
+          Revision (V2 · 09 · About, section-story): less padding on top, 604 → 300; sticker slot and end move with it, and it holds at 19 % (its new resting height, 195 / 1024). */}
+      <section className="relative flex flex-col items-end px-[22px] pt-[300px]">
+        <StorySticker src={story.sticker.src} width={134} height={81} top={195} left={264} end={1256} hold="19%" />
         <div className="relative flex w-[1385px] flex-col items-end">
           <p className="t-h2-indent w-full">{story.intro}</p>
           {story.paragraphs.map((p, i) => (
@@ -46,16 +47,15 @@ export default function AboutPage() {
         />
       </div>
 
-      <section className="flex items-start justify-between border-t border-neutral-1000 px-margin pt-margin pb-[120px]">
+      {/* Revision (Figma V2 · 09 · About, section-services): name in H2 sitting on a black rule, a
+          one-line description small and right-aligned at the top of the row. */}
+      <section className="flex items-start justify-between pt-[120px] pb-[120px] pl-margin">
         <h2 className="t-eyebrow">{services.label}</h2>
-        <ul className="t-h2 flex w-[806px] flex-col gap-2 text-balance">
-          {services.items.map(([name, note], i) => (
-            <li
-              key={name}
-              className={`flex justify-between whitespace-nowrap [text-box:trim-both_cap_alphabetic] ${i === 0 ? "pb-4" : "border-t border-muted py-4"}`}
-            >
-              <span>{name}</span>
-              <span>{note}</span>
+        <ul className="flex w-[806px] flex-col gap-2">
+          {services.items.map(([name, note]) => (
+            <li key={name} className="flex items-start justify-between border-b border-neutral-1000 pr-margin">
+              <span className="t-h2 whitespace-nowrap [text-box:trim-both_cap_alphabetic]">{name}</span>
+              <span className="w-[336px] text-right font-sans text-[12px] leading-[1.4] font-medium">{note}</span>
             </li>
           ))}
         </ul>

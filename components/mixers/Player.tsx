@@ -31,6 +31,8 @@ function embedUrl(vimeo: string, muted: boolean) {
   return `https://player.vimeo.com/video/${m[1]}?${q}`;
 }
 
+const MIXER_TBC = "Mixer to confirm";
+
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 type Props = {
@@ -134,7 +136,9 @@ export function Player({ films, index, onIndex, onClose, longform = false }: Pro
   const mixer = film?.mixer ? mixerBySlug(film.mixer) : undefined;
   const credits = film
     ? ([
-        mixer && [mixer.name, "Mix"],
+        // Revision (Player/Info Panel): always name the mixer. Six longform films are not credited on
+        // Eleven's site, so they show a placeholder until Eleven sends the names.
+        [mixer?.name ?? MIXER_TBC, "Mix"],
         mixer && [mixer.name, "Sound design"],
         film.agency && [film.agency, "Agency"],
         film.production && [film.production, "Production"],

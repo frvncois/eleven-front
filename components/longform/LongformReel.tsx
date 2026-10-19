@@ -100,7 +100,7 @@ export function LongformReel({ films }: { films: Film[] }) {
         ))}
       </div>
 
-      {/* Legend: one square per film; the current one opens into its title. */}
+      {/* Legend: one square per film; the current one holds its title and hugs it (revisions). */}
       <nav aria-label="Films" className="absolute top-1/2 left-6 z-10 flex -translate-y-1/2 flex-col items-start">
         {films.map((f, i) => (
           <motion.button
@@ -121,11 +121,13 @@ export function LongformReel({ films }: { films: Film[] }) {
               animate={{ width: i === index ? "auto" : 25 }}
               transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
             >
+              {/* The title is in the square from the start (8 px in) and the square opens to hug it, so
+                  it reads as one box revealing its title, not a square plus a colour strip. */}
               <motion.span
-                className="t-h6 pr-1.5 pl-[31px]"
+                className="t-h6 px-2"
                 initial={false}
                 animate={{ opacity: i === index ? 1 : 0 }}
-                transition={{ duration: 0.3, delay: i === index ? 0.2 : 0 }}
+                transition={{ duration: i === index ? 0.15 : 0.2 }}
               >
                 {f.label}
               </motion.span>

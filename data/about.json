@@ -34,32 +34,28 @@
     "label": "services",
     "items": [
       [
-        "Design",
-        "Lorem"
+        "Sound Design",
+        "Making the noises, like boom, splash and vroom."
       ],
       [
         "Voice Casting",
-        "Lorem"
+        "Choosing who talks for each character."
       ],
       [
         "Mix",
-        "Lorem"
+        "Making all the sounds not too loud, not too quiet."
       ],
       [
         "Music",
-        "Lorem"
+        "The songs."
       ],
       [
         "ADR",
-        "Lorem"
+        "Saying the words again because the first time was bad."
       ],
       [
         "VO",
-        "Lorem"
-      ],
-      [
-        "Sound",
-        "Lorem"
+        "Someone talking, but you can’t see them."
       ]
     ]
   },

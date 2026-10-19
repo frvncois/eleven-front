@@ -127,7 +127,19 @@ html.lenis body { height: auto; }
   0%, 100% { transform: scaleX(1); }
   50% { transform: scaleX(0.35); }
 }
-.butterfly-flap { animation: butterfly-flap 0.24s ease-in-out infinite; }
+.butterfly-flap { animation: butterfly-flap 1.2s ease-in-out infinite; }
+
+/* Toggle/Butterfly chip: aqua at rest, the accent colours while the party is on (flap speeds up). */
+@keyframes butterfly-colours {
+  0%, 100% { background-color: var(--color-aqua); }
+  20% { background-color: var(--color-red); }
+  40% { background-color: var(--color-yellow); }
+  60% { background-color: var(--color-dark-green); }
+  80% { background-color: var(--color-pink); }
+}
+.butterfly-chip { background-color: var(--color-aqua); }
+.butterfly-chip.is-party { animation: butterfly-colours 2s steps(1, end) infinite; }
+.butterfly-chip.is-party .butterfly-flap { animation-duration: 0.24s; }
 
 /* Sound toggle dot (after gehry.getty.edu): while sound is on, two rings breathe out of it. */
 @keyframes sound-pulse {

@@ -11,19 +11,16 @@ export const metadata: Metadata = { title: "Contact" };
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, "")}`;
 
 /**
- * Contact (V1 · 10 · Contact, 7345:1649). Always exactly one screen, never scrolls: vertical positions
- * use the frame's own percentages of the height, the footer sits on the bottom. Contacts stacked in the
- * 637 column, footer © / privacy / credits / socials.
+ * Contact (V1 · 10 · Contact, 7345:1649; revised on V2 · 10 · Contact 7653:2446). Always exactly one
+ * screen, never scrolls. Revision: the title, one row of space (82 px), then one horizontal row: the
+ * gif in the first columns, Jordan / Adrea / Studio on the grid columns at 493, 845 and 1197. The block
+ * starts at the frame's 22% so it keeps its place on taller screens. Footer © / credits / legal / socials.
  */
 const L = {
-  title: "top-[calc(8.33%+63.67px)] left-[32px]",
-  gif: "top-[calc(25%+24px)]",
-  jordan: "top-[calc(41.67%+7.33px)] left-[637px]",
-  adrea: "top-[calc(50%+44px)] left-[637px] pt-3",
-  studio: "top-[calc(66.67%+6.33px)] left-[637px] pt-3",
+  block: "top-[22.17%] left-[24px] right-[24px]",
   copyright: "bottom-[22px] left-[263.5px]",
-  privacy: "bottom-[23px] left-[637px]",
-  credits: "bottom-[23px] left-[845.5px]",
+  credits: "bottom-[23px] left-[493px]",
+  privacy: "bottom-[23px] left-[845px]",
   linkedin: "bottom-[39px] left-[1080.5px]",
   instagram: "bottom-[23px] left-[1080.5px]",
 };
@@ -34,39 +31,43 @@ export default function ContactPage() {
   const social = (label: string) => footer.social.find((x) => x.label === label)!;
   return (
     <main className="relative h-(--vh) overflow-hidden bg-neutral-0">
-      <h1 className={`t-h2-indent absolute w-[822px] ${L.title}`}>{contact.title}</h1>
+      <div className={`absolute flex flex-col gap-[82px] ${L.block}`}>
+        <h1 className="t-h2-indent w-[822px]">{contact.title}</h1>
 
-      <div className={`absolute left-[24px] flex w-[348px] justify-center overflow-hidden ${L.gif}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/media/contact/rihanna-hear.gif" alt="" width={480} height={265} className="h-[265px] w-[480px] max-w-none object-cover" />
+        <div className="relative h-[265px]">
+          <div className="absolute top-0 left-0 flex w-[348px] justify-center overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/media/contact/rihanna-hear.gif" alt="" width={480} height={265} className="h-[265px] w-[480px] max-w-none object-cover" />
+          </div>
+
+          <address className="not-italic">
+            <div className="absolute top-0 left-[469px] flex flex-col gap-1">
+              <p className="t-h5">{jordan.name}</p>
+              <p className="t-h5 whitespace-pre">{jordan.role}</p>
+              <ContactLink href={`mailto:${jordan.email}`}>{jordan.email}</ContactLink>
+              {jordan.phone && <ContactLink href={tel(jordan.phone)}>{jordan.phone}</ContactLink>}
+            </div>
+
+            <div className="absolute top-0 left-[821px] flex flex-col gap-1">
+              <p className="t-h5">{adrea.name}</p>
+              <p className="t-h5">{adrea.role}</p>
+              <ContactLink href={`mailto:${adrea.email.replace(/[[\]]/g, "")}`}>{adrea.email}</ContactLink>
+            </div>
+
+            <div className="absolute top-0 left-[1173px] flex flex-col gap-1">
+              <p className="t-h5">{contact.studio.label}</p>
+              <ContactLink href={contact.studio.map}>
+                {contact.studio.lines.map((l) => (
+                  <span key={l} className="block [&+&]:mt-1">
+                    {l}
+                  </span>
+                ))}
+              </ContactLink>
+              <ContactLink href={tel(contact.studio.phone)}>{contact.studio.phone}</ContactLink>
+            </div>
+          </address>
+        </div>
       </div>
-
-      <address className="not-italic">
-        <div className={`absolute flex flex-col gap-1 ${L.jordan}`}>
-          <p className="t-h5">{jordan.name}</p>
-          <p className="t-h5 whitespace-pre">{jordan.role}</p>
-          <ContactLink href={`mailto:${jordan.email}`}>{jordan.email}</ContactLink>
-          {jordan.phone && <ContactLink href={tel(jordan.phone)}>{jordan.phone}</ContactLink>}
-        </div>
-
-        <div className={`absolute flex flex-col gap-1 ${L.adrea}`}>
-          <p className="t-h5">{adrea.name}</p>
-          <p className="t-h5">{adrea.role}</p>
-          <ContactLink href={`mailto:${adrea.email.replace(/[[\]]/g, "")}`}>{adrea.email}</ContactLink>
-        </div>
-
-        <div className={`absolute flex w-[332px] flex-col gap-1 ${L.studio}`}>
-          <p className="t-h5">{contact.studio.label}</p>
-          <ContactLink href={contact.studio.map}>
-            {contact.studio.lines.map((l) => (
-              <span key={l} className="block [&+&]:mt-1">
-                {l}
-              </span>
-            ))}
-          </ContactLink>
-          <ContactLink href={tel(contact.studio.phone)}>{contact.studio.phone}</ContactLink>
-        </div>
-      </address>
 
       <footer>
         <p className={`t-mini absolute ${L.copyright}`}>{footer.copyright}</p>

@@ -619,7 +619,10 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
               animate={{ x: 0 }}
               transition={{ duration: 0.6, delay: 0.3 + Math.min(i, 8) * 0.04, ease: [0, 0, 0.58, 1] }}
             >
-              {t.label} · {t.client}
+              {/* Revision (Figma V2 · 08 · Index · List): client first, the title on its own line. */}
+              {t.client} /
+              <br />
+              {t.label}
             </motion.p>
           </div>
         );
