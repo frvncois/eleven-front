@@ -129,6 +129,9 @@ html.lenis body { height: auto; }
 }
 .butterfly-flap { animation: butterfly-flap 1.2s ease-in-out infinite; }
 
+/* Text selection in the page's accent (SelectionColor sets the variables per route). */
+::selection { background-color: var(--accent, #d9d9d9); color: var(--accent-ink, #000000); }
+
 /* Toggle/Butterfly chip: aqua at rest, the accent colours while the party is on (flap speeds up). */
 @keyframes butterfly-colours {
   0%, 100% { background-color: var(--color-aqua); }

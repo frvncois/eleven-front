@@ -5,6 +5,7 @@ import { StageScale } from "@/components/shell/StageScale";
 import { SmoothScroll } from "@/components/shell/SmoothScroll";
 import { PageTransition } from "@/components/shell/PageTransition";
 import { CursorTag } from "@/components/shell/CursorTag";
+import { SelectionColor } from "@/components/shell/SelectionColor";
 import { ClickSound } from "@/components/shell/ClickSound";
 import { PartyMode } from "@/components/shell/PartyMode";
 import { DesktopOnly } from "@/components/shell/DesktopOnly";
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           {children}
           <PartyMode />
           <CursorTag />
+          <SelectionColor />
         </div>
         <PageTransition />
         <DesktopOnly />

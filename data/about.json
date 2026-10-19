@@ -35,27 +35,27 @@
     "items": [
       [
         "Sound Design",
-        "Making the noises, like boom, splash and vroom."
+        "Making the noises, like boom, splash and vroom"
       ],
       [
         "Voice Casting",
-        "Choosing who talks for each character."
+        "Choosing who talks for each character"
       ],
       [
         "Mix",
-        "Making all the sounds not too loud, not too quiet."
+        "Making all the sounds not too loud, not too quiet"
       ],
       [
         "Music",
-        "The songs."
+        "The songs"
       ],
       [
         "ADR",
-        "Saying the words again because the first time was bad."
+        "Redoing the take, the first one was bad."
       ],
       [
         "VO",
-        "Someone talking, but you can’t see them."
+        "Someone talking, but you can’t see them"
       ]
     ]
   },
@@ -151,7 +151,7 @@
     ]
   },
   "team": {
-    "label": "team",
+    "label": "This is our team",
     "rows": [
       [
         {
@@ -229,5 +229,50 @@
         }
       ]
     ]
+  },
+  "roomCarousel": {
+    "note": "Revision (V2 · 09 · About, carousel-img): one view per space, max 5. Heights from the Figma carousel (622 wide).",
+    "items": [
+      {
+        "room": "Studio A",
+        "photo": "/media/studio/11-studio-a.webp",
+        "preset": "studio",
+        "audio": null,
+        "height": 397
+      },
+      {
+        "room": "Studio B",
+        "photo": "/media/studio/12-studio-b.webp",
+        "preset": "studio",
+        "audio": null,
+        "height": 814
+      },
+      {
+        "room": "Studio C",
+        "photo": "/media/studio/05-studio-c.webp",
+        "preset": "studio",
+        "audio": null,
+        "height": 397
+      },
+      {
+        "room": "Studio C · Outside",
+        "photo": "/media/studio/13-studio-c-outside.webp",
+        "preset": "outside",
+        "audio": null,
+        "height": 605
+      },
+      {
+        "room": "Lobby",
+        "photo": "/media/studio/02-lobby.webp",
+        "preset": "lobby",
+        "audio": null,
+        "height": 500
+      }
+    ]
+  },
+  "contact": {
+    "title": "Is it time now to work together?",
+    "cursor": "contact us",
+    "href": "/contact"
   }
 }

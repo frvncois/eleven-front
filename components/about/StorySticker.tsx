@@ -3,13 +3,14 @@
 import { useEffect, useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
-type Props = { src: string; width: number; height: number; top: number; left: number; end: number; hold?: string };
+type Props = { src: string; width: number; height: number; top: number; left: number; end?: number; hold?: string };
 
 /**
  * The ointment sticker (About story). It starts just above the first paragraph, then holds
  * on screen while the story scrolls past, wobbling with the scroll speed (a lagging slide and a tilt,
  * after ascension.pegassi.be/about), and fades out as the text ends, before the snow globe comes in.
- * `top`/`left`: resting slot in the section; `end`: section y where it must be gone.
+ * `top`/`left`: resting slot in the container; `end`: container y where it must be gone (omit to run
+ * to the container's bottom).
  * Both versions (Amélie, 15 Oct: V2 drops the hop between the "Eleven" words, back to this).
  * Holds at `hold` of the screen (default 42 %) and wobbles with the scroll speed; keep `hold` at or
  * above the resting slot, or the sticker drops onto the text on load.
@@ -44,7 +45,7 @@ export function StorySticker({ src, width, height, top, left, end, hold = "42%" 
 
   return (
     // The run: from the resting slot to the end of the story. The sticker holds at `hold` of the screen inside it.
-    <div ref={slot} aria-hidden className="pointer-events-none absolute z-10" style={{ top, left, height: end - top, width }}>
+    <div ref={slot} aria-hidden className="pointer-events-none absolute z-10" style={end === undefined ? { top, left, bottom: 0, width } : { top, left, height: end - top, width }}>
       <motion.div ref={sticker} className="sticky" style={{ top: hold, x, y, rotate, opacity: fade }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} alt="" width={width} height={height} className="block" />
