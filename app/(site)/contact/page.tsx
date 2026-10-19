@@ -16,15 +16,16 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, "")}`;
  * gif in the first columns, Jordan / Adrea / Studio. The block starts at the frame's 22% so it keeps
  * its place on taller screens. Footer © / credits / legal / socials.
  * 9-col grid (Oct 19): title 6 cols, gif 3 cols, Jordan col 4, Adrea col 6, Studio col 8; the footer
- * under them (Credits col 4, Privacy col 6, socials col 8), © on col 2 (col 1 is the floss logo's).
+ * under them (Credits col 4, Privacy col 6), © on col 2 (col 1 is the floss logo's). LinkedIn and
+ * Instagram end on col 7, right-aligned like the nav's About link (Amélie, Oct 19).
  */
 const L = {
   block: "top-[22.17%] inset-x-0",
   copyright: "bottom-[22px] left-col-2",
   credits: "bottom-[23px] left-col-4",
   privacy: "bottom-[23px] left-col-6",
-  linkedin: "bottom-[39px] left-col-8",
-  instagram: "bottom-[23px] left-col-8",
+  linkedin: "bottom-[39px] right-col-7",
+  instagram: "bottom-[23px] right-col-7",
 };
 
 export default function ContactPage() {

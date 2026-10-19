@@ -87,7 +87,8 @@
 /*  9-column grid. All values are 1440 design px (the stage zooms).    */
 /*  .grid-site = the grid itself; col-start-N / col-span-N inside it.  */
 /*  Outside a grid: w-span-N = width of N columns, ml-col-N / left-    */
-/*  col-N = left edge of column N measured from the page edge.         */
+/*  col-N = left edge of column N, right-col-N = right edge on the end */
+/*  of column N, both measured from the page edge.                     */
 /* ------------------------------------------------------------------ */
 @utility grid-site {
   display: grid;
@@ -103,6 +104,10 @@
 }
 @utility left-col-* {
   left: calc(var(--spacing-margin) + (--value(integer) - 1) * (var(--grid-col) + var(--spacing-gutter)));
+}
+/* right-col-N: the right edge sits on the end of column N (like a justify-self: end cell). */
+@utility right-col-* {
+  right: calc(var(--spacing-margin) + (var(--grid-cols) - --value(integer)) * (var(--grid-col) + var(--spacing-gutter)));
 }
 
 /* ------------------------------------------------------------------ */
