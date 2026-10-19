@@ -101,8 +101,9 @@ export function Home() {
             exit={{ y: "-101%" }}
             transition={{ duration: DURATION, ease: EASE }}
           >
+            {/* 9-col grid: the copy block is centred over cols 3 to 7 (766). */}
             <div className="absolute top-[calc(50%-227px)] left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-8">
-              <p className="t-h4 w-[564px] text-center text-neutral-200 [text-box:trim-both_cap_alphabetic]">
+              <p className="t-h4 w-span-5 text-center text-neutral-200 [text-box:trim-both_cap_alphabetic]">
                 {home.gate.line[0]}
                 <br />
                 {home.gate.line[1]}

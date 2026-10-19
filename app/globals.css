@@ -49,6 +49,9 @@
   /* Spacing (Breakpoint collection, Desktop) */
   --spacing-margin: 24px;
   --spacing-gutter: 16px;
+  /* 9-column site grid (Oct 19): col 140.44, step 156.44 at 1440, odd spans centre on 720 */
+  --grid-cols: 9;
+  --grid-col: calc((1440px - 2 * var(--spacing-margin) - (var(--grid-cols) - 1) * var(--spacing-gutter)) / var(--grid-cols));
 
   /* Motion, from the mockup prototype */
   --ease-out-soft: cubic-bezier(0, 0, 0.58, 1);
@@ -81,10 +84,34 @@
 @utility t-nav-lg { font-family: var(--font-serif); font-size: 40px; line-height: 1; }
 
 /* ------------------------------------------------------------------ */
+/*  9-column grid. All values are 1440 design px (the stage zooms).    */
+/*  .grid-site = the grid itself; col-start-N / col-span-N inside it.  */
+/*  Outside a grid: w-span-N = width of N columns, ml-col-N / left-    */
+/*  col-N = left edge of column N measured from the page edge.         */
+/* ------------------------------------------------------------------ */
+@utility grid-site {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--spacing-gutter);
+  padding-inline: var(--spacing-margin);
+}
+@utility w-span-* {
+  width: calc(--value(integer) * var(--grid-col) + (--value(integer) - 1) * var(--spacing-gutter));
+}
+@utility ml-col-* {
+  margin-left: calc(var(--spacing-margin) + (--value(integer) - 1) * (var(--grid-col) + var(--spacing-gutter)));
+}
+@utility left-col-* {
+  left: calc(var(--spacing-margin) + (--value(integer) - 1) * (var(--grid-col) + var(--spacing-gutter)));
+}
+
+/* ------------------------------------------------------------------ */
 /*  Stage: the 1440 design is zoomed to the viewport width.            */
 /*  --app-scale and --vh are set before paint in app/layout.tsx.       */
 /*  Use var(--vh) for "100vh" inside the stage.                        */
 /* ------------------------------------------------------------------ */
+html { scrollbar-gutter: stable; }
+
 :root {
   --app-scale: 1;
   --vh: 1024px;

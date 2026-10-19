@@ -8,8 +8,18 @@ import site from "@/data/site.json";
 import { sound } from "@/lib/sound";
 import { preloadArchive } from "@/lib/archive-preload";
 
+// Column + alignment per link, in site.nav order (Mixers, Archive, Longform, About, Contact).
+const NAV_CELLS = [
+  "col-start-1 justify-self-start",
+  "col-start-3 justify-self-start",
+  "col-start-5 justify-self-center",
+  "col-start-7 justify-self-end",
+  "col-start-9 justify-self-end",
+];
+
 /**
- * Nav/Bar (Figma 7356:3252): five links spread edge to edge, Heading/H4.
+ * Nav/Bar (Figma 7356:3252): five links on the 9-col grid, Heading/H4: cols 1 / 3 / 5 / 7 / 9,
+ * aligned start / start / centre / end / end, so the gaps stay within ~8% of equal (Oct 19).
  * Hover = the link's colour (Mixers red, Archive yellow, Longform dark green, About pink, Contact aqua),
  * 0.3 s ease-out, + a short sound; the current page keeps the hover state (annotation).
  * `tone="light"` (neutral/300) where it sits on video: home, player.
@@ -21,12 +31,12 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
     <>
     <nav
       aria-label="Main"
-      className={`fixed inset-x-0 top-0 z-50 flex items-center justify-between p-margin ${tone === "light" ? "text-neutral-300" : "text-neutral-1000"}`}
+      className={`grid-site fixed inset-x-0 top-0 z-50 items-center py-margin ${tone === "light" ? "text-neutral-300" : "text-neutral-1000"}`}
     >
-      {site.nav.map((item) => {
+      {site.nav.map((item, i) => {
         const current = pathname === item.match || pathname.startsWith(item.match + "/");
         // Hover = the link's own brand colour at full strength (Figma "Nav Hover" modes); the current page keeps it.
-        const cls = `t-h4 cursor-pointer transition-colors duration-300 ease-out hover:text-(--hover) ${current ? "text-(--hover)" : ""}`;
+        const cls = `${NAV_CELLS[i]} t-h4 cursor-pointer whitespace-nowrap transition-colors duration-300 ease-out hover:text-(--hover) ${current ? "text-(--hover)" : ""}`;
         const style = { "--hover": `var(--color-${item.color})` } as React.CSSProperties;
         // Mixers opens the roster overlay instead of a page (annotation).
         if (item.label === "Mixers")

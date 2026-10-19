@@ -5,15 +5,16 @@ import { sound, type RoomHandle, type RoomPreset } from "@/lib/sound";
 
 type Room = { room: string; photo: string; preset: string; audio: string | null; height: number };
 
-const W = 622; // Figma card width
-const GAP = 8;
+const W = 610; // 4 columns of the 9-col grid (was 622)
+const GAP = 16; // the grid gutter
+const DATA_W = 622; // card width the heights in about.json were measured at
 const DRIFT = 28; // design px per second, right to left
 const COPIES = 3; // enough sets to cover the screen while one wraps
 const FRICTION = 0.92; // throw decay per frame after a drag or a swipe
 
 /**
  * Rooms (Figma V2 · 09 · About, carousel-img, revisions Oct 19): an endless banner of the studio, one
- * view per space (max 5), 622 wide, mixed heights hanging from the top. It drifts slowly right to left
+ * view per space (max 5), 4 cols (610) wide with a 16 gutter, mixed heights hanging from the top. It drifts slowly right to left
  * on its own; drag it or scroll sideways (trackpad swipe, shift + wheel) to move it, with a little
  * throw, and it loops forever. Vertical wheel still scrolls the page. Hovering a photo shows the
  * UNMUTE cursor tag; clicking turns the site's sound on and plays that space, clicking again mutes it.
@@ -125,7 +126,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
         onPointerUp={() => setTimeout(() => (drag.current = null))}
         onPointerCancel={() => (drag.current = null)}
       >
-        <div ref={track} className="flex w-max items-start gap-2 will-change-transform">
+        <div ref={track} className="flex w-max items-start gap-gutter will-change-transform">
           {Array.from({ length: COPIES }, (_, c) =>
             items.map((r) => (
               <button
@@ -139,7 +140,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
                 data-sound="off"
                 onClick={() => !drag.current?.moved && toggle(r)}
                 className="relative block shrink-0 cursor-pointer overflow-hidden"
-                style={{ width: W, height: r.height }}
+                style={{ width: W, height: (r.height * W) / DATA_W }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={r.photo} alt={c ? "" : r.room} draggable={false} className="block size-full object-cover" />

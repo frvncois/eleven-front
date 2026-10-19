@@ -9,17 +9,20 @@ import { sound } from "@/lib/sound";
 import { BallCanvas } from "./BallCanvas";
 import { preloadArchive } from "@/lib/archive-preload";
 import { ArchiveStyleSwitch } from "./ArchiveStyleSwitch";
+import { colEnd, span } from "@/lib/grid";
 
 export type Tile = Project & { label: string; client: string; x: number; y: number; w: number; h: number };
 
 const MORPH = { duration: 0.6, ease: [0.4, 0, 0.2, 1] as const };
 const r169 = (w: number) => Math.round((w * 9) / 16);
 
-// List: the three Figma sizes S 332 / M 448 / L 564, right edge on x 1002.
-const LIST_RIGHT = 1002;
-const SMALL_W = 332;
-const MID_W = 448;
-const BIG_W = 564;
+// List: three sizes, S / M / L.
+// 9-col grid (Oct 19): S / M / L = 2 / 3 / 4 columns, every card ends on col 6 (946.67), so the
+// left edges land on cols 5, 4 and 3.
+const LIST_RIGHT = colEnd(6);
+const SMALL_W = span(2);
+const MID_W = span(3);
+const BIG_W = span(4);
 const GAP = 16;
 const STEP = 300; // wheel distance from one project to the next
 // Grid: the Figma field spread out a little so there is air between projects (Amélie, Oct 17), then
@@ -530,7 +533,7 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
             </motion.button>
             {/* The row's name, level with its image; black in the middle, grey elsewhere. */}
             <motion.p
-              className="t-h5 pointer-events-none absolute left-[37px] -translate-y-1/2 whitespace-nowrap"
+              className="t-h5 pointer-events-none absolute left-margin -translate-y-1/2 whitespace-nowrap"
               style={{ top: r.name, color: r.color, opacity: r.fade }}
               initial={{ x: -16 }}
               animate={{ x: 0 }}

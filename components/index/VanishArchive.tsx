@@ -7,6 +7,7 @@ import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { preloadArchive } from "@/lib/archive-preload";
 import { ArchiveStyleSwitch } from "./ArchiveStyleSwitch";
+import { colEnd, span } from "@/lib/grid";
 import { rectToQuadCss, type Pt, type Quad } from "@/lib/perspective";
 import type { Tile } from "./IndexView";
 import { VanishTuner, tune } from "./VanishTuner";
@@ -469,12 +470,14 @@ function VanishGrid({
 }
 
 /* ------------------------------------------------------------------ */
-/* List view: unchanged copy of IndexView's, so this option is complete on its own. */
+/* List view: copy of IndexView's (same 9-col sizes), so this option is complete on its own. */
 
-const LIST_RIGHT = 1002;
-const SMALL_W = 332;
-const MID_W = 448;
-const BIG_W = 564;
+// 9-col grid (Oct 19): S / M / L = 2 / 3 / 4 columns, every card ends on col 6 (946.67), so the
+// left edges land on cols 5, 4 and 3.
+const LIST_RIGHT = colEnd(6);
+const SMALL_W = span(2);
+const MID_W = span(3);
+const BIG_W = span(4);
 const GAP = 16;
 const STEP = 300;
 const widthAt = (d: number) => {
@@ -613,7 +616,7 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
               <img src={t.poster ?? ""} alt={`${t.client}, ${t.label}`} loading="lazy" draggable={false} className="block aspect-video w-full object-cover" />
             </motion.button>
             <motion.p
-              className="t-h5 pointer-events-none absolute left-[37px] -translate-y-1/2 whitespace-nowrap"
+              className="t-h5 pointer-events-none absolute left-margin -translate-y-1/2 whitespace-nowrap"
               style={{ top: r.name, color: r.color, opacity: r.fade }}
               initial={{ x: -16 }}
               animate={{ x: 0 }}

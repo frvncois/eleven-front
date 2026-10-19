@@ -9,6 +9,7 @@ import { SelectionColor } from "@/components/shell/SelectionColor";
 import { ClickSound } from "@/components/shell/ClickSound";
 import { PartyMode } from "@/components/shell/PartyMode";
 import { DesktopOnly } from "@/components/shell/DesktopOnly";
+import { GridOverlay } from "@/components/shell/GridOverlay";
 
 export const metadata: Metadata = {
   title: { default: "Eleven", template: "%s · Eleven" },
@@ -25,9 +26,11 @@ export const viewport: Viewport = {
 /**
  * The mockup is drawn at 1440. Zoom the stage to the viewport width and expose
  * the viewport height in design units (--vh) before first paint, so nothing
- * jumps. Kept in sync on resize by components/shell/StageScale.
+ * jumps. The width is the window minus the scrollbar gutter (html reserves it on every page, see
+ * globals.css; reserved here too so it does not wait for the stylesheet). The scrollbar is measured
+ * on a probe: Chrome's root clientWidth ignores the reserved gutter on pages that don't scroll. Kept in sync on resize by components/shell/StageScale.
  */
-const SCALE_BEFORE_PAINT = `(function(){var r=document.documentElement,s=innerWidth/1440;r.style.setProperty("--app-scale",s.toFixed(4));r.style.setProperty("--vh",(innerHeight/s).toFixed(2)+"px")})()`;
+const SCALE_BEFORE_PAINT = `(function(){var r=document.documentElement,d=document.createElement("div");r.style.scrollbarGutter="stable";d.style.cssText="position:absolute;top:-999px;width:99px;height:99px;overflow:scroll";r.appendChild(d);var b=d.offsetWidth-d.clientWidth;r.removeChild(d);var s=(innerWidth-b)/1440;r.style.setProperty("--app-scale",s.toFixed(4));r.style.setProperty("--vh",(innerHeight/s).toFixed(2)+"px")})()`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -46,6 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <PartyMode />
           <CursorTag />
           <SelectionColor />
+          <GridOverlay />
         </div>
         <PageTransition />
         <DesktopOnly />
