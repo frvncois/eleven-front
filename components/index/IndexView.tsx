@@ -8,9 +8,8 @@ import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { BallCanvas } from "./BallCanvas";
 import { preloadArchive } from "@/lib/archive-preload";
-import { ArchiveStyleSwitch } from "./ArchiveStyleSwitch";
 import { colEnd, span } from "@/lib/grid";
-import { TextToggle } from "@/components/ui/TextToggle";
+import { ViewToggle } from "@/components/shell/ViewToggle";
 
 export type Tile = Project & { label: string; client: string; x: number; y: number; w: number; h: number };
 
@@ -64,7 +63,7 @@ const vhOf = () => parseFloat(getComputedStyle(document.documentElement).getProp
  * reach the middle and shrink after. After the last project comes the first again.
  * The toggle morphs one view into the other (gather / explode sounds). Click a tile to play it.
  */
-const VIEWS: { value: "grid" | "list"; label: string }[] = [
+const VIEWS: [{ value: "grid" | "list"; label: string }, { value: "grid" | "list"; label: string }] = [
   { value: "list", label: "List" },
   { value: "grid", label: "Grid" },
 ];
@@ -91,18 +90,9 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
         )}
       </LayoutGroup>
 
-      {/* Revision (V2 · 08 · Index · List / Grid · 9-col): LIST / GRID on the left margin, 148 above
-          the middle of the screen, in Archive yellow; replaces the icon toggle bottom right. */}
-      <TextToggle
-        label="View"
-        options={VIEWS}
-        value={view}
-        onChange={choose}
-        accent="yellow"
-        className="absolute top-[calc(var(--vh)/2-148px)] left-margin z-20 gap-2"
-      />
-
-      <Chrome toggles={<ArchiveStyleSwitch current="ball" />} />
+      {/* Revision (M2/Nav/Sub): one view word next to the sound toggle, "GRID / SOUND"; the Fisheye /
+          Vanish chips are gone, the Archive is the fisheye only (Amélie, Oct 19). */}
+      <Chrome toggles={<ViewToggle options={VIEWS} value={view} onChange={choose} />} />
       <Player films={tiles} index={playing} onIndex={setPlaying} onClose={() => setPlaying(null)} />
     </main>
   );
@@ -515,15 +505,15 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
       {/* Revision (V2 · 08 · Index · List · 9-col): one title at a time, the middle project's. It stays
           put in the middle of the screen (level with the big image's centre) and only its text changes
           as projects pass (Amélie, Oct 19): the client on the left margin, the title ending on the right. */}
-      <p className="t-h5 pointer-events-none absolute top-[calc(var(--vh)/2)] left-margin z-20 -translate-y-1/2 whitespace-nowrap">
-        {tiles[middle]?.client}
+      {/* The project's number sits before the client, on the left (Amélie, Oct 19). */}
+      <p className="t-h5 pointer-events-none absolute top-[calc(var(--vh)/2)] left-margin z-20 flex -translate-y-1/2 gap-gutter whitespace-nowrap">
+        <span aria-live="polite">
+          {middle + 1}/{tiles.length}
+        </span>
+        <span>{tiles[middle]?.client}</span>
       </p>
       <p className="t-h5 pointer-events-none absolute top-[calc(var(--vh)/2)] right-margin z-20 -translate-y-1/2 whitespace-nowrap">
         {tiles[middle]?.label}
-      </p>
-      {/* Revision: the middle project's number, level with the LIST / GRID switch, ending on the margin. */}
-      <p aria-live="polite" className="t-h6 absolute top-[calc(var(--vh)/2-148px)] right-margin z-20">
-        {middle + 1}/{tiles.length}
       </p>
       {tiles.map((t, i) => {
         const r = rows[i];
