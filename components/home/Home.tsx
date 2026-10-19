@@ -8,6 +8,7 @@ import { NavBar } from "@/components/shell/NavBar";
 import { NavSub } from "@/components/shell/NavSub";
 import { gateSeen, setGateSeen, subscribeGate } from "@/lib/gate";
 import { HomeReel } from "./HomeReel";
+import { GateCursor } from "./GateCursor";
 
 const EASE = [0.42, 0, 0.58, 1] as const; // Figma "ease in and out", the gate → home smart animate
 const DURATION = 1.2;
@@ -20,9 +21,10 @@ const SHAPE = {
 
 /**
  * Gate (V1 · 01 · Gate, 7449:6439) → Home (V1 · 02 · Home, 7345:1333).
- * The gate asks for sound once per visit (session), and again whenever the logo takes you home. Choosing lifts the aqua panel away while the
- * ELEVEN shape shrinks into its home position over the reel, 1.2 s ease-in-out, as in the prototype.
- * "Sound on" also unlocks audio (the browser needs that click).
+ * The gate asks for sound once per visit (session), and again whenever the logo takes you home. Since 19 Oct it works like
+ * gehry.getty.edu: no buttons, a cursor tag "Click anywhere to enable sound" and a click anywhere on the panel turns sound on
+ * (that click is the gesture the browser needs to unlock audio). "Continue without sound" at the foot enters muted.
+ * Either way the aqua panel lifts away while the ELEVEN shape shrinks into its home position, 1.2 s ease-in-out.
  */
 export function Home() {
   // Seen earlier in this visit (nav link back home, or a reload): no gate. The logo reopens it.
@@ -42,17 +44,34 @@ export function Home() {
     setGateSeen(true);
   };
 
+  // Keyboard: Enter or Space while the gate is up = sound on (Tab reaches the skip link).
+  useEffect(() => {
+    if (!gate) return;
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.key === "Enter" || e.key === " ") && !(e.target as Element | null)?.closest?.("[data-gate-skip]")) {
+        e.preventDefault();
+        choose(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
   const pos = gate ? SHAPE.gate : SHAPE.home;
 
   return (
-    <main className="relative h-(--vh) min-h-[700px] overflow-hidden bg-ink">
+    // While the gate is up the whole screen is the "sound on" button, the reel strip under the panel included.
+    <main
+      className={`relative h-(--vh) min-h-[700px] overflow-hidden bg-ink ${gate ? "cursor-pointer" : ""}`}
+      onClick={gate ? () => choose(true) : undefined}
+    >
       <HomeReel src={home.reel.src} poster={home.reel.poster} />
 
       <AnimatePresence>
         {!gate && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: DURATION * 0.6 }}>
             <NavBar tone="light" />
-            <NavSub wordmark={false} />
+            <NavSub wordmark={false} tone="light" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -88,22 +107,24 @@ export function Home() {
                 <br />
                 {home.gate.line[1]}
               </p>
-              <div className="flex gap-3">
-                {[true, false].map((on) => (
-                  <button
-                    key={String(on)}
-                    type="button"
-                    onClick={() => choose(on)}
-                    className="t-accent bg-neutral-200 px-2 py-1 text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50"
-                  >
-                    {on ? home.gate.on : home.gate.off}
-                  </button>
-                ))}
-              </div>
+              {/* The way in without sound, quiet under the line. The cursor tag steps aside over it. */}
+              <button
+                type="button"
+                data-gate-skip
+                onClick={(e) => {
+                  e.stopPropagation();
+                  choose(false);
+                }}
+                className="t-accent cursor-pointer text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50"
+              >
+                {home.gate.skip}
+              </button>
             </div>
           </motion.section>
         )}
       </AnimatePresence>
+
+      <AnimatePresence>{gate && <GateCursor key="gate-cursor" label={home.gate.cursor} />}</AnimatePresence>
     </main>
   );
 }

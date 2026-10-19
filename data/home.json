@@ -1,8 +1,8 @@
 {
   "gate": {
     "line": ["We’re a sound studio.", "Of course this site makes noise."],
-    "on": "Sound on",
-    "off": "Sound off"
+    "cursor": "Click anywhere to enable sound",
+    "skip": "Continue without sound"
   },
   "reel": {
     "src": "/media/home/reel.mp4",

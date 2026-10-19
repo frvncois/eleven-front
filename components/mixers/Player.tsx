@@ -242,8 +242,8 @@ export function Player({ films, index, onIndex, onClose, longform = false }: Pro
           >
             {labels.close}
           </button>
-          <div className="absolute left-[1383.5px] border border-neutral-0" style={{ top: "calc(var(--vh) - 56px)" }}>
-            <SoundToggle />
+          <div className="absolute right-margin" style={{ top: "calc(var(--vh) - 56px)" }}>
+            <SoundToggle tone="light" />
           </div>
         </motion.div>
       )}

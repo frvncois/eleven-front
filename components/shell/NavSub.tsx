@@ -24,7 +24,7 @@ export function NavSub({ toggles, wordmark = true, tone = "dark" }: { toggles?: 
       )}
       <div className="fixed right-margin bottom-4 z-50 flex items-center justify-end gap-1">
         {toggles}
-        <SoundToggle />
+        <SoundToggle tone={tone} />
       </div>
     </>
   );
