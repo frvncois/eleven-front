@@ -45,6 +45,10 @@ const nextConfig: NextConfig = {
   // Phone review on the same Wi-Fi (http://<this Mac's IP>:3700): Next blocks dev assets for other hosts otherwise.
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*"],
   // Security headers everywhere; until launch every response, redirects included, is also noindex (lib/site.ts).
+  // The page was /privacy until Oct 23 2026.
+  async redirects() {
+    return [{ source: "/privacy", destination: "/legal", permanent: true }];
+  },
   async headers() {
     const robots = INDEXABLE ? [] : [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }];
     return [{ source: "/:path*", headers: [...SECURITY_HEADERS, ...robots] }];

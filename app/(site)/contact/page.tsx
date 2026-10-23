@@ -18,7 +18,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, "")}`;
  * its place on taller screens. Footer © / credits / legal / socials.
  * 9-col grid: title 6 cols, gif 3 cols, Jordan col 4, Adrea col 6, Studio col 8; the footer
  * under them, © on col 2 (col 1 is the floss logo's).
- * Footer: © col 2, Privacy col 3, Credits
+ * Footer: © col 2, Legal col 3, Credits
  * col 4, LinkedIn over Instagram on col 6 (left-aligned), the butterfly on col 8 (no label),
  * out of the bottom-right toggles; the sound toggle stays bottom right.
  * One bottom line: every footer text sits on SOUND / OFF's baseline (23.6 above the

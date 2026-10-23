@@ -2,7 +2,7 @@ import site from "@/data/site.json";
 import { MiniLink } from "@/components/ui/MiniLink";
 import { CreditsPopover } from "@/components/ui/CreditsPopover";
 
-/** The phone's footer (Contact and Privacy, like desktop's FooterLinks), two columns: © + Privacy + Credits | the socials. */
+/** The phone's footer (Contact and Legal, like desktop's FooterLinks), two columns: © + Legal + Credits | the socials. */
 export function FooterMobile({ className = "" }: { className?: string }) {
   const { footer } = site;
   return (

@@ -6,7 +6,7 @@ import { party, useParty } from "@/lib/party";
 import { VideoParty } from "./VideoParty";
 
 /**
- * The butterfly party (Contact, Privacy): the funny-animals easter egg (VideoParty).
+ * The butterfly party (Contact, Legal): the funny-animals easter egg (VideoParty).
  */
 export function PartyMode() {
   const on = useParty();

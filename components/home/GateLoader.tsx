@@ -18,7 +18,7 @@ const SWING_LAG_S = 0.14; // the right corner follows the left, like the Mixers 
 /** When the home's nav (Home, PhoneShell) fades in, counted from the moment the gate starts to leave. */
 export const GATE_EXIT = 0.45;
 
-// The panel: a light-grey panel over the home reel, its lower edge 65 above
+// The panel: an aqua panel over the home reel, its lower edge 65 above
 // the screen's bottom at the left and 135 at the right, so a band of the playing video shows under it. Kept relative
 // to the screen's bottom so the band survives any height. Phone: the same slope, scaled to 390.
 const EDGE = { left: 65.15, right: 135.08 };
@@ -98,11 +98,11 @@ export function GateLoader({ onDone, phone = false }: { onDone: () => void; phon
     <motion.section
       ref={panel}
       aria-label="Sound"
-      className="absolute inset-0 z-20 bg-light-grey"
+      className="absolute inset-0 z-20 bg-aqua"
       style={leaving ? { clipPath: clip, WebkitClipPath: clip } : { clipPath: rest, WebkitClipPath: rest }}
     >
       {/* The title, then the choice (plain text, no chip on the gate; 16 px on desktop),
-          and the aqua hint in H6 8 below it. Phone: the title wraps to three lines, the choice at 176. */}
+          and the hint in H6 8 below it, all black on the aqua. Phone: the title wraps to three lines, the choice at 176. */}
       <div className="absolute inset-x-0 top-[90px] flex flex-col items-center text-neutral-1000 phone:top-[72px] phone:px-margin">
         <p className="t-h3 text-center phone:text-[20px] phone:leading-[1.1]">
           {home.gate.line[0]}
@@ -112,7 +112,7 @@ export function GateLoader({ onDone, phone = false }: { onDone: () => void; phon
         <div className="t-h4 mt-[80px] text-[16px] phone:mt-[38px] phone:text-[12px]">
           <SoundToggle meter={false} />
         </div>
-        <p className="t-h6 mt-2 text-center text-aqua">{home.gate.hint}</p>
+        <p className="t-h6 mt-2 text-center">{home.gate.hint}</p>
       </div>
       {/* The row from 46 to 1416, 68 above the ELEVEN; anchored to the bottom with it. */}
       <div

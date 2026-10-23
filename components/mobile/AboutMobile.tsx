@@ -51,13 +51,13 @@ export function AboutMobile() {
           <div className="mt-8 flex flex-col gap-3">
             {story.paragraphs.map((p) => (
               <aside key={p.note.n} className="t-body-sm flex w-span-3 gap-2">
-                <NoteNumber n={p.note.n} boxed className="shrink-0" />
+                <NoteNumber n={p.note.n} className="shrink-0" />
                 <span>{p.note.text}</span>
               </aside>
             ))}
           </div>
         </section>
-        <div className="relative h-[320px]">
+        <div className="relative h-[360px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={story.globe.src}
@@ -66,6 +66,11 @@ export function AboutMobile() {
             height={story.globe.height}
             className="absolute top-12 left-col-2 h-auto w-span-4"
           />
+          {/* The globe's note under it, on the margin. */}
+          <aside className="t-body-sm absolute bottom-6 left-margin flex w-span-3 gap-2">
+            <NoteNumber n={story.globe.note.n} className="shrink-0" />
+            <span>{story.globe.note.text}</span>
+          </aside>
         </div>
       </div>
 
@@ -84,7 +89,7 @@ export function AboutMobile() {
 
       <RoomCarousel items={about.roomCarousel.items} />
 
-      {/* "This is our team" spread over the 358, the bars under it. */}
+      {/* The team title spread over the 358, the bars under it. */}
       <section className="flex flex-col gap-4 px-margin pt-20 pb-20">
         {/* Neue Haas bold caps like the desktop title, at the phone's 20 (half the desktop 40, like the names). */}
         <h2 className="flex justify-between font-sans text-[20px] leading-none font-bold uppercase">
@@ -98,7 +103,11 @@ export function AboutMobile() {
       {/* The question in Mobile/Line (40) and a pink CONTACT US chip, on one full screen (100vh); the
           whole screen links. The team above ends on an 80 padding, like its 80 top. */}
       <Link href={about.contact.href} className="flex h-(--vh) flex-col items-center justify-center gap-6 px-margin">
-        <h2 className="w-span-4 text-center font-serif text-[28px] leading-none text-balance">{about.contact.title}</h2>
+        <div className="flex w-span-4 flex-col items-center text-center">
+          <h2 className="font-serif text-[28px] leading-none text-balance">{about.contact.title}</h2>
+          <p className="font-serif text-[28px] leading-none">{about.contact.line}</p>
+          <p className="t-mini mt-3 normal-case">{about.contact.aside}</p>
+        </div>
         <span className="chip bg-pink">{about.contact.cursor}</span>
       </Link>
     </main>

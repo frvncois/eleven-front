@@ -14,7 +14,7 @@ import { useDialogFocus } from "@/lib/dialog-focus";
 const ITEMS = party.items;
 
 /**
- * The butterfly easter egg (Contact, Privacy), desktop and phone. Click the butterfly: a random picture (later a
+ * The butterfly easter egg (Contact, Legal), desktop and phone. Click the butterfly: a random picture (later a
  * video) opens from it in a circle wipe and covers everything, navs and dock included, with its own
  * music when Eleven's audio arrives. Only the butterfly stays, in the same spot (flapping fast, it closes the party),
  * plus a CLOSE tag: bottom right on the phone (MENU's spot), top right on desktop (the player's). Esc closes too.

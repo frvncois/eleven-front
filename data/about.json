@@ -27,7 +27,11 @@
     "globe": {
       "src": "/media/about/snow-globe.webp",
       "width": 671.621,
-      "height": 515.849
+      "height": 515.849,
+      "note": {
+        "n": "03",
+        "text": "The old Santa Monica studio, where it all started in 1999. Long gone, never forgotten."
+      }
     }
   },
   "services": {
@@ -60,7 +64,7 @@
     ]
   },
   "team": {
-    "label": "This is our team",
+    "label": "These are our humans",
     "rows": [
       [
         {
@@ -180,6 +184,8 @@
   },
   "contact": {
     "title": "Is it time now to work together?",
+    "line": "That would be nice.",
+    "aside": "(we even have snacks)",
     "cursor": "contact us",
     "href": "/contact"
   }

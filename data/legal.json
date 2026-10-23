@@ -1,0 +1,33 @@
+{
+  "title": "Legal",
+  "sections": [
+    {
+      "id": "privacy",
+      "label": "01  Privacy",
+      "paragraphs": [
+        "This website is run by Eleven Sound LLC, 2255 Barry Avenue, Los Angeles, CA 90064.",
+        "We don’t collect anything through this site. If you email us, we use your name, email and message to reply, and that’s it. We never sell or share it.",
+        "Like every website, our host keeps basic technical logs (IP address, browser, pages visited) to keep the site running and secure.",
+        "You can ask what we hold about you, or ask us to correct or delete it: [privacy contact email]."
+      ],
+      "note": "Effective October 2026"
+    },
+    {
+      "id": "cookies",
+      "label": "02  Cookies & tracking",
+      "paragraphs": [
+        "No cookies, no analytics. Your sound on or off choice stays in your browser until you close the tab.",
+        "Films play through Vimeo with tracking turned off. Links to Vimeo, Instagram and LinkedIn take you to sites with their own privacy policies.",
+        "We don’t track you across other sites, so every visit is treated the same, with or without a Do Not Track signal."
+      ]
+    },
+    {
+      "id": "use-of-this-site",
+      "label": "03  Use of this site",
+      "paragraphs": [
+        "The films on this site are shown as examples of our work. They belong to their brands, agencies and directors, so please don’t download or reuse them.",
+        "Everything else, the design and the words, is ©2026 Eleven."
+      ]
+    }
+  ]
+}

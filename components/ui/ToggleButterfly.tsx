@@ -4,7 +4,7 @@ import { party, useParty } from "@/lib/party";
 
 /**
  * Toggle/Butterfly. Click for the funny-animals easter egg (PartyMode → VideoParty).
- * A chip in the page accent (Contact royal blue, Privacy lime) with
+ * A chip in the page accent (Contact royal blue, Legal lime) with
  * the accent's ink for the butterfly (grey on royal blue, black on lime), flapping slowly; while the party is on, the chip runs through the accent colours and the
  * butterfly flaps fast. The glyph is a mask, so its colour is set here, not in the SVG.
  */

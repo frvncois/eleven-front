@@ -161,7 +161,7 @@ html.lenis body { height: auto; }
   80% { background-color: var(--color-pink); }
   90% { background-color: var(--color-aqua); }
 }
-.butterfly-chip { background-color: var(--accent, var(--color-royal-blue)); } /* the page accent: Contact royal blue, Privacy lime */
+.butterfly-chip { background-color: var(--accent, var(--color-royal-blue)); } /* the page accent: Contact royal blue, Legal lime */
 .butterfly-chip.is-party { animation: butterfly-colours 2s steps(1, end) infinite; }
 .butterfly-chip.is-party .butterfly-flap { animation-duration: 0.24s; }
 

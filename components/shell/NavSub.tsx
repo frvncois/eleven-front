@@ -26,7 +26,7 @@ export function NavSub({ toggles, bareToggles = false, wordmark = true, tone = "
       </Link>
       )}
       {/* The page toggle and SOUND, each in a grey chip like the phone dock. `bareToggles`: a toggle that is
-          its own chip (the butterfly on Privacy) sits without the grey one around it. */}
+          its own chip (the butterfly on Legal) sits without the grey one around it. */}
       <div className="fixed right-margin bottom-4 z-50 flex items-center justify-end gap-2">
         {toggles && (bareToggles ? toggles : <div className="chip">{toggles}</div>)}
         <div className="chip">

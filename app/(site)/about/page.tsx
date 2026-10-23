@@ -16,7 +16,7 @@ const nameOf = (slug: string) => team.find((p) => p.slug === slug)?.name ?? slug
 // TeamCard gets no `icon` here: no icon pops on the team bars.
 
 /** About: story with sticky sticker, snow globe, services, rooms, team, contact. */
-// "This is our team" on the 9-col grid, one cell per word.
+// The team title on the 9-col grid, one cell per word.
 const TEAM_WORD_CELLS = ["col-start-1", "col-start-4", "col-start-6 justify-self-end", "col-start-9 justify-self-end"];
 
 export default function AboutPage() {
@@ -45,7 +45,7 @@ function AboutDesktop() {
             {story.paragraphs.map((p, i) => (
               <div key={p.note.n} className={`flex w-full justify-between ${i === 0 ? "items-end" : "items-center"}`}>
                 <aside className="t-body-sm flex w-span-1 shrink-0 gap-2">
-                  <NoteNumber n={p.note.n} boxed className="shrink-0" />
+                  <NoteNumber n={p.note.n} className="shrink-0" />
                   <span className="w-[151.8px] shrink-0">{p.note.text}</span>
                 </aside>
                 <p className={`t-h2 indent-col shrink-0 ${i === 0 ? "w-span-7" : "w-span-6"}`}>
@@ -65,6 +65,11 @@ function AboutDesktop() {
             height={story.globe.height}
             className="absolute top-[134px] left-col-5 h-auto w-span-4"
           />
+          {/* The globe's note on col 9, right beside it, level with its top. */}
+          <aside className="t-body-sm absolute top-[134px] left-col-9 flex w-span-1 gap-2">
+            <NoteNumber n={story.globe.note.n} className="shrink-0" />
+            <span className="min-w-0">{story.globe.note.text}</span>
+          </aside>
         </div>
       </div>
 
@@ -89,10 +94,10 @@ function AboutDesktop() {
 
       <RoomCarousel items={about.roomCarousel.items} />
 
-      {/* Team: THIS IS OUR TEAM spread edge to edge, then one
+      {/* Team: THESE ARE OUR HUMANS spread edge to edge, then one
           full-width colour bar per person. */}
       <section className="flex h-[1024px] flex-col gap-6 px-margin pt-[120px] pb-16">
-        {/* 9-col grid: THIS starts col 1, IS starts col 4, OUR ends col 6, TEAM ends col 9. */}
+        {/* 9-col grid: word 1 starts col 1, word 2 starts col 4, word 3 ends col 6, word 4 ends col 9. */}
         {/* Neue Haas bold caps at 40, the sans of the bars' roles. */}
         <h2 className="grid grid-cols-9 gap-x-gutter font-sans text-[40px] leading-none font-bold uppercase">
           {about.team.label.split(" ").map((w, i) => (
@@ -113,7 +118,11 @@ function AboutDesktop() {
         data-cursor={about.contact.cursor}
         className="flex h-[1024px] items-center justify-center px-margin pt-[120px] pb-16"
       >
-        <h2 className="t-h2 w-span-5 text-center text-balance">{about.contact.title}</h2>
+        <div className="flex w-span-5 flex-col items-center text-center">
+          <h2 className="t-h2 text-balance">{about.contact.title}</h2>
+          <p className="t-h2">{about.contact.line}</p>
+          <p className="t-mini mt-4 normal-case">{about.contact.aside}</p>
+        </div>
       </Link>
 
       <Chrome />

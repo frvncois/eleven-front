@@ -60,8 +60,8 @@
     "copyright": "©2026 Eleven",
     "legal": [
       {
-        "label": "Privacy Policy",
-        "href": "/privacy"
+        "label": "Legal",
+        "href": "/legal"
       }
     ],
     "credits": {
@@ -75,7 +75,7 @@
         {
           "name": "François Lemieux",
           "role": "Dev",
-          "href": null
+          "href": "https://www.frvncois.com/"
         }
       ]
     },

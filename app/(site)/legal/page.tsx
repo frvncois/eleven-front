@@ -1,37 +1,39 @@
 import type { Metadata } from "next";
-import privacy from "@/data/privacy.json";
+import legal from "@/data/legal.json";
 import { Chrome } from "@/components/shell/Chrome";
 import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
 import { ByDevice } from "@/components/mobile/ByDevice";
 import { FooterLinks } from "@/components/ui/FooterLinks";
-import { PrivacyMobile } from "@/components/mobile/PrivacyMobile";
+import { LegalMobile } from "@/components/mobile/LegalMobile";
 
-export const metadata: Metadata = { title: "Privacy Policy" };
+export const metadata: Metadata = { title: "Legal" };
 
 /**
- * Privacy Policy (no terms of use: only the privacy policy is required, CalOPPA). About's ruled-section system on the 9-col grid: title on the 24 margin,
+ * Legal: privacy (CalOPPA's points, for a site that collects nothing, with its small effective date), cookies, use of the films.
+ * No separate terms of use: nothing on the site to govern (no shop, accounts or forms). About's ruled-section system on the 9-col grid: title on the 24 margin,
  * each section a 4-col label (24 to 634) and the text from col 5 to col 9 (650 to 1416).
- * Ends on Contact's footer line (© / Privacy / Credits / LinkedIn, Instagram) in a 360 tall last section, so it sits
- * well apart from "Last updated". The butterfly stays bottom right next to SOUND.
- * Phone (PrivacyMobile): one column, each label above its text.
+ * Ends on Contact's footer line (© / Legal / Credits / LinkedIn, Instagram) in a 360 tall last section.
+ * The butterfly stays bottom right next to SOUND.
+ * Phone (LegalMobile): one column, each label above its text.
  */
-export default function PrivacyPage() {
-  return <ByDevice desktop={<PrivacyDesktop />} phone={<PrivacyMobile />} />;
+export default function LegalPage() {
+  return <ByDevice desktop={<LegalDesktop />} phone={<LegalMobile />} />;
 }
 
-function PrivacyDesktop() {
+function LegalDesktop() {
   return (
     <main className="bg-bg">
       <section className="px-margin pt-[240px] pb-[160px]">
-        <h1 className="t-h2">{privacy.title}</h1>
+        <h1 className="t-h2">{legal.title}</h1>
       </section>
-      {privacy.sections.map((s) => (
+      {legal.sections.map((s) => (
         <section key={s.id} id={s.id} className="flex scroll-mt-24 gap-gutter border-t border-neutral-1000 px-margin pt-margin pb-[120px]">
           <h2 className="t-h6 w-span-4 shrink-0 whitespace-pre">{s.label}</h2>
           <div className="t-body-lg flex flex-1 flex-col gap-5">
             {s.paragraphs.map((p) => (
               <p key={p}>{p}</p>
             ))}
+            {s.note && <p className="t-body-sm mt-3">{s.note}</p>}
           </div>
         </section>
       ))}
