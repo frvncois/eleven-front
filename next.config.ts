@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   turbopack: { root: path.resolve(__dirname) },
   // Media is pre-sized WebP/MP4 (scripts/build_data.py): no runtime image optimisation.
   images: { unoptimized: true },
-  // Screenshots are compared against Figma: keep the dev badge out of the bottom-left wordmark.
+  // Keep the dev badge out of the bottom-left wordmark.
   devIndicators: false,
   // Phone review on the same Wi-Fi (http://<this Mac's IP>:3700): Next blocks dev assets for other hosts otherwise.
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*"],

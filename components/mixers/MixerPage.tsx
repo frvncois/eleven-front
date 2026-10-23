@@ -19,13 +19,13 @@ const VIEWS: [{ value: MixerView; label: string }, { value: MixerView; label: st
 
 /**
  * Mixer page: the name, then the spots in one of two views, switched by the view word next to the
- * sound toggle in Nav/Sub ("GRID / SOUND", ViewToggle, Revision on M2/Nav/Sub, Oct 19):
- * - carousel (default): the Warp carousel (Figma 7654:1821), flat at rest, bending into the ELEVEN
- *   wordmark's perspective as it moves (depth 1.25, titles on hover only). Picked by Amélie, Oct 17.
- * - grid: the three-up grid of Figma 7345:1378, on the 9-col grid (V2 · 05 · Mixer · Grid · 9-col).
- * Who's next was removed on Oct 17; other mixers are reached through the Mixers overlay.
+ * sound toggle in Nav/Sub ("GRID / SOUND", ViewToggle):
+ * - carousel (default): the Warp carousel, flat at rest, bending into the ELEVEN
+ *   wordmark's perspective as it moves (depth 1.25, titles on hover only).
+ * - grid: a three-up grid on the 9-col grid.
+ * Other mixers are reached through the Mixers nav (MixersBanner).
  */
-// Projects crossfade (Amélie, Oct 19: "plus smooth", always a blur between transitions): both views
+// Projects crossfade (always a blur between transitions): both views
 // sit in the same grid cell while one leaves and the other arrives, so the page is never empty.
 const SWAP = { duration: 0.4, ease: EASE_OUT };
 const LAYER = {
@@ -73,8 +73,8 @@ export function MixerPage({ mixer, spots }: { mixer: Person; spots: Project[] })
   };
 
   return (
-    // Carousel: exactly one screen, no vertical scroll (Amélie, Oct 17). Grid: the page scrolls, with
-    // 240 px under the last row (Amélie, Oct 19). The top padding is the same in both views so the
+    // Carousel: exactly one screen, no vertical scroll. Grid: the page scrolls, with
+    // 240 px under the last row. The top padding is the same in both views so the
     // name never moves.
     <main
       className={`flex flex-col items-center gap-[88px] bg-neutral-0 pt-[calc(var(--vh)*0.3)] ${

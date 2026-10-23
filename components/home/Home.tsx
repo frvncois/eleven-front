@@ -12,15 +12,15 @@ import { HomeReel } from "./HomeReel";
 import { GATE_EXIT, GateLoader } from "./GateLoader";
 
 
-// Phone: no big ELEVEN on the home any more (Amélie, Oct 22); the nav's wordmark is the logo, the reel has the screen.
+// Phone: no big ELEVEN on the home; the nav's wordmark is the logo, the reel has the screen.
 
-// Desktop home wordmark, new version (Figma 7741:2181, review note 7, Oct 23): the ELEVEN stepping down from left to
-// right, neutral/200, 320.6 × 80 on the left margin, its foot 22.9 above the screen's bottom (Figma y 921.1 of 1024).
+// Desktop home wordmark: the ELEVEN stepping down from left to
+// right, neutral/200, 320.6 × 80 on the left margin, its foot 22.9 above the screen's bottom (y 921.1 of 1024).
 const HOME_MARK = { src: "/icons/eleven-home-v2.svg", width: 320.59, height: 79.998, bottom: 22.87 };
 const enterHome = () => setGateSeen(true); // stable, so the loader never restarts on a re-render
 
 /**
- * The gate (GateLoader, Figma V2 · 01 · Gate · 9-col 7684:1491, new version Oct 23) is a grey panel over the playing
+ * The gate (GateLoader) is a grey panel over the playing
  * reel on both devices: it counts "one" … "ten", one word at a time, then swings up like the Mixers wedge; sound is
  * chosen with the toggle on it. Once per visit (session), and again whenever the logo takes you home.
  */
@@ -29,7 +29,7 @@ export function Home() {
   // Seen earlier in this visit (nav link back home, or a reload): no gate. The home wordmark reopens it.
   const gate = !useSyncExternalStore(subscribeGate, () => gateSeen(), () => false);
 
-  // The gate always starts silent, even if sound was on earlier in the visit (Amélie, 15 Oct):
+  // The gate always starts silent, even if sound was on earlier in the visit:
   // the visitor turns it on here, deliberately.
   useEffect(() => {
     if (gate) sound.setMuted(true);
@@ -54,7 +54,7 @@ export function Home() {
       </AnimatePresence>
 
       {/* Desktop: the home wordmark, in with the nav (under the gate it would peek out below the panel's edge).
-          Clicking it brings the sound gate back, from the home only (Amélie, Oct 23, "for now"); the floss logo on the
+          Clicking it brings the sound gate back, from the home only; the floss logo on the
           other pages still just goes home. */}
       {!phone && (
         <motion.button

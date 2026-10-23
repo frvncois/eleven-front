@@ -6,7 +6,7 @@ import { FooterMobile } from "./FooterMobile";
 import { useDockToggle } from "./dock";
 
 /**
- * Privacy on a phone (mobile plan 3.9): one column, each label above its text. Ends on the phone footer and carries
+ * Privacy on a phone: one column, each label above its text. Ends on the phone footer and carries
  * the butterfly in the dock's top-right slot, like Contact (desktop has both).
  */
 export function PrivacyMobile() {

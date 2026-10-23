@@ -42,8 +42,8 @@ function Tag({ label, onClick, children }: { label: string; onClick: () => void;
 const CHIP = "chip cursor-pointer";
 
 /**
- * The player on a phone (mobile plan 3.6; no Figma mock, straight to code like Nimiopere's).
- * Portrait, kept lean and in the site's chip language (Amélie, Oct 22): the film is a 16:9 band a little above the
+ * The player on a phone.
+ * Portrait, kept lean and in the site's chip language: the film is a 16:9 band a little above the
  * middle; top left the caption every project has, client and title in grey chips; under the film one quiet line:
  * 16 × 16 grey tags with mini icons (previous, pause / play, next), the scrub, the time, a fullscreen tag. + INFO
  * sits top right and opens the credits (+ description on Longform) right under it, small and right-aligned. SOUND and CLOSE sit where the nav's SOUND and MENU are, so the thumb never moves. Swiping the film
@@ -132,7 +132,7 @@ export function PlayerMobile({ films, index, onIndex, onClose, longform = false 
   const toggle = () => {
     const p = playerRef.current;
     if (!p) return;
-    // Pause just pauses, Longform too (Amélie, Oct 23; it used to close the player).
+    // Pause just pauses, Longform too (it does not close the player).
     (playing ? p.pause() : p.play()).catch(() => {});
   };
 
@@ -238,7 +238,7 @@ export function PlayerMobile({ films, index, onIndex, onClose, longform = false 
             {captionOf(film).name && <span className="chip-title">{captionOf(film).name}</span>}
           </div>
 
-          {/* + INFO top right (Amélie, Oct 22); the credits (and the description on Longform) open right under it,
+          {/* + INFO top right; the credits (and the description on Longform) open right under it,
               right-aligned, in small type: each row a grey tag, the name in 12 bold, the role in 10 caps. */}
           {!landscape && (
             <div className="absolute top-[20.5px] right-margin z-10 flex max-w-[240px] flex-col items-end gap-1">
@@ -255,7 +255,7 @@ export function PlayerMobile({ films, index, onIndex, onClose, longform = false 
                     exit={{ opacity: 0, y: -6 }}
                     transition={PHONE_MOTION.reveal}
                   >
-                    {/* The credits as one block: the tags touch, each 1 px over the one above (Amélie, Oct 22); the
+                    {/* The credits as one block: the tags touch, each 1 px over the one above; the
                         description is a second block, 8 under it. */}
                     <div className="flex flex-col items-end">
                       {creditsOf(film).map(([name, role], i) => (
@@ -284,7 +284,7 @@ export function PlayerMobile({ films, index, onIndex, onClose, longform = false 
 
           {!landscape && (
             <div className="absolute inset-x-0 flex flex-col gap-4 px-margin" style={{ top: `calc(${FILM_TOP} + ${FILM_H + 16}px)` }}>
-              {/* One quiet line under the film (Amélie, Oct 22): previous, pause / play, next as 16 × 16 grey tags with
+              {/* One quiet line under the film: previous, pause / play, next as 16 × 16 grey tags with
                   mini icons, the scrub, the time in small grey, fullscreen at the end. Each tag has a 32 px tap area. */}
               <div className="flex items-center gap-3">
                 <div className="flex gap-1.5">
@@ -312,7 +312,7 @@ export function PlayerMobile({ films, index, onIndex, onClose, longform = false 
           )}
 
           {/* SOUND bottom left and CLOSE bottom right, the same chips in the same spots as the nav's SOUND and MENU
-              (Amélie, Oct 22: sound is always on the left). */}
+              (sound is always on the left). */}
           {!landscape && (
             <button type="button" onClick={onClose} className={`${CHIP} absolute right-margin bottom-4`}>
               {site.player.close}

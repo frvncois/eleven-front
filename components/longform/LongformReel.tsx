@@ -15,11 +15,11 @@ export type Film = Project & { label: string; color: string; position?: string }
 const SLIDE_MS = 900;
 
 /**
- * V1 · 07 · Longform (Figma 7345:1493, Longform/Reel 7356:3991). One film per screen; a scroll,
- * swipe or arrow key moves to the next one (fela.tv logic). Each film previews as its still with a
- * slow 10 s push-in (1 → 1.06, the Figma timeline) under a 25 % dim, standing in for Eleven's 10 s
+ * Longform. One film per screen; a scroll,
+ * swipe or arrow key moves to the next one. Each film previews as its still with a
+ * slow 10 s push-in (1 → 1.06) under a 25 % dim, standing in for Eleven's 10 s
  * preview loops. The legend on the left: one colour square per film, fading in one after another on
- * first load (annotation: "smooth, something clean"); the current one opens into its title. Click a
+ * first load; the current one opens into its title. Click a
  * square to jump, click the film ("play" tag) to watch it in the player.
  */
 export function LongformReel({ films }: { films: Film[] }) {

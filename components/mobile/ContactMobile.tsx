@@ -9,7 +9,7 @@ import { useDockToggle } from "./dock";
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, "")}`;
 
 /**
- * Contact on a phone (mobile plan 3.8, straight to code). The line in serif 28 (Junicode), the
+ * Contact on a phone. The line in serif 28 (Junicode), the
  * gif edge to edge (text keeps the margin), then Jordan / Adrea / Studio stacked 32 apart, every email
  * and phone a real mailto: / tel: link. Footer in two columns. The butterfly takes the dock's top-right
  * slot and still starts the animal party.

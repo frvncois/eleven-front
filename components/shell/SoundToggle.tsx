@@ -3,11 +3,11 @@
 import { useSound } from "@/lib/sound";
 
 /**
- * Toggle/Sound, after perfectdaymedia.se (Amélie, 22 Oct): SOUND OFF / ON with a three-bar meter.
- * It takes its type and colour from the `chip` around it (globals.css), on desktop as on the phone (Amélie, 22 Oct:
- * "little chips like mobile, smaller text"), so it reads the same on video and on white.
+ * Toggle/Sound: SOUND OFF / ON with a three-bar meter.
+ * It takes its type and colour from the `chip` around it (globals.css), on desktop as on the phone,
+ * so it reads the same on video and on white.
  * The current word is solid, the other dimmed; flipping rolls the solid copy up through a clipped cell.
- * The bars bounce while sound is on and rest as short stubs when it is off. Replaces the breathing dot after gehry.getty.edu (git 364f6ec).
+ * The bars bounce while sound is on and rest as short stubs when it is off.
  */
 export function SoundToggle() {
   const s = useSound();

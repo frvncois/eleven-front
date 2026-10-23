@@ -3,9 +3,8 @@
 import type { Project } from "@/lib/content";
 
 /**
- * Card/Project (Figma 7356:3387), the mixer page's grid view. Default: thumbnail, then the caption 8 below it in the
- * same style as the List view (the Warp carousel): client chip over title chip (Amélie, Oct 23; was title / client
- * on one Body line). Hover: the image takes the full card and the chips sit over its bottom edge (0.3 s ease-out).
+ * Card/Project, the mixer page's grid view. Default: thumbnail, then the caption 8 below it in the
+ * same style as the List view (the Warp carousel): client chip over title chip. Hover: the image takes the full card and the chips sit over its bottom edge (0.3 s ease-out).
  * Click opens the player.
  */
 export function ProjectCard({ project, onOpen }: { project: Project; onOpen: (p: Project) => void }) {

@@ -3,8 +3,8 @@
 import { useSyncExternalStore } from "react";
 
 /**
- * Phone or desktop (mobile plan, Oct 19): a phone is a window under 1024 px or a touch-only pointer.
- * The phone gets the 390-unit stage (Figma "V2 · MOBILE (390) · phone mocks", 7696:1980) and the
+ * Phone or desktop: a phone is a window under 1024 px or a touch-only pointer.
+ * The phone gets the 390-unit stage and the
  * pages render their `*Mobile` layouts. Decided before paint in app/layout.tsx (html.phone) and kept
  * in step on resize by components/shell/StageScale, which fires EVENT when it flips.
  */

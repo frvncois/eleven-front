@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Archive thumbnails, fetched and decoded before the page opens (Amélie, Oct 17: the ball must be
+ * Archive thumbnails, fetched and decoded before the page opens (the ball must be
  * there the moment Archive opens). Starts when the pointer reaches the Archive link (the sweep then
  * gives it about a second more). Each poster becomes an ImageBitmap, decoded off the main thread,
  * so handing it to the GPU later costs almost nothing. The data is a separate chunk so other pages

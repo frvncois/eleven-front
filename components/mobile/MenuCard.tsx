@@ -12,7 +12,7 @@ import { PHONE_MOTION } from "@/lib/motion";
 const UNFOLD = PHONE_MOTION.sheet;
 
 /**
- * The phone menu, after ascension.pegassi.be (Amélie, Oct 22): a card that unfolds upward from the
+ * The phone menu: a card that unfolds upward from the
  * MENU chip, just above the chips. A small "Menu" label, then one row per page in Heading/H3 and its
  * colour, hairlines between them, the current page marked with a dot. MIXERS doesn't go anywhere: it
  * opens a drawer inside the card with the six mixers (the other pages fold away meanwhile, so it never scrolls), each with its icon, names and icons in Mixers red. Studio address and
@@ -41,7 +41,7 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
     <AnimatePresence onExitComplete={() => setDrawer(false)}>
       {open && (
         <motion.div key="menu" className="fixed inset-0 z-[79]" initial="out" animate="in" exit="out">
-          {/* The page behind goes soft while the menu is open (Amélie, Oct 22); tapping it closes. The
+          {/* The page behind goes soft while the menu is open; tapping it closes. The
               nav chips sit above this layer, so they stay sharp. */}
           <motion.button
             type="button"
@@ -70,7 +70,7 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
                     {item.label}
                   </span>
                 );
-                // Rows at 20 px (H3 was 28; smaller after Seventeen, Oct 22).
+                // Rows at 20 px (smaller than the 28 px H3).
                 const cls = "t-h3 block w-full px-3 py-2.5 text-left phone:text-[20px]";
                 return (
                   <motion.li
@@ -145,7 +145,7 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
                       </>
                     ) : (
                       // While the Mixers drawer is open the other pages fold away, so the card always fits the
-                      // screen (Amélie, Oct 22: no scrolling the nav); closing the drawer brings them back.
+                      // screen (the nav never scrolls); closing the drawer brings them back.
                       <motion.div
                         className="overflow-hidden"
                         initial={false}

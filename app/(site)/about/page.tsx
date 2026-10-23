@@ -13,9 +13,9 @@ import { ByDevice } from "@/components/mobile/ByDevice";
 export const metadata: Metadata = { title: "About" };
 
 const nameOf = (slug: string) => team.find((p) => p.slug === slug)?.name ?? slug;
-// No icon pops on the team bars any more (Amélie, Oct 23; they did since review note 1): TeamCard gets no `icon`.
+// TeamCard gets no `icon` here: no icon pops on the team bars.
 
-/** About (Figma V1 7345:1607, revised on V2 · 09 · About 7653:2391): story with sticky sticker, snow globe, services, rooms, team, contact. */
+/** About: story with sticky sticker, snow globe, services, rooms, team, contact. */
 // "This is our team" on the 9-col grid, one cell per word.
 const TEAM_WORD_CELLS = ["col-start-1", "col-start-4", "col-start-6 justify-self-end", "col-start-9 justify-self-end"];
 
@@ -29,16 +29,16 @@ function AboutDesktop() {
     <main className="bg-bg">
 
       {/* Story + snow globe share one container so the sticker can run through both.
-          Amélie, Oct 19: the second paragraph always starts level with the top of the floss (Nav/Sub,
-          bottom 16 + 90.68 tall = vh − 106.68 since the floss went 20 % smaller, Oct 23), the intro (5 lines, 320) sits
-          on top of it, so the padding is vh − 426.68 (≈ 597 on a 1024 screen). Revisions (V2 · 09 · About): the sticker starts higher (rests at
-          120, held at 12 % ≈ 120 / 1024) and stays until after the snow globe, fading out at its end. */}
+          The second paragraph always starts level with the top of the floss (Nav/Sub,
+          bottom 16 + 90.68 tall = vh − 106.68), the intro (5 lines, 320) sits
+          on top of it, so the padding is vh − 426.68 (≈ 597 on a 1024 screen). The sticker rests at
+          120 (held at 12 % ≈ 120 / 1024) and stays until after the snow globe, fading out at its end. */}
       <div className="relative">
         {/* 9-col grid: the sticker starts on col 3. */}
         <StorySticker src={story.sticker.src} width={134} height={81} top={120} left={336.89} hold="12%" />
         {/* 9-col grid: text on the 24 margin, the notes 1 col wide, paragraph 1 from col 3, paragraph 2 from col 4, both to 1416.
             Each first line is indented one column step (indent-col), so it starts on the next column:
-            intro col 2, paragraph 1 col 4, paragraph 2 col 5 (Amélie, Oct 19; was a flat 120). */}
+            intro col 2, paragraph 1 col 4, paragraph 2 col 5. */}
         <section className="relative flex flex-col px-margin pt-[calc(var(--vh)-426.68px)]">
           <div className="relative flex w-full flex-col items-end">
             <p className="t-h2 indent-col w-full">{story.intro}</p>
@@ -68,7 +68,7 @@ function AboutDesktop() {
         </div>
       </div>
 
-      {/* Revision (Figma V2 · 09 · About, section-services 7671:2339): black rule on top, the label left,
+      {/* Services: black rule on top, the label left,
           and from x 633 one row per service: the name in condensed serif capitals (Junicode wdth 87.5,
           50/100) and a big bold description (Neue 75, 46/100) right-aligned, rules between rows. */}
       {/* 9-col grid: label column 4 cols (24 to 634), the list from col 5 (650), text ending at 1416. */}
@@ -89,7 +89,7 @@ function AboutDesktop() {
 
       <RoomCarousel items={about.roomCarousel.items} />
 
-      {/* Revision (M2/Section/Team, "new layout"): THIS IS OUR TEAM spread edge to edge, then one
+      {/* Team: THIS IS OUR TEAM spread edge to edge, then one
           full-width colour bar per person. */}
       <section className="flex h-[1024px] flex-col gap-6 px-margin pt-[120px] pb-16">
         {/* 9-col grid: THIS starts col 1, IS starts col 4, OUR ends col 6, TEAM ends col 9. */}
@@ -105,7 +105,7 @@ function AboutDesktop() {
         </div>
       </section>
 
-      {/* Revision (section-contact, "new layout"): one screen, the question centred; the whole section
+      {/* Contact: one screen, the question centred; the whole section
           is the link to Contact, with the CONTACT US cursor tag. */}
       <Link
         href={about.contact.href}

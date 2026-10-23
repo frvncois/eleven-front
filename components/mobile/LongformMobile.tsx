@@ -11,11 +11,11 @@ import { LongformTag } from "@/components/longform/LongformTag";
 import { appScale } from "@/lib/device";
 
 /**
- * Figma M · 07 · Longform (7696:2004). One film per screen, cropped to cover the portrait (until
+ * Longform on a phone. One film per screen, cropped to cover the portrait (until
  * Eleven sends 9:16 cuts), with the slow push-in and 25 % dim of desktop. The films follow the finger and land
- * on one when it lets go, the same feel as the Archive list (lib/stepper). The colour strip stays vertical like desktop (Amélie, Oct 22: across the screen the titles
+ * on one when it lets go, the same feel as the Archive list (lib/stepper). The colour strip stays vertical like desktop (across the screen the titles
  * don't fit): 24 squares down the left margin, centred, the current one opening into a tag of client over
- * title (LongformTag, shared with desktop). No "turn the phone" prompt (Amélie, Oct 22). Tap = the player.
+ * title (LongformTag, shared with desktop). No "turn the phone" prompt. Tap = the player.
  */
 export function LongformMobile({ films }: { films: Film[] }) {
   const [index, setIndex] = useState(0);

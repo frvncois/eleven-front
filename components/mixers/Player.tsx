@@ -11,7 +11,7 @@ import { SoundToggle } from "@/components/shell/SoundToggle";
 import site from "@/data/site.json";
 
 const labels = site.player;
-// Every button in the player is the same small grey chip (Amélie, Oct 23: CLOSE, + INFO, NEXT and SOUND one size,
+// Every button in the player is the same small grey chip (CLOSE, + INFO, NEXT and SOUND one size,
 // smaller than the site's 24 tall chip): `chip-sm`, 20 tall, 10 px bold caps, 6 px sides, hover 50 %.
 const CHIP_SM = "chip-sm cursor-pointer transition-opacity duration-200 ease-out hover:opacity-50";
 // Like YouTube: after 5 s without moving the mouse the controls fade out (and the cursor with them); any move brings
@@ -39,11 +39,11 @@ export function embedUrl(vimeo: string, muted: boolean) {
 
 const MIXER_TBC = "Mixer to confirm";
 
-/** The film's credits rows, [name, role]: always a Mix row (Revision on Player/Info Panel). */
+/** The film's credits rows, [name, role]: always a Mix row. */
 export function creditsOf(film: Project): [string, string][] {
   const mixer = film.mixer ? mixerBySlug(film.mixer) : undefined;
   return [
-    // Revision (Player/Info Panel): always name the mixer. Six longform films are not credited on
+    // Always name the mixer. Six longform films are not credited on
     // Eleven's site, so they show a placeholder until Eleven sends the names.
     [mixer?.name ?? MIXER_TBC, "Mix"],
     mixer && [mixer.name, "Sound design"],
@@ -54,14 +54,14 @@ export function creditsOf(film: Project): [string, string][] {
 }
 
 /**
- * A project's caption pair without repeats (Amélie, Oct 22): Longform's labels read "Client · Title", so they are
+ * A project's caption pair without repeats: Longform's labels read "Client · Title", so they are
  * split on the "·" into the two chips; a title that only repeats the client ("Alice Gu") is not shown twice.
  */
 export const captionOf = (f: Project) => splitCaption(f.short ?? f.title, f.client);
 
 export const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
-/** The film's scrub line and time, one look on both players (Oct 23, the phone's): a 1 px line, the time as "0:12 / 0:30". */
+/** The film's scrub line and time, one look on both players: a 1 px line, the time as "0:12 / 0:30". */
 export function Scrub({ time, duration, onSeek }: { time: number; duration: number; onSeek: (e: React.PointerEvent<HTMLDivElement>) => void }) {
   return (
     <>
@@ -83,20 +83,20 @@ type Props = {
   onIndex: (i: number) => void;
   onClose: () => void;
   /**
-   * Longform (annotation on Longform/Reel + Player/Info Panel Description): the info panel also shows
-   * the film's description. Pausing just pauses, as everywhere (it used to leave the player, until Oct 23).
+   * Longform: the info panel also shows
+   * the film's description. Pausing just pauses, as everywhere.
    */
   longform?: boolean;
 };
 
 /**
- * Project player (Figma V2 · 06 · Project player · 9-col 7684:1600, redesigned by Amélie Oct 23; was V1 7345:1485).
+ * Project player.
  * An overlay over the mixer page, so closing is instant. The film fills the screen; the films of this mixer sit on a
  * horizontal strip and the next one slides in when a film ends. Same chip language as the rest of the site and the
- * phone player (Amélie, Oct 23): every action a grey `chip` (CLOSE, + INFO, NEXT, PAUSE / PLAY, SOUND), the caption
- * the client / title pair top-left, the credits as touching grey tags (name 12 bold, role 9 caps). Layout from the
- * frame: caption + CLOSE on one top line, + INFO and NEXT (a size smaller) at 471 / 1024 of the height, time / scrub /
- * duration bottom-left and SOUND bottom-right. No pause button (Amélie, Oct 23): clicking the film pauses / plays.
+ * phone player: every action a grey `chip` (CLOSE, + INFO, NEXT, PAUSE / PLAY, SOUND), the caption
+ * the client / title pair top-left, the credits as touching grey tags (name 12 bold, role 9 caps). Layout:
+ * caption + CLOSE on one top line, + INFO and NEXT (a size smaller) at 471 / 1024 of the height, time / scrub /
+ * duration bottom-left and SOUND bottom-right. No pause button: clicking the film pauses / plays.
  * The controls hide after 5 s without mouse movement while the film plays (IDLE_MS).
  */
 export function Player({ films, index, onIndex, onClose, longform = false }: Props) {
@@ -186,7 +186,7 @@ export function Player({ films, index, onIndex, onClose, longform = false }: Pro
   const toggle = useCallback(() => {
     const p = playerRef.current;
     if (!p) return;
-    // Pause just pauses, Longform too (Amélie, Oct 23: it used to close the player and the film restarted from 0).
+    // Pause just pauses, Longform too (the player stays open and the film keeps its place).
     (playing ? p.pause() : p.play()).catch(() => {});
   }, [playing]);
 

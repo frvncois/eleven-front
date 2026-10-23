@@ -39,7 +39,7 @@ void main() {
 }`;
 
 /**
- * The Archive grid drawn on the GPU, bent over a ball (Amélie, Oct 17): thumbnails curve with it,
+ * The Archive grid drawn on the GPU, bent over a ball: thumbnails curve with it,
  * flat in the middle and rolling away at the edges and corners. Positions come from the grid's
  * flat layout (motion values, read every frame); `hover` gets a label that follows the curve.
  */

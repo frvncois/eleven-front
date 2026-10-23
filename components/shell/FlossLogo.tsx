@@ -5,9 +5,9 @@ import type { DotLottie } from "@lottiefiles/dotlottie-web";
 import { prefersReducedMotion } from "@/lib/motion";
 
 /**
- * The floss logo, animated like elevensound.framer.website: hover scrubs the hand-drawn Lottie
+ * The floss logo, animated: hover scrubs the hand-drawn Lottie
  * (28 frames, the floss pulls out) forward over 600 ms with an ease-in-out cubic, leaving scrubs it
- * back from wherever it is. Off for reduced motion and touch. It is the live site's drawing (solid
+ * back from wherever it is. Off for reduced motion and touch. It is the Lottie drawing (solid
  * box, "SINCE 1999"), not the line-drawn logo-floss.webp.
  *
  * The Lottie is one white fill with the details (ELEVEN, the swoosh, the text, the drawn lines) cut
@@ -18,13 +18,13 @@ import { prefersReducedMotion } from "@/lib/motion";
  * it is dimmed to the nav's grey.
  *
  * Canvas sizing: in the 500×500 Lottie the floss box at frame 0 spans x 60–368, y 86–436, so the
- * canvas is scaled and offset to land that box in its slot: the webp's 106.651×113.346, 20 % smaller since Oct 23
- * (Amélie), so 85.32×90.68.
+ * canvas is scaled and offset to land that box in its slot: the webp's 106.651×113.346, 20 % smaller,
+ * so 85.32×90.68.
  */
 const DURATION = 600;
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
-const SLOT = { w: 106.651 * 0.8, h: 113.346 * 0.8 }; // the webp's slot, 20 % smaller (Oct 23)
+const SLOT = { w: 106.651 * 0.8, h: 113.346 * 0.8 }; // the webp's slot, 20 % smaller
 const SCALE = SLOT.h / 350; // slot height / floss height in the Lottie
 const CANVAS = 500 * SCALE;
 const OFFSET_X = 60 * SCALE;

@@ -1,7 +1,7 @@
 /**
  * The ELEVEN wordmark's perspective, as geometry the carousels can reuse.
  *
- * The logo (Figma 7661:3343, public/icons/eleven-shape.svg, 1400 × 286) is a one-point
+ * The logo (public/icons/eleven-shape.svg, 1400 × 286) is a one-point
  * perspective: the letters keep roughly the same width but lose height to the right, the top
  * line drops (0,0 → 1400,110), the bottom line rises (286 → 218), so the vanishing point sits
  * to the right and a little below the middle. The left edges lean (the E's top is 23 px right of

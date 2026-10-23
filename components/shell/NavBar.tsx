@@ -19,16 +19,16 @@ const NAV_CELLS = [
 ];
 
 /**
- * Nav/Bar (Figma 7356:3252): five links on the 9-col grid, Heading/H4: cols 1 / 3 / 5 / 7 / 9,
- * aligned start / start / centre / end / end, so the gaps stay within ~8% of equal (Oct 19).
+ * Nav/Bar: five links on the 9-col grid, Heading/H4: cols 1 / 3 / 5 / 7 / 9,
+ * aligned start / start / centre / end / end, so the gaps stay within ~8% of equal.
  * Hover = the link's colour (Mixers red, Archive aqua, Longform dark green, About pink, Contact royal blue),
- * 0.3 s ease-out, + a short sound; the current page keeps the hover state (annotation).
+ * 0.3 s ease-out, + a short sound; the current page keeps the hover state.
  * `tone="light"` (neutral/300) where it sits on video: home, player.
  */
 export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
   const pathname = usePathname();
   const [mixersOpen, setMixersOpen] = useState(false);
-  // Phone: the dock and its colour-bar menu replace the bar (components/mobile/PhoneShell).
+  // Phone: the dock and its menu replace the bar (components/mobile/PhoneShell).
   if (usePhone()) return null;
   return (
     <>
@@ -38,7 +38,7 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
     >
       {site.nav.map((item, i) => {
         const current = pathname === item.match || pathname.startsWith(item.match + "/");
-        // Hover = the link's own brand colour at full strength (Figma "Nav Hover" modes); the current page keeps it.
+        // Hover = the link's own brand colour at full strength; the current page keeps it.
         const cls = `${NAV_CELLS[i]} t-h4 cursor-pointer whitespace-nowrap transition-colors duration-300 ease-out hover:text-(--hover) ${current ? "text-(--hover)" : ""}`;
         const style = { "--hover": `var(--color-${item.color})` } as React.CSSProperties;
         // Mixers opens the roster wedge (MixersBanner) instead of a page.

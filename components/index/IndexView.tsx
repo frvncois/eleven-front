@@ -18,32 +18,32 @@ export type Tile = Project & { label: string; client: string; x: number; y: numb
 const MORPH = { duration: 0.6, ease: EASE_DISSOLVE };
 const r169 = (w: number) => Math.round((w * 9) / 16);
 
-// List: three sizes, S / M / L = 2 / 3 / 4 columns. Like the phone list (Amélie, Oct 22): every card ends on the
+// List: three sizes, S / M / L = 2 / 3 / 4 columns. Like the phone list: every card ends on the
 // screen's right edge, so the widest, in the middle, points left at the caption.
 const LIST_RIGHT = 1440;
 // The stack runs the full height of the screen, from under About and Contact down past the GRID / SOUND chips, which
-// sit on top of it (review note 19, Oct 23; it used to stop 16 above them). Clean cut, no white fade.
+// sit on top of it. Clean cut, no white fade.
 const LIST_BOTTOM = 0;
 const SMALL_W = span(2);
 const MID_W = span(3);
 const BIG_W = span(4);
 const GAP = 16;
 const STEP = 300; // wheel distance from one project to the next
-// Grid: the Figma field spread out a little so there is air between projects (Amélie, Oct 17), then
+// Grid: the designed field spread out a little so there is air between projects, then
 // evened out (relax) so there are no big holes. Tile sizes stay.
-const SPREAD = 1.32; // was 1.12 (Oct 17) and 0.95: more room so projects sit further apart (Amélie, Oct 23)
-const MIN_GAP = 136; // smallest space between two projects after evening out (was 104, then 64)
-const GROW = 1.15; // field frames 15 % bigger than the grid's 2 / 3 / 4 columns (Amélie, Oct 23: too crowded)
+const SPREAD = 1.32; // room so projects sit well apart
+const MIN_GAP = 136; // smallest space between two projects after evening out
+const GROW = 1.15; // field frames 15 % bigger than the grid's 2 / 3 / 4 columns
 // On arrival the nav must read clearly: the opening view (searched over the whole wrapped field)
 // keeps the top nav clear, avoids the floss and toggle corners, and fills the screen.
-// Amélie's chosen opening view (Oct 23): P&G · Best Job on the right, Visa · Typewriter top left, Adidas · Reflections
-// bottom left. Pinned by Best Job's centre as it shows on the ball, measured from the screen centre (from her 1440 ×
-// 1005 capture), so it holds at any window height. The search below is only the fallback if that project goes.
+// The chosen opening view: P&G · Best Job on the right, Visa · Typewriter top left, Adidas · Reflections
+// bottom left. Pinned by Best Job's centre as it shows on the ball, measured from the screen centre (at 1440 ×
+// 1005), so it holds at any window height. The search below is only the fallback if that project goes.
 const OPEN = { slug: "p-g-best-job", x: 371, y: 123 };
 const NAV_TOP = 96;
 const NAV_BOTTOM = 88;
 const FLOSS = { w: 160, h: 145 };
-// The screen as a ball (Amélie, Oct 17): the flat grid is drawn bent over a sphere (BallCanvas,
+// The screen as a ball: the flat grid is drawn bent over a sphere (BallCanvas,
 // WebGL), so thumbnails themselves curve, flat in the middle and rolling away at the edges.
 // A point at distance s from the centre on the flat grid shows at r = R·sin(s / R) on screen.
 const BALL_RADIUS = 1150; // smaller = rounder
@@ -60,9 +60,9 @@ const widthAt = (d: number) => {
 const vhOf = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--vh")) || 1024;
 
 /**
- * V1 · 08 · Index (Figma 7345:1515 grid, 7345:1560 list). Every project in one place.
- * Grid: the Figma field, opening centred on project 01. It moves only when you scroll (after
- * neu.team): vertical scroll moves it up/down, horizontal (trackpad) sideways, with soft inertia;
+ * Archive (desktop). Every project in one place.
+ * Grid: the designed field (data/index.json), opening centred on project 01. It moves only when you scroll:
+ * vertical scroll moves it up/down, horizontal (trackpad) sideways, with soft inertia;
  * drag works too. The field repeats endlessly, so there is no edge. Hover shows title / client.
  * List: one endless column in three sizes, opening on project 01 in the middle: the middle project
  * large with its name in black, its neighbours medium, the rest small and grey; rows grow as they
@@ -75,7 +75,7 @@ const VIEWS: [{ value: "grid" | "list"; label: string }, { value: "grid" | "list
 ];
 
 export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number; h: number } }) {
-  // The Archive opens on the list (review note 19, Oct 23); GRID switches to the fisheye.
+  // The Archive opens on the list; GRID switches to the fisheye.
   const [view, setView] = useState<"grid" | "list">("list");
   // The grid only plays its flat morph phase when it comes back from the list.
   const [fromList, setFromList] = useState(false);
@@ -97,8 +97,7 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
         )}
       </LayoutGroup>
 
-      {/* Revision (M2/Nav/Sub): one view word next to the sound toggle, "GRID / SOUND"; the Fisheye /
-          Vanish chips are gone, the Archive is the fisheye only (Amélie, Oct 19). */}
+      {/* One view word next to the sound toggle, "GRID / SOUND". */}
       <Chrome toggles={<ViewToggle options={VIEWS} value={view} onChange={choose} />} />
       <Player films={tiles} index={playing} onIndex={setPlaying} onClose={() => setPlaying(null)} />
     </main>

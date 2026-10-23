@@ -1,5 +1,5 @@
 /**
- * The 9-column site grid in 1440 design px (Amélie, Oct 19): 24 margin, 16 gutter, columns 140.44
+ * The 9-column site grid in 1440 design px: 24 margin, 16 gutter, columns 140.44
  * wide, step 156.44. Mirrors --grid-* in app/globals.css, for layouts computed in JS.
  */
 export const MARGIN = 24;
@@ -13,7 +13,7 @@ export const span = (n: number) => n * COL + (n - 1) * GUTTER;
 export const colStart = (n: number) => MARGIN + (n - 1) * (COL + GUTTER);
 
 /**
- * Archive thumbnails come from the Figma field in three sizes (S 332 / M 448 / L 564, data/index.json).
+ * Archive thumbnails come from the designed field in three sizes (S 332 / M 448 / L 564, data/index.json).
  * On the 9-col grid they are 2 / 3 / 4 columns wide; the image stays 16:9, the caption room under
  * it and the tile's centre are kept, so the field keeps its neighbourhoods.
  */

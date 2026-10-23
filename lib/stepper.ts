@@ -1,6 +1,5 @@
 /**
- * One scrolling feel for the phone lists that step through projects (the Archive stack and Longform; Amélie, Oct 22:
- * the Archive skipped 1–2 projects too easily, Longform only ever moved one). While the finger is down the list
+ * One scrolling feel for the phone lists that step through projects (the Archive stack and Longform). While the finger is down the list
  * follows it; on release it projects the throw, lands on the nearest project and eases into it, so one project always
  * sits square. A short or gentle swipe moves exactly one; a hard flick may skip more, never more than MAX_SKIP.
  */

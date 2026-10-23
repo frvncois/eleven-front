@@ -2,8 +2,7 @@
 
 /* ------------------------------------------------------------------ */
 /*  Eleven: design tokens                                              */
-/*  Mirrors Figma qpFHei1imXNCWCrvRFfIbs (Primitives, Color,           */
-/*  Breakpoint, Typography collections, dev-ready code syntax).        */
+/*  Primitives, colour, breakpoint and typography tokens.              */
 /*  Build against these only, never raw hex.                           */
 /* ------------------------------------------------------------------ */
 @theme static {
@@ -49,19 +48,19 @@
   /* Spacing (Breakpoint collection, Desktop) */
   --spacing-margin: 24px;
   --spacing-gutter: 16px;
-  /* 9-column site grid (Oct 19): col 140.44, step 156.44 at 1440, odd spans centre on 720 */
+  /* 9-column site grid: col 140.44, step 156.44 at 1440, odd spans centre on 720 */
   --grid-cols: 9;
   --grid-col: calc((1440px - 2 * var(--spacing-margin) - (var(--grid-cols) - 1) * var(--spacing-gutter)) / var(--grid-cols));
   --grid-step: calc(var(--grid-col) + var(--spacing-gutter)); /* one column + one gutter, 156.44 */
 
-  /* Motion, from the mockup prototype */
+  /* Motion */
   --ease-out-soft: cubic-bezier(0, 0, 0.58, 1);
   --ease-sweep: cubic-bezier(0.62, 0.05, 0.01, 0.99);
   --ease-dissolve: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ------------------------------------------------------------------ */
-/*  Text styles: one class per Figma text style, same names.           */
+/*  Text styles: one class per design text style, same names.          */
 /* ------------------------------------------------------------------ */
 @utility t-display-big { font-family: var(--font-serif); font-size: 120px; line-height: 0.95; text-transform: uppercase; }
 @utility t-h2 { font-family: var(--font-serif); font-size: 64px; line-height: 1; }
@@ -152,7 +151,7 @@ html.lenis body { height: auto; }
 /* Text selection in the page's accent (SelectionColor sets the variables per route). */
 ::selection { background-color: var(--accent, #d9d9d9); color: var(--accent-ink, #000000); }
 
-/* Toggle/Butterfly chip: Contact's royal blue at rest with a grey butterfly (review note 4, Oct 23), the accent
+/* Toggle/Butterfly chip: Contact's royal blue at rest with a grey butterfly, the accent
    colours while the party is on (flap speeds up). */
 @keyframes butterfly-colours {
   0%, 100% { background-color: var(--color-royal-blue); }
@@ -162,7 +161,7 @@ html.lenis body { height: auto; }
   80% { background-color: var(--color-pink); }
   90% { background-color: var(--color-aqua); }
 }
-.butterfly-chip { background-color: var(--accent, var(--color-royal-blue)); } /* the page accent: Contact royal blue, Privacy lime (review note 9) */
+.butterfly-chip { background-color: var(--accent, var(--color-royal-blue)); } /* the page accent: Contact royal blue, Privacy lime */
 .butterfly-chip.is-party { animation: butterfly-colours 2s steps(1, end) infinite; }
 .butterfly-chip.is-party .butterfly-flap { animation-duration: 0.24s; }
 
@@ -186,7 +185,7 @@ html.lenis body { height: auto; }
 }
 
 /* ------------------------------------------------------------------ */
-/*  Phone stage (mobile plan, Oct 19; Figma V2 · MOBILE (390) 7696:1980). */
+/*  Phone stage (390).                                                 */
 /*  html.phone is set before paint (app/layout.tsx): the stage is 390   */
 /*  wide, 5 columns, 16 margin, 8 gutter. `phone:` styles phone only.  */
 /*  The hydrated desktop markup stays hidden until the phone layouts   */
@@ -206,21 +205,20 @@ html.phone {
 /* Clip sideways: nothing (the hydrated desktop markup included) may widen the phone's layout viewport. */
 html.phone .stage { width: 390px; overflow-x: clip; }
 html.phone body { overflow-x: clip; }
-/* Mobile/Nav: Heading/H4 drops 24 → 12 on the phone (in the t-h4 utility; 16 in the Figma mock, then 13; 12 after
-   measuring seventeenagency.com, Oct 22: 14 px regular there, so 12 bold caps here). Labels and captions keep their size. */
+/* Mobile/Nav: Heading/H4 drops 24 → 12 on the phone (in the t-h4 utility, 12 bold caps). Labels and captions keep
+   their size. */
 html.phone:not(.phone-ready) .stage { visibility: hidden; }
 
-/* Phone chips and captions, after seventeenagency.com (Amélie, Oct 22: ours were too big): their chips are 19–21 tall
-   with 5 px sides and 14 px text. Ours: 24 tall, 8 px sides, 12 px bold caps; the caption pair = client 12 caps over
-   a 14 px bold title, 2 px top / bottom like theirs. One definition for the nav, the player, the menu and captions.
-   Phone type scale (standardised Oct 22): text 16 (reading) / 14 (titles, H5 on the phone) / 12 (UI, captions) / 9
+/* Chips and captions: 24 tall, 8 px sides, 12 px bold caps; the caption pair = client 12 caps over
+   a 14 px bold title, 2 px top / bottom. One definition for the nav, the player, the menu and captions.
+   Phone type scale: text 16 (reading) / 14 (titles, H5 on the phone) / 12 (UI, captions) / 9
    (micro labels); serif display 40 (page titles) / 28 (lines, story) / 20 (names). */
 @utility chip {
   display: flex; align-items: center; height: 24px; padding-inline: 8px;
   background: var(--color-neutral-200); color: var(--color-neutral-1000);
   font-family: var(--font-sans); font-weight: 700; font-size: 12px; line-height: 1; text-transform: uppercase;
 }
-/* The small chip, one step down (Amélie, Oct 23): the desktop player's + INFO and NEXT. 20 tall, 6 px sides, 10 px. */
+/* The small chip, one step down: the desktop player's + INFO and NEXT. 20 tall, 6 px sides, 10 px. */
 @utility chip-sm {
   display: flex; align-items: center; height: 20px; padding-inline: 6px;
   background: var(--color-neutral-200); color: var(--color-neutral-1000);
@@ -234,5 +232,5 @@ html.phone:not(.phone-ready) .stage { visibility: hidden; }
   display: inline-block; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-1000);
   font-family: var(--font-sans); font-weight: 700; font-size: 14px; line-height: 1.2;
 }
-/* The caption pair: the title chip tucks 1 px under the client chip (Amélie, Oct 23), on every page that stacks them. */
+/* The caption pair: the title chip tucks 1 px under the client chip, on every page that stacks them. */
 .chip-client + .chip-title { margin-top: -1px; }

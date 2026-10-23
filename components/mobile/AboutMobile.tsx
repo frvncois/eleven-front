@@ -7,13 +7,13 @@ import { NoteNumber, StoryText } from "@/components/about/NoteNumber";
 import { TeamBarsMobile } from "./TeamBarsMobile";
 
 const nameOf = (slug: string) => team.find((p) => p.slug === slug)?.name ?? slug;
-// Story, after ascension.pegassi.be/about on a phone (Amélie, Oct 22): one continuous text, no space
+// Story on a phone: one continuous text, no space
 // between paragraphs, same size and leading throughout. A new paragraph only shows by where it starts:
 // the blocks alternate full width / inset one column, and each first line is indented on the grid.
 //   intro        full width, first line in 1 col
 //   paragraph 1  inset 1 col (284.8 wide), first line in 1 more col
 //   paragraph 2  full width, first line in 2 cols
-// The notes leave the flow (Pegassi hides its side notes on the phone) and sit together under it.
+// The notes leave the flow and sit together under it.
 const STORY = [
   { inset: 0, indent: 1 },
   { inset: 1, indent: 1 },
@@ -25,8 +25,7 @@ const block = (k: number) => {
 };
 
 /**
- * About on a phone (mobile plan 3.7; the team is Figma M · 08 · About · Team 7696:2005, the rest
- * straight to code from the annotation). Story in Mobile/Story (Junicode 32) as one continuous text
+ * About on a phone. Story in Mobile/Story (Junicode 32) as one continuous text
  * (STORY above), the sticker held on screen, the snow globe, services as name over description, the room banner, the team bars
  * that open as they cross the middle, then "work together?" on one screen with a CONTACT US chip.
  */
@@ -39,7 +38,7 @@ export function AboutMobile() {
         {/* The sticker at 60 %, resting in the intro's first-line indent (col 1), held at 14 % of the
             screen and riding over the story like desktop. */}
         <StorySticker src={story.sticker.src} width={72} height={43} top={170} left={16} hold="14%" />
-        {/* Top padding 324, from Figma M · 10 · About section-story (Amélie, Oct 22). */}
+        {/* Top padding 324. */}
         <section className="flex flex-col px-margin pt-[324px]">
           <p className="font-serif text-[28px] leading-none" style={block(0)}>
             {story.intro}
@@ -95,8 +94,7 @@ export function AboutMobile() {
         <TeamBarsMobile cards={cards} />
       </section>
 
-      {/* The question in Mobile/Line (40) and a pink CONTACT US chip, on one full screen (Revision notes on
-          M · 10 · About, Oct 22: "this section needs to take 100vh", "button needs to be pink"); the
+      {/* The question in Mobile/Line (40) and a pink CONTACT US chip, on one full screen (100vh); the
           whole screen links. The team above ends on an 80 padding, like its 80 top. */}
       <Link href={about.contact.href} className="flex h-(--vh) flex-col items-center justify-center gap-6 px-margin">
         <h2 className="w-span-4 text-center font-serif text-[28px] leading-none text-balance">{about.contact.title}</h2>

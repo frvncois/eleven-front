@@ -5,7 +5,7 @@ import { sound } from "@/lib/sound";
 
 /**
  * Every button clicks (links get the page-transition sound instead). Opt out with data-sound="off"
- * on buttons that have their own sound (Mixers overlay, Index view toggle).
+ * on buttons that have their own sound (the Mixers nav link, the view toggle).
  */
 export function ClickSound() {
   useEffect(() => {

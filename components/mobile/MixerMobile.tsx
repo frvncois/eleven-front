@@ -23,7 +23,7 @@ const CARD = { w: 300, h: 168.75, gap: 8 };
 const STEP = CARD.w + CARD.gap;
 const COPIES = 3;
 /**
- * The desktop Warp on the phone (Oct 23): flat at rest, speed bends the strip into the ELEVEN wordmark's taper, the
+ * The desktop Warp on the phone: flat at rest, speed bends the strip into the ELEVEN wordmark's taper, the
  * vanishing point on the side it travels from. The field spans the 390 screen like the desktop's spans 1440; a little
  * gentler than the desktop's 1.25 since one card fills most of the screen.
  * depth: taper strength · grow: left-edge height vs a flat card · full: px per frame for the full bend ·
@@ -39,7 +39,7 @@ const LAYER = {
 
 const label = (p: Project) => `${p.client}, ${p.short ?? p.title}`;
 
-/** The caption every project has (Oct 22): client and title as two grey chips, stacked flush, no gap (Amélie, Oct 23). */
+/** The caption every project has: client and title as two grey chips, stacked flush, no gap. */
 function Caption({ p }: { p: Project }) {
   return (
     <span className="flex flex-col items-start">
@@ -50,12 +50,12 @@ function Caption({ p }: { p: Project }) {
 }
 
 /**
- * Figma M · 05 · Mixer (7696:2002). The name in serif 40 caps (Junicode, first and last name
+ * A mixer's page on a phone. The name in serif 40 caps (Junicode, first and last name
  * on two lines, centred 150 from the top), then the strip: 300-wide cards, the centred one with its
  * neighbours cut at both edges. Every card carries its caption under it (client and title chips), so it travels
  * with it; the card in the middle pushes in slowly (the desktop's 10 s preview stand-in). The strip is endless,
  * follows the finger and lands on a card (lib/stepper). Tap the middle card = the player, another = to the middle.
- * GRID in the dock = one column, edge to edge, each film's caption under it (mobile plan 3.3).
+ * GRID in the dock = one column, edge to edge, each film's caption under it.
  */
 export function MixerMobile({ mixer, spots }: { mixer: Person; spots: Project[] }) {
   const [view, setView] = useState<View>("carousel");
@@ -136,7 +136,7 @@ export function MixerMobile({ mixer, spots }: { mixer: Person; spots: Project[] 
       });
     };
     // The middle card pushes in slowly, in all three copies, on the image that is already there (re-keying it
-    // remounted the image and flashed its grey box on every new card, the Archive list's bug, Oct 23).
+    // would remount the image and flash its grey box on every new card).
     const pushIn = (i: number) => {
       push.forEach((a) => a.cancel());
       if (still) return;
@@ -236,7 +236,7 @@ export function MixerMobile({ mixer, spots }: { mixer: Person; spots: Project[] 
     sound.cue("step");
   }, [current]);
 
-  // The rule on every page (Oct 22): tap the card in the middle = play it; tap another = bring it to the middle.
+  // The rule on every page: tap the card in the middle = play it; tap another = bring it to the middle.
   const tap = (k: number) => {
     const i = k % spots.length;
     if (i === current) openWithSound(() => setPlaying(i));

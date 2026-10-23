@@ -4,13 +4,13 @@ import { sound } from "@/lib/sound";
 
 type Props = { name: string; slug: string; bg: string; ink: string; roles: string[]; icon?: string };
 
-// The icon perched on the bar's top edge (Figma teammate 7741:7064): 110 tall, half above the bar, 128 past the end
-// of the name (Jeff's frame: name 243 wide, drawing at 371), so it never lands on a longer name. Always black
-// (review note 12).
+// The icon perched on the bar's top edge: 110 tall, half above the bar, 128 past the end
+// of the name (e.g. a name 243 wide puts the drawing at 371), so it never lands on a longer name. Always
+// black.
 const ICON = { gap: 128, top: -55, h: 110 };
 
 /**
- * Card/Team/<Name>, as a full-width bar (Figma teammate 7741:7064, Amélie's redesign, Oct 23). Default: a solid brand
+ * Card/Team/<Name>, as a full-width bar. Default: a solid brand
  * bar, 90 tall, empty. Hover (0.3 s ease-out): the name (H2, Junicode 64) on the left and the roles (H3, 48 apart) on
  * the right fade up into the bar, both cap-trimmed to its 24 padding, and the person's drawing lands across the bar's
  * top edge. The person's sound plays. Shared step sounds until Eleven's takes arrive: drop
@@ -19,7 +19,7 @@ const ICON = { gap: 128, top: -55, h: 110 };
 export function TeamCard({ name, slug, bg, ink, roles, icon }: Props) {
   const takes: string[] = [];
   const onEnter = () => {
-    // Prototype: the shared step sounds until each person has their own takes.
+    // Stand-in: the shared step sounds until each person has their own takes (replace before launch).
     if (takes.length) sound.play(takes, slug);
     else sound.cue("step");
   };

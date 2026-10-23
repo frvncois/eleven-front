@@ -8,21 +8,21 @@ import { lerpQuad, quadVisible, rectToQuadCss, taperField, type Quad } from "@/l
 
 type Room = { room: string; photo: string; preset: string; audio: string | null; height: number };
 
-const W = 610; // 4 columns of the 9-col grid (was 622)
+const W = 610; // 4 columns of the 9-col grid
 const GAP = 16; // the grid gutter
 const DATA_W = 622; // card width the heights in about.json were measured at
 const DRIFT = 28; // design px per second, right to left
 const COPIES = 3; // enough sets to cover the screen while one wraps
 const FRICTION = 0.92; // throw decay per frame after a drag or a swipe
-// Phone (mobile plan 3.7): the rooms stay big, 390/1440 × 1.6 of the desktop size, 8 apart.
+// Phone: the rooms stay big, 390/1440 × 1.6 of the desktop size, 8 apart.
 const PHONE_W = Math.round(W * (390 / 1440) * 1.6);
 const PHONE_GAP = 8;
-// Desktop Warp (review note 13, Oct 23): the mixer carousel's bend. Flat at rest and while drifting; speed (drag,
+// Desktop Warp: the mixer carousel's bend. Flat at rest and while drifting; speed (drag,
 // throw, sideways swipe) bends the banner into the ELEVEN wordmark taper, the vanishing point on the side it heads to.
 const WARP = { depth: 1, grow: 1.2, full: 22, bendIn: 0.12, bendOut: 0.05 };
 
 /**
- * Rooms (Figma V2 · 09 · About, carousel-img, revisions Oct 19): an endless banner of the studio, one
+ * Rooms: an endless banner of the studio, one
  * view per space (max 5), 4 cols (610) wide with a 16 gutter, mixed heights hanging from the top. It drifts slowly right to left
  * on its own; drag it or scroll sideways (trackpad swipe, shift + wheel) to move it, with a little
  * throw, and it loops forever. Vertical wheel still scrolls the page. Hovering a photo shows the
@@ -178,7 +178,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
       <div
         className={`cursor-grab touch-pan-y active:cursor-grabbing ${phone ? "px-margin" : ""}`}
         onPointerDown={(e) => {
-          // Dragging the banner never starts a text selection or an image drag (Amélie, Oct 19).
+          // Dragging the banner never starts a text selection or an image drag.
           if (e.pointerType === "mouse") e.preventDefault();
           window.getSelection()?.removeAllRanges();
           drag.current = { x: e.clientX, last: e.clientX, t: performance.now(), moved: false };
@@ -232,7 +232,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={r.photo} alt={c ? "" : r.room} draggable={false} className="block size-full object-cover" />
-                {/* Phone: a small pink sound tag bottom left (Amélie, Oct 22, instead of the UNMUTE chip): a crossed-out
+                {/* Phone: a small pink sound tag bottom left (instead of the UNMUTE cursor tag): a crossed-out
                     speaker at rest, the speaker with its waves (breathing) while the room plays. */}
                 {phone && (
                   <span aria-hidden className="absolute bottom-2 left-2 flex size-4 items-center justify-center bg-pink text-neutral-1000">

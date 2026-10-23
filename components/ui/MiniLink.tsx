@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 /**
  * Link/Mini: 11 px uppercase, hover 50 % (0.2 s ease-out). External links open in a new tab.
- * On the page it points to, a small dot in the page accent follows the label (Amélie, Oct 23: Privacy Policy in the
+ * On the page it points to, a small dot in the page accent follows the label (Privacy Policy in the
  * footer gets a lime dot on /privacy); the label itself stays where it is.
  */
 export function MiniLink({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) {

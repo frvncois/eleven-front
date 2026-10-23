@@ -5,10 +5,10 @@ import { Flip } from "./LetterRoll";
 type Option<V extends string> = { value: V; label: string };
 
 /**
- * Toggle/View in Nav/Sub (Figma Revision on M2/Nav/Sub 7653:7913, Oct 19): one word next to the
- * sound toggle. Since 22 Oct both sit in their own grey chips (no slash), type and colour from the chip. It names the view you switch to;
+ * Toggle/View in Nav/Sub: one word next to the
+ * sound toggle. Both sit in their own grey chips (no slash), type and colour from the chip. It names the view you switch to;
  * a click swaps the views and the word rolls letter by letter into the other one, like ON / OFF.
- * Hover rolls the letters. Mixer pages and the Archive use it (replaces their LIST / GRID switches).
+ * Hover rolls the letters. Mixer pages and the Archive use it.
  */
 export function ViewToggle<V extends string>({
   options,

@@ -20,12 +20,12 @@ const VIEWS: [{ value: View; label: string }, { value: View; label: string }] = 
 ];
 
 // The desktop field (lib/grid tiles, 2 / 3 / 4 columns) drawn at 26 %: S ≈ 78, M ≈ 118, L ≈ 157 wide
-// (Amélie, Oct 23: bigger than Figma M · 06 · Archive's 22 %, it felt crowded).
+// (22 % felt crowded).
 const K = 0.26;
-// Positions: the desktop field's are uneven (and left white holes on the phone, Amélie Oct 22), so the
+// Positions: the desktop field's are uneven (and leave white holes on the phone), so the
 // phone lays the 66 projects on its own even, staggered grid: 6 rows (even, so the stagger repeats
 // cleanly where the field wraps), each row a band of the desktop field read left to right, so
-// neighbours stay neighbours. 205 / 170 apart (Oct 23, was 165 / 128): the L tile plus its two-chip caption still
+// neighbours stay neighbours. 205 / 170 apart: the L tile plus its two-chip caption still
 // has ~40 around it.
 // A small fixed jitter keeps it from reading as a spreadsheet.
 const ROWS = 6;
@@ -47,8 +47,7 @@ function phoneField(tiles: Tile[]) {
   }
   return { pos, W: cols * DX, H: ROWS * DY };
 }
-// The desktop fisheye (BallCanvas, Amélie Oct 23: the phone lens that grew the middle tile and pushed the others out
-// was too jumpy): the field is bent over a ball, a point s px from the screen centre shows at R·sin(s/R). Flat and
+// The desktop fisheye (BallCanvas): the field is bent over a ball, a point s px from the screen centre shows at R·sin(s/R). Flat and
 // true size in the middle, rolling away and shrinking towards the edges; nothing grows, nothing is pushed. Same
 // curve as desktop's 1150 on 1440, scaled to the phone's screen. Each tile maps its four corners onto the ball
 // (one matrix3d), so its caption bends with it.
@@ -70,15 +69,15 @@ const LAYER = {
 const wrap = (v: number, size: number) => ((v % size) + size) % size;
 
 /**
- * Figma M · 06 · Archive (7696:2003). The same 66 projects as the desktop field, panned with one
+ * The Archive on a phone. The same 66 projects as the desktop field, panned with one
  * finger (it flings on release and repeats endlessly, so there is no edge), bent over the desktop's ball (BALL_R).
  * Every tile carries its client and title from the start, small and grey under it; no counter, and no big caption
- * above LIST on the field (Amélie, Oct 22). The project nearest the centre settles there; tap it = the player.
- * Stills only. LIST = the Seventeen stack (List below): the projects against the right edge, the middle one wide,
+ * above LIST on the field. The project nearest the centre settles there; tap it = the player.
+ * Stills only. LIST = the stack (List below): the projects against the right edge, the middle one wide,
  * its client and title in grey chips on the left.
  */
 export function ArchiveMobile({ tiles }: { tiles: Tile[]; field: { w: number; h: number } }) {
-  // Opens on the list, like desktop (Amélie, Oct 23); GRID switches to the field.
+  // Opens on the list, like desktop; GRID switches to the field.
   const [view, setView] = useState<View>("list");
   const [playing, setPlaying] = useState<number | null>(null);
 
@@ -257,7 +256,7 @@ function Field({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void }
           hitS = d.hw;
         }
       });
-      // The rule on every page (Oct 22): the project under the lens plays; another comes under the lens.
+      // The rule on every page: the project under the lens plays; another comes under the lens.
       if (hit === best) cb.current(hit);
       else if (hit >= 0) aim = { x: -rel[hit].x, y: -rel[hit].y };
     };
@@ -295,7 +294,7 @@ function Field({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void }
   );
 }
 
-// List, after seventeenagency.com on a phone (Amélie, Oct 22): one screen, the projects stacked against the right
+// List on a phone: one screen, the projects stacked against the right
 // edge, 12 apart; the one crossing the middle grows (16:9 always, 128 → 200 wide) and its neighbours step up with
 // it, a pyramid pointing at the caption on the left (client and title in grey chips). A finger drags the stack and
 // on release it lands on a project (lib/stepper, the same feel as Longform); it loops, no first or last one.
@@ -311,7 +310,7 @@ function List({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void })
   const root = useRef<HTMLElement>(null);
   const rows = useRef<(HTMLButtonElement | null)[]>([]);
   // Only the caption follows the middle project in React; the rows never re-render while the stack moves (a re-keyed
-  // row remounted its image, which flashed its grey box on every step, Oct 23).
+  // row would remount its image and flash its grey box on every step).
   const [current, setCurrent] = useState(0);
   const cb = useRef({ onOpen, current });
   useEffect(() => {
@@ -495,7 +494,7 @@ function List({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void })
   return (
     <section ref={root} aria-label="Projects" data-lenis-prevent className="absolute inset-0 touch-none overflow-hidden select-none">
       {stack}
-      {/* The caption, pinned mid-screen on the left: client and title in grey chips (Seventeen's). */}
+      {/* The caption, pinned mid-screen on the left: client and title in grey chips. */}
       <div className="pointer-events-none absolute top-1/2 left-margin flex max-w-[166px] -translate-y-1/2 flex-col items-start">
         <span className="chip-client">{t.client}</span>
         <span className="chip-title">{t.short ?? t.label}</span>
@@ -505,7 +504,7 @@ function List({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void })
 }
 
 /**
- * The caption under every tile (Amélie, Oct 23): the mixer caption's hierarchy, client (bold caps) over title (bold),
+ * The caption under every tile: the mixer caption's hierarchy, client (bold caps) over title (bold),
  * but small and grey, text only, so the field reads as pictures first. It may run wider than a small tile, up to the
  * space before the next column, and truncates past that.
  */

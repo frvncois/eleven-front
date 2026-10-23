@@ -3,9 +3,9 @@ import { MiniLink } from "@/components/ui/MiniLink";
 import { CreditsPopover } from "@/components/ui/CreditsPopover";
 
 /**
- * The footer line (Contact, V2 · 10 · Contact · 9-col 7684:2720): © col 2, Privacy col 3, Credits col 4, LinkedIn and
+ * The footer line: © col 2, Privacy col 3, Credits col 4, LinkedIn and
  * Instagram side by side on col 6, every text on SOUND / OFF's baseline (21.8 above the bottom of its container).
- * Shared by Contact (one screen) and the end of Privacy (review note 17, Oct 23). Absolutely placed: the parent is
+ * Shared by Contact (one screen) and the end of Privacy. Absolutely placed: the parent is
  * the positioned box whose bottom is the line.
  */
 const L = {

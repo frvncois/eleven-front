@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { sound } from "@/lib/sound";
 
-/** Media/Reel (Figma 7356:5115): the full-screen reel. On the sound bus, so the gate, mute and overlays control it. */
+/** Media/Reel: the full-screen reel. On the sound bus, so the gate, mute and overlays control it. */
 export function HomeReel({ src, poster }: { src: string; poster: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {

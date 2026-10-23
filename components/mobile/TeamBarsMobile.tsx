@@ -9,7 +9,7 @@ type Card = { slug: string; name: string; bg: string; ink: string; roles: string
 const OPEN_BAND = 110; // how close to the middle of the screen a bar's centre must be to open
 
 /**
- * Figma M · 08 · About · Team (7696:2005): scroll is the hover. Eight full-width bars, 80 tall and 8
+ * The About team on a phone: scroll is the hover. Eight full-width bars, 80 tall and 8
  * apart; the one crossing the middle of the screen opens to 132 (0.3 s ease-out), its name in Card
  * Title and roles in Eyebrow sliding in, and closes as it leaves. Scrolling plays the team like keys:
  * one step note per bar, only when the site's sound is on.

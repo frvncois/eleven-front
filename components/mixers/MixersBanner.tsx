@@ -8,7 +8,7 @@ import { sound } from "@/lib/sound";
 import { usePathname } from "next/navigation";
 import { EASE_DISSOLVE, SWING, THEME_INK, themeColor } from "@/lib/motion";
 
-// Figma "mixers" (7712:9041): the wedge (yellow in Figma, the page accent here) runs full width from the top, its lower edge from
+// The wedge (in the page accent) runs full width from the top, its lower edge from
 // 179.7 at the left to 581.9 at the right. Names sit in a stair along that edge.
 const WEDGE = { left: 179.718, right: 581.946 };
 const NAMES: Record<string, { x: number; y: number }> = {
@@ -25,18 +25,18 @@ const ICONS: Record<string, { cx: number; cy: number; h: number }> = {
   "jordan-meltzer": { cx: 300, cy: 180, h: 120 },
   "jeff-payne": { cx: 600, cy: 78, h: 100 },
   "aj-murillo": { cx: 1046, cy: 78, h: 100 },
-  "bob-gremore": { cx: 735, cy: 305, h: 70 }, // smaller + clear of the diagonal, it was cropped (review note 14)
+  "bob-gremore": { cx: 735, cy: 305, h: 70 }, // smaller + clear of the diagonal, so it is not cropped
   "bruce-bueckert": { cx: 1380, cy: 450, h: 120 },
   "marco-tornillo": { cx: 1150, cy: 445, h: 90 },
 };
 
 /**
- * Mixers nav, option B (annotation on 7712:9041): clicking Mixers swings the wedge down from
+ * Mixers nav: clicking Mixers swings the wedge down from
  * the top, right corner first, left corner catching up, so the edge tilts into its angle. The page
  * behind blurs with no colour. Hovering a name pops its icon into an empty spot between the names;
  * clicking a name opens that mixer. Click outside or Esc closes (the wedge swings back up).
- * The wedge wears the page's accent (review note 6, Oct 23; was always yellow), names and icons in that colour's ink
- * (black or grey). Cursor (review note 16, Oct 23): the plain arrow over the wedge, the CLOSE tag only over the blurred
+ * The wedge wears the page's accent, names and icons in that colour's ink
+ * (black or grey). Cursor: the plain arrow over the wedge, the CLOSE tag only over the blurred
  * page, in the page accent with black text.
  */
 export function MixersBanner({ open, onClose }: { open: boolean; onClose: () => void }) {

@@ -10,7 +10,7 @@ import { useStrip, wrap } from "./useStrip";
 const CW = 480;
 const IMG_H = 270;
 /**
- * The caption is the phone's (Oct 23): client chip stacked straight on the title chip, no gap, 8 under the film. Cards
+ * The caption is the phone's: client chip stacked straight on the title chip, no gap, 8 under the film. Cards
  * are drawn at 480 and shown at 400, so it is drawn at CAPTION_K to read at the chips' true size (12 / 14) on the stage.
  */
 const CAPTION_K = 480 / 400;
@@ -61,8 +61,8 @@ export function VanishStrip({ films, depth, onOpen }: { films: Project[]; depth:
       const fwd = taperField({ midY: 0, hLeft: h * 1.45, depth });
       const back = taperField({ midY: 0, hLeft: h * 1.45, depth, mirror: true });
       for (let k = 0; k < n; k++) {
-        // Loop seam two cards past the left edge: at one, the bent card's leaning top corner was still
-        // on screen when it jumped to the far end, so it vanished instead of sliding off (Oct 17).
+        // Loop seam two cards past the left edge: at one, the bent card's leaning top corner would still be
+        // on screen when it jumps to the far end, so it would vanish instead of sliding off.
         const x = wrap(k * pitch - s.offset + pitch, total) - pitch * 2;
         const flat: Quad = [[x, -h / 2], [x + w, -h / 2], [x + w, h / 2], [x, h / 2]];
         const bent = lerpQuad(back.quad(x, x + w), fwd.quad(x, x + w), (wv.dir + 1) / 2);

@@ -5,7 +5,7 @@ import { EASE_DISSOLVE } from "@/lib/motion";
 import { splitCaption } from "@/lib/content";
 import type { Film } from "./LongformReel";
 
-// Black legend text on the light brand colours, neutral/300 grey on the dark ones (never white: review note 3, Oct 23).
+// Black legend text on the light brand colours, neutral/300 grey on the dark ones (never white).
 const DARK = new Set(["purple", "ink", "dark-green", "royal-blue"]);
 const MORPH = { duration: 0.5, ease: EASE_DISSOLVE };
 
@@ -16,7 +16,7 @@ const MORPH = { duration: 0.5, ease: EASE_DISSOLVE };
 export const filmCaption = (f: Film) => splitCaption(f.label, f.client);
 
 /**
- * One square of the Longform colour strip (desktop and phone, Amélie Oct 23). The current film's square opens into
+ * One square of the Longform colour strip (desktop and phone). The current film's square opens into
  * the mixer caption in its colour: a bar hugging the client (chip-client's type and padding) with a second bar hugging
  * the title (chip-title's) tucked 1 px under it. The square becomes the client bar and the title bar unrolls out of
  * it; leaving, the title bar rolls back up and the client bar closes into the square.

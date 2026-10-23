@@ -8,7 +8,7 @@ import { SWING, prefersReducedMotion } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 
 const WORDS = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
-// The count (Amélie, Oct 23: "one at a time", 7 s, was 5): a word every 0.64 s from 0.4 s, ten lands at 6.16 s,
+// The count, one word at a time over 7 s: a word every 0.64 s from 0.4 s, ten lands at 6.16 s,
 // held 0.84 s, then the panel swings up at 7 s.
 const FIRST_MS = 400;
 const STEP_MS = 640;
@@ -18,17 +18,17 @@ const SWING_LAG_S = 0.14; // the right corner follows the left, like the Mixers 
 /** When the home's nav (Home, PhoneShell) fades in, counted from the moment the gate starts to leave. */
 export const GATE_EXIT = 0.45;
 
-// Figma "Subtract" (V2 · 01 · Gate · 9-col 7684:1491): a light-grey panel over the home reel, its lower edge 65 above
+// The panel: a light-grey panel over the home reel, its lower edge 65 above
 // the screen's bottom at the left and 135 at the right, so a band of the playing video shows under it. Kept relative
 // to the screen's bottom so the band survives any height. Phone: the same slope, scaled to 390.
 const EDGE = { left: 65.15, right: 135.08 };
 const EDGE_PHONE = { left: 48, right: 67 };
 
 /**
- * Sound gate, new version (Figma V2 · 01 · Gate · 9-col 7684:1491, Oct 23), over the playing home reel: the H3 line
+ * Sound gate, over the playing home reel: the H3 line
  * and SOUND OFF / ON (the choice) centred at the top, the counting words "one" … "ten" in a row above the big ELEVEN.
  * The words appear one at a time (a step sound each, heard only with sound on); after "ten" the panel swings back up,
- * left corner first, like the Mixers wedge closing. Nobody is stuck here (Jordan, Oct 15): the gate leaves on its own.
+ * left corner first, like the Mixers wedge closing. Nobody is stuck here: the gate leaves on its own.
  * `onDone` fires when the swing starts (the home marks the gate seen); AnimatePresence keeps this mounted until the
  * swing has finished (usePresence).
  */
@@ -101,8 +101,8 @@ export function GateLoader({ onDone, phone = false }: { onDone: () => void; phon
       className="absolute inset-0 z-20 bg-light-grey"
       style={leaving ? { clipPath: clip, WebkitClipPath: clip } : { clipPath: rest, WebkitClipPath: rest }}
     >
-      {/* The title, then the choice (plain H4 text like the Figma, no chip on the gate) at its Figma spot, 226 from the
-          top, and the aqua hint just below it (Amélie, Oct 23). Phone: the title wraps to three lines, the choice at 176. */}
+      {/* The title, then the choice (plain H4 text, no chip on the gate), 226 from the
+          top, and the aqua hint just below it. Phone: the title wraps to three lines, the choice at 176. */}
       <div className="absolute inset-x-0 top-[90px] flex flex-col items-center text-neutral-1000 phone:top-[72px] phone:px-margin">
         <p className="t-h3 text-center phone:text-[20px] phone:leading-[1.1]">
           {home.gate.line[0]}
@@ -114,7 +114,7 @@ export function GateLoader({ onDone, phone = false }: { onDone: () => void; phon
         </div>
         <p className="mt-2 font-sans text-[12px] leading-none font-medium text-aqua">{home.gate.hint}</p>
       </div>
-      {/* Figma: the row from 46 to 1416, 68 above the ELEVEN; anchored to the bottom with it. */}
+      {/* The row from 46 to 1416, 68 above the ELEVEN; anchored to the bottom with it. */}
       <div
         role="progressbar"
         aria-valuemin={0}
@@ -133,7 +133,7 @@ export function GateLoader({ onDone, phone = false }: { onDone: () => void; phon
           </span>
         ))}
       </div>
-      {/* The ELEVEN (Figma "shape", the gate wordmark at 1392 × 284, black: public/icons/eleven-gate-v2.svg): 24 from the left, its foot 114 above the screen's
+      {/* The ELEVEN (the gate wordmark at 1392 × 284, black: public/icons/eleven-gate-v2.svg): 24 from the left, its foot 114 above the screen's
           bottom. Phone: 358 wide on the 16 margins. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

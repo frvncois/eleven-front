@@ -1,8 +1,8 @@
 const ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
 
 /**
- * A story note's number as a Roman numeral in Junicode (review note 11, Oct 23). In the text: pink, raised like a
- * footnote mark. Beside the side note (`boxed`): black in a small pink square (review note 23), so the pair still reads.
+ * A story note's number as a Roman numeral in Junicode. In the text: pink, raised like a
+ * footnote mark. Beside the side note (`boxed`): black in a small pink square, so the pair still reads.
  */
 export function NoteNumber({ n, boxed = false, className = "" }: { n: string; boxed?: boolean; className?: string }) {
   const numeral = ROMAN[parseInt(n, 10)] ?? n;

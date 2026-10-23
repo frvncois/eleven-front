@@ -8,11 +8,10 @@ type Props = { src: string; width: number; height: number; top: number; left: nu
 
 /**
  * The ointment sticker (About story). It starts just above the first paragraph, then holds
- * on screen while the story scrolls past, wobbling with the scroll speed (a lagging slide and a tilt,
- * after ascension.pegassi.be/about), and fades out as the text ends, before the snow globe comes in.
+ * on screen while the story scrolls past, wobbling with the scroll speed (a lagging slide and a tilt),
+ * and fades out as the text ends, before the snow globe comes in.
  * `top`/`left`: resting slot in the container; `end`: container y where it must be gone (omit to run
  * to the container's bottom).
- * Both versions (Amélie, 15 Oct: V2 drops the hop between the "Eleven" words, back to this).
  * Holds at `hold` of the screen (default 42 %) and wobbles with the scroll speed; keep `hold` at or
  * above the resting slot, or the sticker drops onto the text on load.
  */

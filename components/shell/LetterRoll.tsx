@@ -8,7 +8,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 /**
  * Hover: the letter rolls up and a copy rises in under it, staggered by its index `i` within its word.
- * SOUND and ON / OFF start together, each rolling one letter at a time (Amélie, 19 Oct).
+ * SOUND and ON / OFF start together, each rolling one letter at a time.
  * Pure CSS (group-hover), so it costs nothing at rest.
  */
 function RollChar({ ch, i, roll = true }: { ch: string; i: number; roll?: boolean }) {

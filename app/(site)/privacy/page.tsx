@@ -9,12 +9,11 @@ import { PrivacyMobile } from "@/components/mobile/PrivacyMobile";
 export const metadata: Metadata = { title: "Privacy Policy" };
 
 /**
- * Privacy Policy (Figma V1 · 12 · Terms & Policy 7453:4225, Terms of use removed 15 Oct: only the privacy
- * policy is required, CalOPPA). About's ruled-section system on the 9-col grid: title on the 24 margin,
+ * Privacy Policy (no terms of use: only the privacy policy is required, CalOPPA). About's ruled-section system on the 9-col grid: title on the 24 margin,
  * each section a 4-col label (24 to 634) and the text from col 5 to col 9 (650 to 1416).
  * Ends on Contact's footer line (© / Privacy / Credits / LinkedIn, Instagram) in a 360 tall last section, so it sits
- * well apart from "Last updated" (review notes 17 + 18, Oct 23). The butterfly stays bottom right next to SOUND.
- * Phone (mobile plan 3.9): one column, each label above its text.
+ * well apart from "Last updated". The butterfly stays bottom right next to SOUND.
+ * Phone (PrivacyMobile): one column, each label above its text.
  */
 export default function PrivacyPage() {
   return <ByDevice desktop={<PrivacyDesktop />} phone={<PrivacyMobile />} />;

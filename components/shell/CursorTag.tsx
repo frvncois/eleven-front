@@ -7,20 +7,20 @@ import { DUR, EASE_OUT, THEME_INK, themeColor } from "@/lib/motion";
 import { appScale } from "@/lib/device";
 
 /**
- * The one cursor tag (annotation: "cursors are tags following the original browser cursor,
- * not being the actual cursor"), after seventeenagency.com: the normal arrow stays, and a small tag
+ * The one cursor tag: cursors are tags following the browser cursor, not replacing it.
+ * The normal arrow stays, and a small tag
  * rides just below-right of its tip, nearly attached (a short spring), fading in and out.
  * Any element opts in with data-cursor="listen" (or play, close, hold…); the closest one under the
  * pointer wins. Chip in the page's theme colour (the colour of its transition: Mixers royal blue,
  * About pink…), text black or grey for contrast. An element with data-cursor-tone="chip" gets the grey chip with black
- * text instead (the Mixers overlay, where the wedge already wears the page colour); "accent" = the page accent with its ink (the Mixers wedge's CLOSE, review note 16; grey text on the dark accents, notes 20 + 22); any other value is a brand colour
- * name with black text (data-cursor-tone="pink": the Contact butterfly's "click me", review note 8). Mouse only: nothing on touch.
+ * text instead (the Mixers wedge backdrop, where the wedge already wears the page colour); "accent" = the page accent with its ink (the Mixers wedge's CLOSE; grey text on the dark accents); any other value is a brand colour
+ * name with black text (data-cursor-tone="pink": the Contact butterfly's "click me"). Mouse only: nothing on touch.
  */
 export function CursorTag() {
   const [label, setLabel] = useState<string | null>(null);
   const [tone, setTone] = useState<string | null>(null);
   const bg = themeColor(usePathname());
-  const ink = THEME_INK[bg] ?? "#bdbdbd"; // grey, never white (review note 3)
+  const ink = THEME_INK[bg] ?? "#bdbdbd"; // grey, never white
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
   const sx = useSpring(x, { stiffness: 900, damping: 60, mass: 0.4 });
@@ -58,7 +58,7 @@ export function CursorTag() {
               tone === "chip"
                 ? { background: "var(--color-neutral-200)", color: "var(--color-neutral-1000)" }
                 : tone === "accent"
-                  ? // black on the light accents, grey on red / dark green / royal blue (review notes 20 + 22)
+                  ? // black on the light accents, grey on red / dark green / royal blue
                     { background: bg, color: ink }
                   : tone
                   ? { background: `var(--color-${tone})`, color: "var(--color-neutral-1000)" }

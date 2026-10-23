@@ -15,19 +15,19 @@ import { GATE_EXIT } from "@/components/home/GateLoader";
 
 // Pages whose top sits on video: the logo is dimmed to grey there.
 const ON_VIDEO = ["/", "/longform"];
-// The phone ELEVEN (same drawing as the home wordmark), the nav logo since Oct 22.
-// The new ELEVEN (Figma 7741:2181, review note 7): 4:1, so 88.2 wide at the nav's 22 tall.
+// The phone ELEVEN (same drawing as the home wordmark) is the nav logo.
+// 4:1, so 88.2 wide at the nav's 22 tall.
 const WORDMARK = "/icons/eleven-home-v2.svg";
-// The phone chip (globals.css `chip`: 24 tall, 12 px bold caps, Seventeen's scale).
+// The phone chip (globals.css `chip`: 24 tall, 12 px bold caps).
 const CHIP = "chip pointer-events-auto";
 
 /**
- * The phone dock, after ascension.pegassi.be (Amélie, Oct 22), mounted once for the whole visit so it
- * never jumps between pages. Top: the ELEVEN wordmark on the left (straight to the home, never back to the sound gate; Amélie, Oct 22)
+ * The phone dock, mounted once for the whole visit so it
+ * never jumps between pages. Top: the ELEVEN wordmark on the left (straight to the home, never back to the sound gate)
  * and the page's own control as a chip on the right (GRID / LIST on Mixer and Archive, the butterfly
  * on Contact). Bottom, 16 from the edges: SOUND as a chip on the left, MENU on the right, which opens
  * the menu card (components/mobile/MenuCard) and becomes CLOSE. The chips read the same on video and
- * on white, so no blur or scrim behind them (Amélie, Oct 22). Hidden while the sound gate is up; it fades in as the gate's panel swings up, and under the player.
+ * on white, so no blur or scrim behind them. Hidden while the sound gate is up; it fades in as the gate's panel swings up, and under the player.
  */
 export function PhoneShell() {
   const phone = usePhone();
@@ -60,7 +60,7 @@ export function PhoneShell() {
             animate={{ opacity: 1, transition: { duration: 0.6, delay: pathname === "/" ? GATE_EXIT : 0, ease: EASE_DISSOLVE } }}
             exit={{ opacity: 0, transition: { duration: 0.2 } }}
           >
-            {/* Top (Figma M2/Mobile/Nav, Amélie's logo swap, Oct 22): the ELEVEN wordmark left, 52.4 × 22,
+            {/* Top: the ELEVEN wordmark left, 52.4 × 22,
                 its bottom 2 above the page's chip's bottom; the chip right, 20.5 from the top. */}
             <div className="relative flex h-[44.5px] items-end justify-between px-margin">
               <Link

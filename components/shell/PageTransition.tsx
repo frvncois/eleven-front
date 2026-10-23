@@ -10,7 +10,7 @@ const CARRY_KEY = "eleven-sweep";
 
 
 /**
- * Page sweep (Figma "V1 · PAGE TRANSITIONS", 7405:4175): six bands cover from the left, the route changes,
+ * Page sweep: six bands cover from the left, the route changes,
  * the bands leave to the right. One colour for the whole transition, the destination's.
  * Intercepts every same-origin <a> click in the capture phase, so plain Next <Link>s get it for free.
  * Opt out with data-no-sweep.

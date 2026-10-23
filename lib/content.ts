@@ -4,7 +4,7 @@ import projects from "@/data/projects.json";
 export type Person = (typeof team)[number];
 export type Project = (typeof projects)[number];
 
-/** The six mixers, in the order of the Figma roster (Mixers overlay, Who's next). */
+/** The six mixers, in roster order (the Mixers nav, the menu). */
 const MIXER_ORDER = ["jordan-meltzer", "jeff-payne", "aj-murillo", "bob-gremore", "bruce-bueckert", "marco-tornillo"];
 
 export const mixers = MIXER_ORDER.map((slug) => team.find((p) => p.slug === slug)!).filter(Boolean);

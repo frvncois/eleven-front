@@ -12,16 +12,16 @@ export const metadata: Metadata = { title: "Contact" };
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, "")}`;
 
 /**
- * Contact (V1 · 10 · Contact, 7345:1649; revised on V2 · 10 · Contact 7653:2446). Always exactly one
- * screen, never scrolls. Revision: the title, one row of space (82 px), then one horizontal row: the
- * gif in the first columns, Jordan / Adrea / Studio. The block starts at the frame's 22% so it keeps
+ * Contact. Always exactly one
+ * screen, never scrolls. The title, one row of space (82 px), then one horizontal row: the
+ * gif in the first columns, Jordan / Adrea / Studio. The block starts at the screen's 22% so it keeps
  * its place on taller screens. Footer © / credits / legal / socials.
- * 9-col grid (Oct 19): title 6 cols, gif 3 cols, Jordan col 4, Adrea col 6, Studio col 8; the footer
+ * 9-col grid: title 6 cols, gif 3 cols, Jordan col 4, Adrea col 6, Studio col 8; the footer
  * under them, © on col 2 (col 1 is the floss logo's).
- * Footer realigned on V2 · 10 · Contact · 9-col (7684:2720, Oct 22): © col 2, Privacy col 3, Credits
- * col 4, LinkedIn over Instagram on col 6 (left-aligned), the butterfly on col 8 (no "Click me"
- * label since Oct 22), out of the bottom-right toggles; the sound toggle stays bottom right.
- * One bottom line (Amélie, Oct 22): every footer text sits on SOUND / OFF's baseline (23.6 above the
+ * Footer: © col 2, Privacy col 3, Credits
+ * col 4, LinkedIn over Instagram on col 6 (left-aligned), the butterfly on col 8 (no label),
+ * out of the bottom-right toggles; the sound toggle stays bottom right.
+ * One bottom line: every footer text sits on SOUND / OFF's baseline (23.6 above the
  * screen bottom; Label/Mini's baseline is 1.8 above its box), LinkedIn and Instagram side by side,
  * the butterfly chip's bottom on the same line.
  */

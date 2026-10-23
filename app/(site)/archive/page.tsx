@@ -8,7 +8,7 @@ import { ByDevice } from "@/components/mobile/ByDevice";
 
 export const metadata: Metadata = { title: "Archive" };
 
-/** Archive (Figma V1 · 08 · Index, renamed by Amélie 2026-10-15). Phone: Figma M · 06 · Archive. */
+/** Archive: every project in one place. Phone: ArchiveMobile. */
 export default function ArchivePage() {
   const tiles = index.tiles
     .map((t) => {

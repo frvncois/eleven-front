@@ -1,11 +1,11 @@
 "use client";
 
-// Eleven · sound kit. Ported from the Framer build (framer/code/Sound.tsx), same engine on `window.__elevenSound`.
+// Eleven · sound kit, one engine on `window.__elevenSound`.
 // One audio engine for the whole visit; survives client-side page changes.
 // - unlock(): audio needs a user gesture. The Gate calls it; any later click also unlocks if sound was on before.
 // - setMuted / toggle: fades the master over 0.4 s, remembered for the session.
 // - play(urls): one-shot hover sounds. Random take, never the same take twice in a row.
-// - tone(): soft synthesized blip, the placeholder until Eleven's real sounds arrive.
+// - tone(): soft synthesized blip, the fallback when a cue has no file.
 // - registerMedia / duck / unduck: background media on a bus that overlays can fade.
 import { useEffect, useState, startTransition } from "react";
 
@@ -13,9 +13,9 @@ type Kit = { tone: (f?: number, d?: number, v?: number) => void; whoosh: (d?: nu
 type Cue = { files: string[]; volume: number; sequence?: boolean; placeholder: (k: Kit) => void }
 
 // UI sound cues. `files`: takes from public/sounds, a random take each time (never twice in a row),
-// or played in order when `sequence` is set. A cue with no files plays its synthesized placeholder.
-// PROTOTYPE ONLY: the files in public/sounds/placeholder-auge are AUGE's (auge-xp.com), stand-ins
-// until Eleven makes the real ones. Replace them and that folder before launch.
+// or played in order when `sequence` is set. A cue with no files plays its synthesized fallback (`placeholder`).
+// Stand-in sounds (AUGE, auge-xp.com): the files in public/sounds/placeholder-auge must be replaced with
+// Eleven's own before launch, and that folder removed.
 const A = (n: string) => `/sounds/placeholder-auge/${n}.mp3`
 const HOVERS = [A("hover-1"), A("hover-2"), A("hover-3"), A("hover-4")]
 const STEPS = [A("step-1"), A("step-2"), A("step-3"), A("step-4"), A("step-5"), A("step-6")]
@@ -26,7 +26,7 @@ const CUES = {
   sweepIn: { files: [A("transition")], volume: 0.7, placeholder: (k: Kit) => k.whoosh(0.9, 0.14, 250, 2200) },
   sweepOut: { files: [] as string[], volume: 0.6, placeholder: () => {} }, // the transition file covers both halves
   step: { files: STEPS, volume: 0.6, sequence: true, placeholder: (k: Kit) => k.tone(660, 0.15, 0.1) },
-  // Index list → grid: "the line explodes with a sound" (annotation).
+  // Archive list → grid: the line explodes with a sound.
   explode: { files: [A("scramble")], volume: 0.8, placeholder: (k: Kit) => (k.whoosh(0.5, 0.22, 3000, 120), k.tone(90, 0.5, 0.25)) },
   gather: { files: [A("menu-open")], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.6, 0.12, 400, 2600) },
 } satisfies Record<string, Cue>
@@ -216,7 +216,7 @@ function createKit() {
     },
     /**
      * A room's ambience for "Hear the rooms": Eleven's recording when `src` is given (looped), otherwise a
-     * synthesized placeholder by `preset`. Runs through distance (low-pass + level), left/right pan and an
+     * synthesized fallback by `preset`. Runs through distance (low-pass + level), left/right pan and an
      * analyser for the meter, on the master bus (so mute works). Fades in; `stop()` fades out.
      */
     ambience(preset: RoomPreset, src?: string | null): RoomHandle {
@@ -368,7 +368,7 @@ function createKit() {
       }
     },
     /**
-     * Named UI sounds. Each cue plays Eleven's file when one is listed in CUES, otherwise its placeholder.
+     * Named UI sounds. Each cue plays Eleven's file when one is listed in CUES, otherwise its synthesized `placeholder`.
      * Swapping in the real sounds = adding the file in public/sounds and its path here.
      */
     cue(name: keyof typeof CUES) {

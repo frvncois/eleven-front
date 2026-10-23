@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * The sound gate, once per visit (session). The floss logo goes straight to the home (Amélie, Oct 22); on the home
- * itself, clicking the ELEVEN wordmark reopens the gate (Amélie, Oct 23).
+ * The sound gate, once per visit (session). The floss logo goes straight to the home; on the home
+ * itself, clicking the ELEVEN wordmark reopens the gate.
  */
 const KEY = "eleven-gate";
 const EVENT = "eleven-gate";

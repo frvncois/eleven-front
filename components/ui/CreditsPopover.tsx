@@ -7,8 +7,8 @@ import { EASE_DISSOLVE } from "@/lib/motion";
 type Item = { name: string; role: string; href: string | null };
 
 /**
- * Contact footer "Credits" (Figma credit-open 7640:2313, both versions). The link toggles a small box of
- * grey chips just above it (above rather than beside, so it never covers LinkedIn / Instagram); it opens and closes like the site credits on ascension.pegassi.be/about:
+ * Contact footer "Credits". The link toggles a small box of
+ * grey chips just above it (above rather than beside, so it never covers LinkedIn / Instagram); it opens and closes in steps:
  * rows rise and fade in one after another, fold back down on close. Click outside or Esc closes it.
  */
 export function CreditsPopover({ label, items, className = "" }: { label: string; items: Item[]; className?: string }) {
