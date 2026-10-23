@@ -36,7 +36,6 @@ const SWING = [0.62, 0.05, 0.01, 0.99] as const; // same curve as the page sweep
  * the top, right corner first, left corner catching up, so the edge tilts into its angle. The page
  * behind blurs with no colour. Hovering a name pops its icon into an empty spot between the names;
  * clicking a name opens that mixer. Click outside or Esc closes (the wedge swings back up).
- * Option A (the red overlay) stays in MixersOverlay; NavBar picks one (Shift + M swaps them).
  * The wedge wears the page's accent (review note 6, Oct 23; was always yellow), names and icons in that colour's ink
  * (black or grey). Cursor (review note 16, Oct 23): the plain arrow over the wedge, the CLOSE tag only over the blurred
  * page, in the page accent with black text.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { prefersReducedMotion } from "@/lib/motion";
 
 /** Stage units per CSS px (the 1440 stage is zoomed to the window). */
@@ -44,7 +44,9 @@ export function useStrip(
   } = {},
 ) {
   const frameRef = useRef(frame);
-  frameRef.current = frame;
+  useLayoutEffect(() => {
+    frameRef.current = frame;
+  });
   const moved = useRef(0);
 
   useEffect(() => {
@@ -128,91 +130,3 @@ export function useStrip(
 /** Positive modulo. */
 export const wrap = (n: number, m: number) => ((n % m) + m) % m;
 
-/**
- * A stepped strip: one slot per gesture. `frame(p)` gets the eased position (in slots) every frame.
- * Wheel past a threshold, drag (one slot per `slotPx`), arrow keys, and an idle autoplay step.
- */
-export function useStepper(
-  ref: React.RefObject<HTMLElement | null>,
-  frame: (p: number) => void,
-  { slotPx = 240, every = 2600, ease = 0.085 }: { slotPx?: number; every?: number; ease?: number } = {},
-) {
-  const frameRef = useRef(frame);
-  frameRef.current = frame;
-  const moved = useRef(0);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let p = 0;
-    let target = 0;
-    let wheelAcc = 0;
-    let lastStep = 0;
-    let lastInput = performance.now();
-    let drag: { x: number; from: number } | null = null;
-    let raf = 0;
-
-    const step = (dir: number) => {
-      target = Math.round(target) + dir;
-      lastStep = performance.now();
-      lastInput = lastStep;
-    };
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      lastInput = performance.now();
-      wheelAcc += Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      if (Math.abs(wheelAcc) > 60 && performance.now() - lastStep > 380) {
-        step(Math.sign(wheelAcc));
-        wheelAcc = 0;
-      }
-    };
-    const onDown = (e: PointerEvent) => {
-      drag = { x: e.clientX, from: target };
-      moved.current = 0;
-      lastInput = performance.now();
-    };
-    const onMove = (e: PointerEvent) => {
-      if (!drag) return;
-      const dx = (e.clientX - drag.x) / appScale();
-      moved.current = Math.abs(dx);
-      target = drag.from - dx / slotPx;
-      lastInput = performance.now();
-    };
-    const onUp = () => {
-      if (!drag) return;
-      drag = null;
-      target = Math.round(target);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") step(1);
-      if (e.key === "ArrowLeft") step(-1);
-    };
-
-    const tick = () => {
-      const now = performance.now();
-      if (!drag && now - lastInput > every) step(1);
-      p += (target - p) * (drag ? 0.35 : ease);
-      frameRef.current(p);
-      raf = requestAnimationFrame(tick);
-    };
-
-    el.addEventListener("wheel", onWheel, { passive: false });
-    el.addEventListener("pointerdown", onDown);
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
-    window.addEventListener("keydown", onKey);
-    raf = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(raf);
-      el.removeEventListener("wheel", onWheel);
-      el.removeEventListener("pointerdown", onDown);
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [ref, slotPx, every, ease]);
-
-  return (fn: () => void) => () => {
-    if (moved.current < 6) fn();
-  };
-}

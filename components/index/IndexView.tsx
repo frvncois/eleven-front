@@ -77,12 +77,12 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
   // The Archive opens on the list (review note 19, Oct 23); GRID switches to the fisheye.
   const [view, setView] = useState<"grid" | "list">("list");
   // The grid only plays its flat morph phase when it comes back from the list.
-  const fromList = useRef(false);
+  const [fromList, setFromList] = useState(false);
   const [playing, setPlaying] = useState<number | null>(null);
 
   const choose = (v: "grid" | "list") => {
     sound.cue(v === "list" ? "gather" : "explode");
-    fromList.current = v === "grid";
+    setFromList(v === "grid");
     setView(v);
   };
 
@@ -90,7 +90,7 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
     <main className="relative h-(--vh) overflow-hidden bg-neutral-0 select-none">
       <LayoutGroup>
         {view === "grid" ? (
-          <GridView tiles={tiles} field={field} fromList={fromList.current} onPlay={(i) => openWithSound(() => setPlaying(i))} paused={playing !== null} />
+          <GridView tiles={tiles} field={field} fromList={fromList} onPlay={(i) => openWithSound(() => setPlaying(i))} paused={playing !== null} />
         ) : (
           <ListView tiles={tiles} onPlay={(i) => openWithSound(() => setPlaying(i))} />
         )}
@@ -154,6 +154,10 @@ function relax(tiles: Tile[], field: { w: number; h: number }) {
 // The opening view per screen height and the evened-out layout, worked out once per visit.
 const arrival = new Map<number, { x: number; y: number }>();
 let relaxed: { source: Tile[]; tiles: Tile[] } | null = null;
+function relaxedTiles(source: Tile[], field: { w: number; h: number }) {
+  if (!relaxed || relaxed.source !== source) relaxed = { source, tiles: relax(source.map((t) => ({ ...t, x: t.x * SPREAD, y: t.y * SPREAD, w: t.w * GROW, h: t.h * GROW })), field) };
+  return relaxed.tiles;
+}
 
 function GridView({
   tiles: figmaTiles,
@@ -169,11 +173,8 @@ function GridView({
   paused: boolean;
 }) {
   const field = useMemo(() => ({ w: figmaField.w * SPREAD, h: figmaField.h * SPREAD }), [figmaField.w, figmaField.h]);
-  const tiles = useMemo(() => {
-    // Evened out once per visit (the layout is the same every time).
-    if (!relaxed || relaxed.source !== figmaTiles) relaxed = { source: figmaTiles, tiles: relax(figmaTiles.map((t) => ({ ...t, x: t.x * SPREAD, y: t.y * SPREAD, w: t.w * GROW, h: t.h * GROW })), field) };
-    return relaxed.tiles;
-  }, [figmaTiles, field]);
+  // Evened out once per visit (the layout is the same every time).
+  const tiles = useMemo(() => relaxedTiles(figmaTiles, field), [figmaTiles, field]);
   // Each tile's position on the flat grid (screen coordinates), written every frame (no re-render).
   const [pos] = useState(() => tiles.map(() => ({ left: motionValue(0), top: motionValue(0) })));
   const drag = useRef<{ x: number; y: number; tx: number; ty: number; moved: boolean } | null>(null);
@@ -183,6 +184,7 @@ function GridView({
   const hoverRef = useRef<number | null>(null);
   const label = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(1024);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- the viewport height only exists after mount (static prerender)
   useEffect(() => setHeight(vhOf()), []);
   // The page's own tiles stay in place (hit areas, and the morph to and from the list): visible
   // while the morph plays, then the ball takes over.
@@ -451,7 +453,6 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
         if (shown.has(i)) return; // fewer projects than slots: never draw one twice
         shown.add(i);
         const r = rows[i];
-        const d = k - frac;
         r.width.set(widths[j]);
         r.left.set(LIST_RIGHT - widths[j]);
         r.top.set(centers[j] - heights[j] / 2);

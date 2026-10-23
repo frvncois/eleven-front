@@ -13,15 +13,6 @@ const nextConfig: NextConfig = {
   // Phone review on the same Wi-Fi (http://<this Mac's IP>:3700): Next blocks dev assets for other hosts otherwise.
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*"],
   // Client review prototype: every response, the password page and redirects included, is noindex.
-  // One site now (inline nav only, Oct 17): old versioned links land on the same page.
-  async redirects() {
-    return [
-      { source: "/v1", destination: "/", permanent: false },
-      { source: "/v2", destination: "/", permanent: false },
-      { source: "/v1/:path*", destination: "/:path*", permanent: false },
-      { source: "/v2/:path*", destination: "/:path*", permanent: false },
-    ];
-  },
   async headers() {
     return [{ source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] }];
   },

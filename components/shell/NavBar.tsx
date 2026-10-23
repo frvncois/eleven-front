@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { MixersOverlay } from "@/components/mixers/MixersOverlay";
+import { useState } from "react";
 import { MixersBanner } from "@/components/mixers/MixersBanner";
 import { usePathname } from "next/navigation";
 import site from "@/data/site.json";
@@ -29,7 +28,6 @@ const NAV_CELLS = [
 export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
   const pathname = usePathname();
   const [mixersOpen, setMixersOpen] = useState(false);
-  const mixersNav = useMixersNav();
   // Phone: the dock and its colour-bar menu replace the bar (components/mobile/PhoneShell).
   if (usePhone()) return null;
   return (
@@ -43,7 +41,7 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
         // Hover = the link's own brand colour at full strength (Figma "Nav Hover" modes); the current page keeps it.
         const cls = `${NAV_CELLS[i]} t-h4 cursor-pointer whitespace-nowrap transition-colors duration-300 ease-out hover:text-(--hover) ${current ? "text-(--hover)" : ""}`;
         const style = { "--hover": `var(--color-${item.color})` } as React.CSSProperties;
-        // Mixers opens the roster overlay instead of a page (annotation).
+        // Mixers opens the roster wedge (MixersBanner) instead of a page.
         if (item.label === "Mixers")
           return (
             <button key={item.label} type="button" data-sound="off" aria-current={current ? "page" : undefined} onClick={() => setMixersOpen(true)} onPointerEnter={() => sound.cue("navHover")} className={`${cls} uppercase`} style={style}>
@@ -67,37 +65,7 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
         );
       })}
     </nav>
-    {mixersNav === "banner" ? (
-      <MixersBanner open={mixersOpen} onClose={() => setMixersOpen(false)} />
-    ) : (
-      <MixersOverlay open={mixersOpen} onClose={() => setMixersOpen(false)} />
-    )}
+    <MixersBanner open={mixersOpen} onClose={() => setMixersOpen(false)} />
     </>
   );
-}
-
-type MixersNav = "banner" | "overlay";
-
-/**
- * Which Mixers nav opens: "banner" = the yellow wedge (option B, 7712:9041), "overlay" = the red
- * roster overlay (option A, kept as the backup). Default from site.json `mixersNav`; Shift + M swaps
- * them for comparing, until the next reload (review note 15, Oct 23: a swap remembered in the browser left the
- * homepage on the red overlay).
- */
-function useMixersNav(): MixersNav {
-  const [nav, setNav] = useState<MixersNav>((site as { mixersNav?: MixersNav }).mixersNav ?? "overlay");
-  useEffect(() => {
-    try {
-      localStorage.removeItem("eleven-mixers-nav"); // an old remembered swap; swaps no longer persist
-    } catch {}
-    const onKey = (e: KeyboardEvent) => {
-      if (e.code !== "KeyM" || !e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
-      const t = e.target as HTMLElement | null;
-      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-      setNav((v) => (v === "banner" ? "overlay" : "banner"));
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-  return nav;
 }

@@ -64,7 +64,9 @@ export function MixerMobile({ mixer, spots }: { mixer: Person; spots: Project[] 
   const pageRef = useRef<HTMLElement>(null);
   const cards = useRef<(HTMLButtonElement | null)[]>([]);
   const playingRef = useRef(playing);
-  playingRef.current = playing;
+  useLayoutEffect(() => {
+    playingRef.current = playing;
+  });
   const [first, ...rest] = mixer.name.split(" ");
 
   const choose = (v: View) => {

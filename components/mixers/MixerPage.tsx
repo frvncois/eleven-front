@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { Person, Project } from "@/lib/content";
 import { Chrome } from "@/components/shell/Chrome";
 import { SectionColor } from "@/components/shell/SectionColor";
-import { VanishStrip } from "@/components/lab/VanishStrip";
+import { VanishStrip } from "@/components/mixers/VanishStrip";
 import { EASE_OUT } from "@/lib/motion";
 import { sound } from "@/lib/sound";
 import { ProjectCard } from "./ProjectCard";

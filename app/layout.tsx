@@ -9,7 +9,6 @@ import { SelectionColor } from "@/components/shell/SelectionColor";
 import { ClickSound } from "@/components/shell/ClickSound";
 import { PartyMode } from "@/components/shell/PartyMode";
 import { PhoneShell } from "@/components/mobile/PhoneShell";
-import { GridOverlay } from "@/components/shell/GridOverlay";
 import { ReviewNotes } from "@/components/dev/ReviewNotes";
 
 export const metadata: Metadata = {
@@ -51,7 +50,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <PartyMode />
           <CursorTag />
           <SelectionColor />
-          <GridOverlay />
           <PhoneShell />
         </div>
         <PageTransition />
