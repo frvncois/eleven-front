@@ -11,6 +11,7 @@ import { PlayerMobile } from "./PlayerMobile";
 import { useDockToggle } from "./dock";
 import { STEPPER, landing } from "@/lib/stepper";
 import { lerpQuad, rectToQuadCss, taperField, type Quad } from "@/lib/perspective";
+import { appScale } from "@/lib/device";
 
 type View = "carousel" | "grid";
 const VIEWS: [{ value: View; label: string }, { value: View; label: string }] = [
@@ -91,7 +92,6 @@ export function MixerMobile({ mixer, spots }: { mixer: Person; spots: Project[] 
     if (!el || !track || view !== "carousel") return;
     const n = spots.length;
     const set = n * STEP;
-    const scale = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
     const lead = (390 - CARD.w) / 2; // x of the middle card's left edge
     let x = lead - set; // first card of the middle copy in the middle
     let v = 0; // px per frame while dragging, positive to the right
@@ -190,8 +190,8 @@ export function MixerMobile({ mixer, spots }: { mixer: Person; spots: Project[] 
     };
     const move = (e: PointerEvent) => {
       if (!drag || e.pointerId !== drag.id) return;
-      const mx = (e.clientX - drag.x) / scale();
-      const my = (e.clientY - drag.y) / scale();
+      const mx = (e.clientX - drag.x) / appScale();
+      const my = (e.clientY - drag.y) / appScale();
       // The gesture keeps the axis it starts on, so a slightly diagonal swipe never jitters between the two.
       if (!drag.axis && Math.hypot(mx, my) > 4) drag.axis = Math.abs(mx) >= Math.abs(my) ? "x" : "y";
       const dx = drag.axis === "y" ? my : drag.axis === "x" ? mx : 0;

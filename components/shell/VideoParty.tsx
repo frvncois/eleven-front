@@ -2,10 +2,11 @@
 
 import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { SWING } from "@/lib/motion";
 import party from "@/data/party.json";
 import { party as partyStore, usePartyPick } from "@/lib/party";
 import { sound } from "@/lib/sound";
-import { usePhone } from "@/lib/device";
+import { usePhone, appScale } from "@/lib/device";
 import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
 import site from "@/data/site.json";
 
@@ -24,7 +25,7 @@ export function VideoParty({ on }: { on: boolean }) {
   const phone = usePhone();
   // The pressed butterfly (viewport px) in stage units (the stage is zoomed), and the reveal's centre on it.
   const o = partyStore.origin;
-  const k = typeof document !== "undefined" ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1 : 1;
+  const k = typeof document !== "undefined" ? appScale() : 1;
   const b = o ? { left: o.x / k, top: o.y / k, width: o.w / k, height: o.h / k } : null;
   const origin = o ? `${o.x + o.w / 2}px ${o.y + o.h / 2}px` : "97% 97%";
 
@@ -66,7 +67,7 @@ export function VideoParty({ on }: { on: boolean }) {
           initial={{ clipPath: `circle(0% at ${origin})` }}
           animate={{ clipPath: `circle(160% at ${origin})` }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: [0.62, 0.05, 0.01, 0.99] }}
+          transition={{ duration: 0.8, ease: SWING }}
         >
           {item.video ? (
             <video src={item.video} autoPlay loop muted playsInline className="absolute inset-0 size-full object-cover" />

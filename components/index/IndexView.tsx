@@ -9,11 +9,13 @@ import { sound } from "@/lib/sound";
 import { BallCanvas } from "./BallCanvas";
 import { preloadArchive } from "@/lib/archive-preload";
 import { span } from "@/lib/grid";
+import { EASE_DISSOLVE } from "@/lib/motion";
 import { ViewToggle } from "@/components/shell/ViewToggle";
+import { appScale } from "@/lib/device";
 
 export type Tile = Project & { label: string; client: string; x: number; y: number; w: number; h: number };
 
-const MORPH = { duration: 0.6, ease: [0.4, 0, 0.2, 1] as const };
+const MORPH = { duration: 0.6, ease: EASE_DISSOLVE };
 const r169 = (w: number) => Math.round((w * 9) / 16);
 
 // List: three sizes, S / M / L = 2 / 3 / 4 columns. Like the phone list (Amélie, Oct 22): every card ends on the
@@ -55,7 +57,6 @@ const widthAt = (d: number) => {
   if (x <= 2) return SMALL_W + (MID_W - SMALL_W) * smooth(2 - x);
   return SMALL_W;
 };
-const scaleOf = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
 const vhOf = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--vh")) || 1024;
 
 /**
@@ -300,7 +301,7 @@ function GridView({
     const onWheel = (e: WheelEvent) => {
       if (paused) return;
       e.preventDefault();
-      const s = scaleOf();
+      const s = appScale();
       // Vertical scroll moves the field up/down, horizontal (trackpad, shift) sideways.
       target.current.x -= (e.shiftKey ? e.deltaY : e.deltaX) / s;
       target.current.y -= (e.shiftKey ? 0 : e.deltaY) / s;
@@ -308,7 +309,7 @@ function GridView({
     const onMove = (e: PointerEvent) => {
       const d = drag.current;
       if (!d) return;
-      const s = scaleOf();
+      const s = appScale();
       const mx = (e.clientX - d.x) / s;
       const my = (e.clientY - d.y) / s;
       if (Math.abs(mx) + Math.abs(my) > 4) d.moved = true;
@@ -332,7 +333,7 @@ function GridView({
     const el = box.current;
     if (!el) return null;
     const r = el.getBoundingClientRect();
-    const s = scaleOf();
+    const s = appScale();
     const h = vhOf();
     const dx = (clientX - r.left) / s - 720;
     const dy = (clientY - r.top) / s - h / 2;
@@ -484,7 +485,7 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
     };
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      target += e.deltaY / scaleOf() / STEP;
+      target += e.deltaY / appScale() / STEP;
       scheduleSettle();
     };
     const onKey = (e: KeyboardEvent) => {
@@ -494,7 +495,7 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
     const onTouchStart = (e: TouchEvent) => (touchY = e.touches[0].clientY);
     const onTouchMove = (e: TouchEvent) => {
       const y = e.touches[0].clientY;
-      target += (touchY - y) / scaleOf() / STEP;
+      target += (touchY - y) / appScale() / STEP;
       touchY = y;
       scheduleSettle();
     };

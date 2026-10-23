@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { MotionValue } from "framer-motion";
 import { posterBitmap } from "@/lib/archive-preload";
+import { appScale } from "@/lib/device";
 
 type Item = { poster: string | null; w: number; h: number };
 
@@ -66,7 +67,7 @@ export function BallCanvas({
     if (!el) return;
     const gl = el.getContext("webgl", { antialias: true, premultipliedAlpha: true, alpha: true });
     if (!gl) return;
-    const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
+    const scale = appScale();
     const dpr = Math.min(2, window.devicePixelRatio * scale);
     el.width = Math.round(1440 * dpr);
     el.height = Math.round(height * dpr);
@@ -187,6 +188,8 @@ export function BallCanvas({
       tex.forEach((t) => t.tex && gl.deleteTexture(t.tex));
       gl.deleteBuffer(buf);
       gl.deleteProgram(prog);
+      // Each list → grid toggle mounts a new canvas: release this context instead of waiting for GC.
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
   }, [items, pos, height, radius, hover, label]);
 

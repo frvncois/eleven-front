@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { animate, motion, useMotionTemplate, useMotionValue, usePresence } from "framer-motion";
 import home from "@/data/home.json";
 import { sound } from "@/lib/sound";
-import { prefersReducedMotion } from "@/lib/motion";
+import { SWING, prefersReducedMotion } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 
 const WORDS = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
@@ -13,7 +13,6 @@ const WORDS = ["one", "two", "three", "four", "five", "six", "seven", "eight", "
 const FIRST_MS = 400;
 const STEP_MS = 640;
 const HOLD_MS = 840;
-const SWING = [0.62, 0.05, 0.01, 0.99] as const; // the Mixers wedge's curve (MixersBanner)
 const SWING_S = 0.7;
 const SWING_LAG_S = 0.14; // the right corner follows the left, like the Mixers wedge closing
 /** When the home's nav (Home, PhoneShell) fades in, counted from the moment the gate starts to leave. */

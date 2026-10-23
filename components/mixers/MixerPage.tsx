@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { Person, Project } from "@/lib/content";
 import { Chrome } from "@/components/shell/Chrome";
-import { SectionColor } from "@/components/shell/SectionColor";
 import { VanishStrip } from "@/components/mixers/VanishStrip";
 import { EASE_OUT } from "@/lib/motion";
 import { sound } from "@/lib/sound";
@@ -63,8 +62,13 @@ export function MixerPage({ mixer, spots }: { mixer: Person; spots: Project[] })
 
   // Apply the page sizing once the old view is gone; for the carousel, also wait for the glide to
   // reach the top (the one-screen height would otherwise clamp the scroll).
+  const settleRaf = useRef(0);
+  useEffect(() => () => cancelAnimationFrame(settleRaf.current), []);
   const settle = (v: MixerView) => {
-    const done = () => (v === "grid" || window.scrollY < 0.5 ? setLayout(v) : requestAnimationFrame(done));
+    const done = () => {
+      if (v === "grid" || window.scrollY < 0.5) setLayout(v);
+      else settleRaf.current = requestAnimationFrame(done);
+    };
     done();
   };
 
@@ -73,12 +77,10 @@ export function MixerPage({ mixer, spots }: { mixer: Person; spots: Project[] })
     // 240 px under the last row (Amélie, Oct 19). The top padding is the same in both views so the
     // name never moves.
     <main
-      data-page
       className={`flex flex-col items-center gap-[88px] bg-neutral-0 pt-[calc(var(--vh)*0.3)] ${
         layout === "carousel" ? "h-(--vh) overflow-hidden pb-[120px]" : "min-h-[var(--vh)] overflow-x-clip pb-[240px]"
       }`}
     >
-      <SectionColor base="neutral-0" />
       <h1 className="t-display-big w-full text-center">{mixer.name}</h1>
       <div className="grid w-full">
         <AnimatePresence initial={false} onExitComplete={() => settle(view)}>
@@ -91,7 +93,7 @@ export function MixerPage({ mixer, spots }: { mixer: Person; spots: Project[] })
             {view === "carousel" ? (
               <section aria-label="Projects" className="relative w-full overflow-x-clip" style={{ height: STRIP_H }}>
                 <div className="absolute inset-x-0 top-1/2">
-                  <VanishStrip inPage films={spots} mode="warp" depth={1.25} titles={false} onOpen={open} />
+                  <VanishStrip films={spots} depth={1.25} onOpen={open} />
                 </div>
               </section>
             ) : (

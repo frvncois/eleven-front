@@ -135,25 +135,15 @@ def main() -> None:
     for p in projects:
         p["short"] = p["short"] or p["title"]
 
-    home = [{
-        "label": t["label"],
-        "mixer": mixer_slug(t.get("mixer")),
-        "agency": t.get("agency") or None,
-        "director": t.get("director") or None,
-        "vimeo": t["vimeo"],
-        "vimeoId": t["preview_id"],
-        "previewStart": int(t["preview_start"]) if t.get("preview_start") else 0,
-        "poster": to_webp(t["file"], "home"),
-    } for t in src["homepage_tiles"]]
-
-    studio = [{"caption": s["caption"], "photo": to_webp(s["file"], "studio")} for s in src["studio_photos"]]
+    # Studio photos: the About room carousel picks its five from these (data/about.json).
+    studio = [to_webp(s["file"], "studio") for s in src["studio_photos"]]
 
     DATA.mkdir(exist_ok=True)
-    for name, value in {"team": team, "projects": projects, "home-tiles": home, "studio": studio}.items():
+    for name, value in {"team": team, "projects": projects}.items():
         (DATA / f"{name}.json").write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
 
     missing = [p["slug"] for p in projects if not p["poster"]]
-    print(f"team {len(team)} · projects {len(projects)} · home {len(home)} · studio {len(studio)} · missing posters {missing}")
+    print(f"team {len(team)} · projects {len(projects)} · studio photos {len(studio)} · missing posters {missing}")
 
 
 def short_title(title: str, client: str) -> str:

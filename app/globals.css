@@ -64,32 +64,24 @@
 /*  Text styles: one class per Figma text style, same names.           */
 /* ------------------------------------------------------------------ */
 @utility t-display-big { font-family: var(--font-serif); font-size: 120px; line-height: 0.95; text-transform: uppercase; }
-@utility t-h1 { font-family: var(--font-serif); font-size: 96px; line-height: 0.95; text-transform: uppercase; }
 @utility t-h2 { font-family: var(--font-serif); font-size: 64px; line-height: 1; }
 @utility t-h2-indent { font-family: var(--font-serif); font-size: 64px; line-height: 1; text-indent: 120px; }
 @utility t-h3 { font-family: var(--font-sans); font-weight: 700; font-size: 28px; line-height: 1; text-transform: uppercase; }
 @utility t-h4 { font-family: var(--font-sans); font-weight: 700; font-size: 24px; line-height: 1.1; text-transform: uppercase; &:where(html.phone *) { font-size: 12px; } }
 @utility t-h5 { font-family: var(--font-sans); font-weight: 700; font-size: 18px; line-height: 1.2; &:where(html.phone *) { font-size: 14px; } }
 @utility t-h6 { font-family: var(--font-sans); font-weight: 700; font-size: 12px; line-height: 1; text-transform: uppercase; }
-@utility t-card-title { font-family: var(--font-serif); font-size: 24px; line-height: 1; }
-@utility t-lead { font-family: var(--font-serif); font-size: 32px; line-height: 1; }
-@utility t-quote { font-family: var(--font-serif); font-size: 36px; line-height: 1.2; }
 @utility t-body-lg { font-family: var(--font-sans); font-weight: 500; font-size: 20px; line-height: 1.4; }
 @utility t-body { font-family: var(--font-sans); font-weight: 500; font-size: 16px; line-height: 1.4; }
 @utility t-body-sm { font-family: var(--font-sans); font-weight: 400; font-size: 12px; line-height: 1; }
-@utility t-caption { font-family: var(--font-sans); font-weight: 500; font-size: 14px; line-height: 1.3; text-transform: uppercase; }
 @utility t-eyebrow { font-family: var(--font-sans); font-weight: 700; font-size: 12px; line-height: 1; text-transform: uppercase; }
 @utility t-accent { font-family: var(--font-sans); font-weight: 700; font-size: 12px; line-height: 1.3; text-transform: uppercase; }
 @utility t-mini { font-family: var(--font-sans); font-weight: 500; font-size: 11px; line-height: 1; text-transform: uppercase; }
-@utility t-nav { font-family: var(--font-serif); font-weight: 500; font-size: 28px; line-height: 1.1; }
-@utility t-nav-lg { font-family: var(--font-serif); font-size: 40px; line-height: 1; }
 
 /* ------------------------------------------------------------------ */
 /*  9-column grid. All values are 1440 design px (the stage zooms).    */
 /*  .grid-site = the grid itself; col-start-N / col-span-N inside it.  */
-/*  Outside a grid: w-span-N = width of N columns, ml-col-N / left-    */
-/*  col-N = left edge of column N, right-col-N = right edge on the end */
-/*  of column N, both measured from the page edge.                     */
+/*  Outside a grid: w-span-N = width of N columns, left-col-N = left   */
+/*  edge of column N, measured from the page edge.                     */
 /* ------------------------------------------------------------------ */
 @utility grid-site {
   display: grid;
@@ -100,18 +92,11 @@
 @utility w-span-* {
   width: calc(--value(integer) * var(--grid-col) + (--value(integer) - 1) * var(--spacing-gutter));
 }
-@utility ml-col-* {
-  margin-left: calc(var(--spacing-margin) + (--value(integer) - 1) * (var(--grid-col) + var(--spacing-gutter)));
-}
 @utility left-col-* {
   left: calc(var(--spacing-margin) + (--value(integer) - 1) * (var(--grid-col) + var(--spacing-gutter)));
 }
 /* indent-col: first line indented by one column step, so it starts on the next column's line. */
 @utility indent-col { text-indent: var(--grid-step); }
-/* right-col-N: the right edge sits on the end of column N (like a justify-self: end cell). */
-@utility right-col-* {
-  right: calc(var(--spacing-margin) + (var(--grid-cols) - --value(integer)) * (var(--grid-col) + var(--spacing-gutter)));
-}
 
 /* ------------------------------------------------------------------ */
 /*  Stage: the 1440 design is zoomed to the viewport width.            */
@@ -181,7 +166,6 @@ html.lenis body { height: auto; }
 .butterfly-chip.is-party { animation: butterfly-colours 2s steps(1, end) infinite; }
 .butterfly-chip.is-party .butterfly-flap { animation-duration: 0.24s; }
 
-/* Sound toggle dot (after gehry.getty.edu): while sound is on, two rings breathe out of it. */
 /* Toggle/Sound meter: three bars on their own uneven loops while sound is on, short stubs when off. */
 .sound-meter > span {
   width: 0.16em;
@@ -189,9 +173,9 @@ html.lenis body { height: auto; }
   background-color: currentColor;
   transform-origin: 50% 100%;
   transform: scaleY(0.2);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s var(--ease-dissolve);
 }
-.sound-meter[data-on="true"] > span { animation: sound-bar-1 1.3s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+.sound-meter[data-on="true"] > span { animation: sound-bar-1 1.3s var(--ease-dissolve) infinite; }
 .sound-meter[data-on="true"] > span:nth-child(2) { animation-name: sound-bar-2; animation-duration: 0.9s; }
 .sound-meter[data-on="true"] > span:nth-child(3) { animation-name: sound-bar-3; animation-duration: 1.1s; }
 @keyframes sound-bar-1 { 0%, 100% { transform: scaleY(0.3); } 20% { transform: scaleY(0.9); } 45% { transform: scaleY(0.5); } 70% { transform: scaleY(1); } }
@@ -199,12 +183,6 @@ html.lenis body { height: auto; }
 @keyframes sound-bar-3 { 0%, 100% { transform: scaleY(0.45); } 25% { transform: scaleY(0.75); } 55% { transform: scaleY(0.2); } 80% { transform: scaleY(0.6); } }
 @media (prefers-reduced-motion: reduce) {
   .sound-meter[data-on="true"] > span { animation: none; transform: scaleY(0.6); }
-}
-
-/* On a coloured section (Who's next), the current-page link would vanish in the same colour: go black. */
-html[data-section] nav [aria-current="page"] {
-  color: var(--color-neutral-1000) !important;
-  transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ------------------------------------------------------------------ */

@@ -41,15 +41,3 @@ export function Flip({ text, shown }: { text: string; shown: boolean }) {
     </span>
   );
 }
-
-export function Roll({ text }: { text: string }) {
-  return (
-    <span aria-hidden className="flex">
-      {[...text].map((ch, i) => (
-        <span key={i} className="relative inline-block overflow-hidden">
-          <RollChar ch={ch} i={i} />
-        </span>
-      ))}
-    </span>
-  );
-}

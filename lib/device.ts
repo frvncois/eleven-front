@@ -17,6 +17,9 @@ export function detectPhone() {
   return window.innerWidth < 1024 || coarse;
 }
 
+/** The stage zoom (--app-scale, set in app/layout.tsx and components/shell/StageScale): screen px per design px. */
+export const appScale = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
+
 export const isPhone = () => typeof document !== "undefined" && document.documentElement.classList.contains("phone");
 
 export function setPhone(phone: boolean) {

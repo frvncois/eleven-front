@@ -11,6 +11,7 @@ import { PlayerMobile } from "./PlayerMobile";
 import { useDockToggle } from "./dock";
 import { STEPPER, landing } from "@/lib/stepper";
 import { rectToQuadCss, type Quad } from "@/lib/perspective";
+import { appScale } from "@/lib/device";
 
 type View = "field" | "list";
 const VIEWS: [{ value: View; label: string }, { value: View; label: string }] = [
@@ -123,7 +124,6 @@ function Field({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void }
     const el = root.current;
     if (!el) return;
     const { pos, W, H } = phoneField(tiles);
-    const scale = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
     // Open on project 01 under the lens.
     const pan = { x: -pos[0].x, y: -pos[0].y };
     const vel = { x: 0, y: 0 };
@@ -214,7 +214,7 @@ function Field({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void }
 
     const toLocal = (e: PointerEvent) => {
       const r = el.getBoundingClientRect();
-      const k = scale();
+      const k = appScale();
       return { x: (e.clientX - r.left) / k, y: (e.clientY - r.top) / k };
     };
     const down = (e: PointerEvent) => {
@@ -327,7 +327,6 @@ function List({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void })
     const n = tiles.length;
     const set = n * PITCH;
     const COPIES = 3;
-    const scale = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let y = -set; // the middle copy's first row in the middle
     let v = 0; // px per frame while dragging, the release speed
@@ -413,7 +412,7 @@ function List({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void })
     };
     const move = (e: PointerEvent) => {
       if (!drag || e.pointerId !== drag.id) return;
-      const dy = (e.clientY - drag.y) / scale();
+      const dy = (e.clientY - drag.y) / appScale();
       const now = performance.now();
       y += dy;
       v = v * 0.6 + (dy / Math.max(1, now - drag.t)) * 16.7 * 0.4;
@@ -443,7 +442,7 @@ function List({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void })
     const wheel = (e: WheelEvent) => {
       e.preventDefault();
       jump.current = null;
-      y -= e.deltaY / scale();
+      y -= e.deltaY / appScale();
       clearTimeout(wheelEnd);
       wheelEnd = setTimeout(() => (jump.current = Math.round(y / PITCH) * PITCH), 140);
     };

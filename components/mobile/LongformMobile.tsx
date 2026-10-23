@@ -8,6 +8,7 @@ import { sound } from "@/lib/sound";
 import { STEPPER, landing } from "@/lib/stepper";
 import { PlayerMobile } from "./PlayerMobile";
 import { LongformTag } from "@/components/longform/LongformTag";
+import { appScale } from "@/lib/device";
 
 /**
  * Figma M · 07 · Longform (7696:2004). One film per screen, cropped to cover the portrait (until
@@ -38,7 +39,6 @@ export function LongformMobile({ films }: { films: Film[] }) {
     window.__lenis?.stop();
     const n = films.length;
     const vhOf = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--vh")) || 844;
-    const scale = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
     let drag: { y: number; t: number; start: number; moved: number } | null = null;
     let v = 0; // px per frame, positive towards later films
     let last = 0;
@@ -73,7 +73,7 @@ export function LongformMobile({ films }: { films: Film[] }) {
     const move = (e: TouchEvent) => {
       if (!drag) return;
       e.preventDefault();
-      const dy = (e.touches[0].clientY - drag.y) / scale();
+      const dy = (e.touches[0].clientY - drag.y) / appScale();
       const now = performance.now();
       pos.current = clamp(pos.current - dy / vhOf());
       v = v * 0.6 + (-dy / Math.max(1, now - drag.t)) * 16.7 * 0.4;
@@ -92,7 +92,7 @@ export function LongformMobile({ films }: { films: Film[] }) {
       if (playingRef.current !== null) return;
       e.preventDefault();
       target.current = null;
-      pos.current = clamp(pos.current + e.deltaY / scale() / vhOf());
+      pos.current = clamp(pos.current + e.deltaY / appScale() / vhOf());
       clearTimeout(wheelEnd);
       wheelEnd = setTimeout(() => (target.current = Math.max(0, Math.min(n - 1, Math.round(pos.current)))), 140);
     };

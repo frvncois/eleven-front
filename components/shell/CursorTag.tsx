@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { DUR, EASE_OUT, THEME_INK, themeColor } from "@/lib/motion";
+import { appScale } from "@/lib/device";
 
 /**
  * The one cursor tag (annotation: "cursors are tags following the original browser cursor,
@@ -27,11 +28,10 @@ export function CursorTag() {
 
   useEffect(() => {
     if (!window.matchMedia("(pointer: fine)").matches) return;
-    const scale = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
     const onMove = (e: PointerEvent) => {
       // The tag lives inside the zoomed stage: convert viewport px to design units. The offset is in
       // screen px so it clears the arrow at any zoom.
-      const s = scale();
+      const s = appScale();
       x.set((e.clientX + 22) / s);
       y.set((e.clientY + 14) / s);
       const el = (e.target as Element | null)?.closest?.("[data-cursor]");

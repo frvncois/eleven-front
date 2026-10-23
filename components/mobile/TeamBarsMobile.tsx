@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { sound } from "@/lib/sound";
+import { appScale } from "@/lib/device";
 
 type Card = { slug: string; name: string; bg: string; ink: string; roles: string[] };
 
@@ -23,7 +24,7 @@ export function TeamBarsMobile({ cards }: { cards: Card[] }) {
     const tick = () => {
       raf = requestAnimationFrame(tick);
       const mid = window.innerHeight / 2;
-      const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
+      const scale = appScale();
       let best = -1;
       let bestD = OPEN_BAND * scale;
       els.current.forEach((n, i) => {

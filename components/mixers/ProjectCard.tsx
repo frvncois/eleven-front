@@ -21,7 +21,7 @@ export function ProjectCard({ project, onOpen }: { project: Project; onOpen: (p:
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={project.poster ?? ""}
-            alt={`${project.client}, ${project.short ?? project.title}`}
+            alt=""
             loading="lazy"
             className="absolute inset-0 size-full object-cover"
           />

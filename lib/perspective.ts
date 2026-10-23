@@ -12,7 +12,7 @@ export type Pt = [number, number];
 export type Quad = [Pt, Pt, Pt, Pt]; // top-left, top-right, bottom-right, bottom-left
 
 /** Logo → stage: the wordmark drawn edge to edge at 1440. */
-export const LOGO_K = 1440 / 1400;
+const LOGO_K = 1440 / 1400;
 
 /** Logo heights: 285.8 at the left, 108 at the right (ratio 0.378). Midline drops 21 px. */
 const LOGO_H_LEFT = 285.8;
@@ -41,26 +41,6 @@ export function taperField({ midY, hLeft = LOGO_H_LEFT * LOGO_K, depth = 1, widt
   const vanishX = ratio < 1 ? width / (1 - ratio) : Infinity;
   const quad = (x0: number, x1: number): Quad => [at(x0, 0), at(x1, 0), at(x1, 1), at(x0, 1)];
   return { at, quad, vanishX };
-}
-
-/** The six letters of the wordmark as quads (logo units), read off the SVG path. */
-const top = (x: number) => 0.07998 * (x - 23.16);
-const bot = (x: number) => 285.81 - 0.04843 * x;
-const LETTER_X: [number, number, number, number][] = [
-  // [top-left x, top-right x, bottom-right x, bottom-left x]
-  [23.16, 254.09, 239.89, 0], // E
-  [277.61, 469.08, 466.72, 257.79], // L
-  [489.48, 702.71, 702.71, 476.83], // E
-  [712, 925, 937.14, 715], // V (its arms share the E's tops; bounded by the neighbours)
-  [937.14, 1141.16, 1147.88, 937.26], // E
-  [1156.88, 1400.01, 1399.71, 1158.56], // N
-];
-
-/** Letter quads in stage units, offset so the logo's midline-left sits at `midY`. */
-export function letterQuads(midY: number, scale = LOGO_K, offsetX = 0): Quad[] {
-  const dy = midY - (LOGO_H_LEFT / 2) * scale;
-  const p = (x: number, y: number): Pt => [offsetX + x * scale, dy + y * scale];
-  return LETTER_X.map(([tl, tr, br, bl]) => [p(tl, top(tl)), p(tr, top(tr)), p(br, bot(br)), p(bl, bot(bl))]);
 }
 
 export const lerpPt = (a: Pt, b: Pt, t: number): Pt => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];

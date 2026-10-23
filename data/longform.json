@@ -1,5 +1,4 @@
 {
-  "note": "V1 · 07 · Longform (Figma 7345:1493): the ten films in order, the legend label and colour of each.",
   "films": [
     { "slug": "hp-wake-up", "label": "HP · Wake Up", "color": "pink", "position": "64% 50%" },
     { "slug": "hbo-mcmillions-trailer", "label": "HBO · McMillions", "color": "yellow" },

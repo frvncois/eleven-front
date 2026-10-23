@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { sound, type RoomHandle, type RoomPreset } from "@/lib/sound";
-import { usePhone } from "@/lib/device";
+import { usePhone, appScale } from "@/lib/device";
+import { prefersReducedMotion } from "@/lib/motion";
 import { lerpQuad, quadVisible, rectToQuadCss, taperField, type Quad } from "@/lib/perspective";
 
 type Room = { room: string; photo: string; preset: string; audio: string | null; height: number };
@@ -48,7 +49,6 @@ export function RoomCarousel({ items }: { items: Room[] }) {
   const heights = items.map((r) => (r.height * w) / DATA_W);
   const tallest = Math.max(...heights);
 
-  const scale = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
 
   const stop = () => {
     handle.current?.h.stop();
@@ -70,7 +70,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
 
   // The loop: drift + throw, wrapped into one set's width so it never runs out.
   useEffect(() => {
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const still = prefersReducedMotion();
     let raf = 0;
     let last = performance.now();
     // Desktop Warp: each card's flat spot on the stage (track x = stage x), bent by the banner's speed.
@@ -153,7 +153,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
       if (!dx) return;
       e.preventDefault();
       e.stopPropagation();
-      x.current -= dx / scale();
+      x.current -= dx / appScale();
     };
     el.addEventListener("wheel", onWheel, { passive: false, capture: true });
     return () => el.removeEventListener("wheel", onWheel, { capture: true });
@@ -192,7 +192,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
             d.moved = true;
             e.currentTarget.setPointerCapture(e.pointerId);
           }
-          const step = (e.clientX - d.last) / scale();
+          const step = (e.clientX - d.last) / appScale();
           x.current += step;
           throwV.current = -step; // last step becomes the throw on release
           d.last = e.clientX;
@@ -222,7 +222,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
                   // Phone: the room comes to the middle of the screen as its sound starts.
                   if (phone && handle.current?.room !== r.room) {
                     const b = e.currentTarget.getBoundingClientRect();
-                    const k = scale();
+                    const k = appScale();
                     centre.current = x.current + (window.innerWidth / 2 - (b.left + b.width / 2)) / k;
                   }
                   toggle(r);

@@ -2,9 +2,9 @@
 
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { prefersReducedMotion } from "@/lib/motion";
+import { appScale } from "@/lib/device";
 
 /** Stage units per CSS px (the 1440 stage is zoomed to the window). */
-const appScale = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
 
 export type StripState = {
   /** Distance travelled, in stage px (or slots, for the stepped options). */

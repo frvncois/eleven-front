@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { EASE_DISSOLVE } from "@/lib/motion";
 
 type Item = { name: string; role: string; href: string | null };
 
@@ -57,7 +58,7 @@ export function CreditsPopover({ label, items, className = "" }: { label: string
                   key={it.name}
                   className="overflow-hidden"
                   variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 12 } }}
-                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                  transition={{ duration: 0.35, ease: EASE_DISSOLVE }}
                 >
                   {it.href ? (
                     <a href={it.href} target="_blank" rel="noreferrer" className="flex items-start gap-2 bg-bg-alt px-2 py-1 whitespace-nowrap transition-opacity duration-200 hover:opacity-50">

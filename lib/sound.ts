@@ -32,58 +32,7 @@ const CUES = {
 } satisfies Record<string, Cue>
 const seqPos = new Map<string, number>()
 
-/** A party loop (used through the wall by the "party" room preset): 124 bpm kick, off-beat hat, bass line, stabs, scheduled ahead into `out`. Returns the timer id. */
-function beatLoop(c: AudioContext, out: AudioNode, onBeat?: (beat: number) => void) {
-  const bpm = 124
-  const sixteenth = 60 / bpm / 4
-  const bass = [41, 0, 41, 0, 44, 0, 41, 0, 39, 0, 39, 0, 46, 0, 44, 0] // MIDI notes, 0 = rest
-  const hz = (m: number) => 440 * Math.pow(2, (m - 69) / 12)
-  const noise = c.createBuffer(1, c.sampleRate * 0.1, c.sampleRate)
-  noise.getChannelData(0).forEach((_, i, a) => (a[i] = Math.random() * 2 - 1))
-  let step = 0
-  let next = c.currentTime + 0.05
-  const voice = (type: OscillatorType, f: number, t: number, dur: number, vol: number, to?: number) => {
-    const o = c.createOscillator()
-    const g = c.createGain()
-    o.type = type
-    o.frequency.setValueAtTime(f, t)
-    if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur)
-    g.gain.setValueAtTime(vol, t)
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
-    o.connect(g).connect(out)
-    o.start(t)
-    o.stop(t + dur + 0.02)
-  }
-  const hat = (t: number) => {
-    const src = c.createBufferSource()
-    const hp = c.createBiquadFilter()
-    const g = c.createGain()
-    src.buffer = noise
-    hp.type = "highpass"
-    hp.frequency.value = 7000
-    g.gain.setValueAtTime(0.25, t)
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05)
-    src.connect(hp).connect(g).connect(out)
-    src.start(t)
-  }
-  return window.setInterval(() => {
-    while (next < c.currentTime + 0.12) {
-      const s = step % 16
-      if (s % 4 === 0) {
-        voice("sine", 150, next, 0.28, 0.9, 45) // kick
-        const beat = step / 4
-        if (onBeat) window.setTimeout(() => onBeat(beat), Math.max(0, (next - c.currentTime) * 1000))
-      }
-      if (s % 4 === 2) hat(next)
-      if (bass[s]) voice("sawtooth", hz(bass[s]), next, sixteenth * 1.6, 0.18)
-      if (s === 4 || s === 12) [65, 68, 72].forEach((m) => voice("square", hz(m), next, 0.12, 0.05)) // stabs
-      next += sixteenth
-      step++
-    }
-  }, 25)
-}
-
-export type RoomPreset = "studio" | "booth" | "lobby" | "hallway" | "outside" | "party"
+export type RoomPreset = "studio" | "lobby" | "outside"
 export type RoomHandle = { setPan: (x: number) => void; setNear: (y: number) => void; stop: () => void; analyser: AnalyserNode | null }
 
 type Listener = () => void
@@ -373,21 +322,11 @@ function createKit() {
         bed("lowpass", 380, 0.9) // the room's air
         tone(60, 0.012) // gear hum
         tone(120, 0.006)
-      } else if (preset === "booth") {
-        bed("lowpass", 220, 0.6) // dead, close
       } else if (preset === "lobby") {
         bed("lowpass", 1400, 0.7)
         const murmur = bed("bandpass", 520, 1.4, 1.6) // voices through a door
         lfo(murmur.g.gain, 0.35, 0.9)
         lfo(murmur.f.frequency, 0.13, 180)
-      } else if (preset === "hallway") {
-        bed("lowpass", 800, 0.6)
-        let left = true
-        every(() => 520 + Math.random() * 60, (t) => {
-          // footsteps, alternating feet
-          blip(left ? 95 : 85, 45, 0.12, 0.35, t)
-          left = !left
-        })
       } else if (preset === "outside") {
         const wind = bed("bandpass", 600, 1.6, 0.6)
         lfo(wind.f.frequency, 0.08, 320)
@@ -397,15 +336,6 @@ function createKit() {
           blip(3200, 4300, 0.09, 0.05, t)
           blip(3600, 4800, 0.08, 0.04, t + 0.12)
         })
-      } else if (preset === "party") {
-        // The party, heard through the wall of the building.
-        const wall = c.createBiquadFilter()
-        wall.type = "lowpass"
-        wall.frequency.value = 260
-        wall.connect(bus)
-        const id = beatLoop(c, wall)
-        stops.push(() => window.clearInterval(id))
-        bed("lowpass", 900, 0.35) // street
       }
 
       return {
@@ -450,9 +380,6 @@ function createKit() {
         return kit.play([c.files[i]], name, c.volume)
       }
       return kit.play(c.files, name, c.volume)
-    },
-    preload(urls: (string | undefined | null)[]) {
-      if (ctx) urls.filter(Boolean).forEach((u) => load(u as string))
     },
     registerMedia(el: HTMLMediaElement) {
       media.add(el)

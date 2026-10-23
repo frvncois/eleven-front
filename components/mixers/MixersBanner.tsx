@@ -6,7 +6,7 @@ import { animate, motion, useMotionTemplate, useMotionValue, useReducedMotion } 
 import { mixers } from "@/lib/content";
 import { sound } from "@/lib/sound";
 import { usePathname } from "next/navigation";
-import { EASE_DISSOLVE, THEME_INK, themeColor } from "@/lib/motion";
+import { EASE_DISSOLVE, SWING, THEME_INK, themeColor } from "@/lib/motion";
 
 // Figma "mixers" (7712:9041): the wedge (yellow in Figma, the page accent here) runs full width from the top, its lower edge from
 // 179.7 at the left to 581.9 at the right. Names sit in a stair along that edge.
@@ -29,7 +29,6 @@ const ICONS: Record<string, { cx: number; cy: number; h: number }> = {
   "bruce-bueckert": { cx: 1380, cy: 450, h: 120 },
   "marco-tornillo": { cx: 1150, cy: 445, h: 90 },
 };
-const SWING = [0.62, 0.05, 0.01, 0.99] as const; // same curve as the page sweep bands
 
 /**
  * Mixers nav, option B (annotation on 7712:9041): clicking Mixers swings the wedge down from

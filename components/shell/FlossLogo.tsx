@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { DotLottie } from "@lottiefiles/dotlottie-web";
+import { prefersReducedMotion } from "@/lib/motion";
 
 /**
  * The floss logo, animated like elevensound.framer.website: hover scrubs the hand-drawn Lottie
@@ -127,7 +128,7 @@ export function FlossLogo({ tone = "dark" }: { tone?: "dark" | "light" }) {
 
   useEffect(() => {
     disabled.current =
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches || window.matchMedia("(hover: none)").matches;
+      prefersReducedMotion() || window.matchMedia("(hover: none)").matches;
     let cancelled = false;
 
     const paint = () => {

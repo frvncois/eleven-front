@@ -1,23 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { EASE_DISSOLVE } from "@/lib/motion";
+import { splitCaption } from "@/lib/content";
 import type { Film } from "./LongformReel";
 
 // Black legend text on the light brand colours, neutral/300 grey on the dark ones (never white: review note 3, Oct 23).
 const DARK = new Set(["purple", "ink", "dark-green", "royal-blue"]);
-const EASE = [0.4, 0, 0.2, 1] as const;
-const MORPH = { duration: 0.5, ease: EASE };
+const MORPH = { duration: 0.5, ease: EASE_DISSOLVE };
 
 /**
  * The client / title pair of a longform film, as the player shows it: labels read "Client · Title" and are split on
  * the "·"; a film without one takes the project's client, and a title that only repeats the client is not shown twice.
  */
-export function filmCaption(f: Film) {
-  const [left, ...rest] = f.label.split(" · ");
-  const client = rest.length ? left : f.client;
-  const name = rest.length ? rest.join(" · ") : f.label;
-  return { client, name: name === client ? null : name };
-}
+export const filmCaption = (f: Film) => splitCaption(f.label, f.client);
 
 /**
  * One square of the Longform colour strip (desktop and phone, Amélie Oct 23). The current film's square opens into

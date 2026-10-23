@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { appScale } from "@/lib/device";
 
 type Props = { src: string; width: number; height: number; top: number; left: number; end?: number; hold?: string };
 
@@ -31,7 +32,7 @@ export function StorySticker({ src, width, height, top, left, end, hold = "42%" 
     const tick = () => {
       raf = requestAnimationFrame(tick);
       const now = window.scrollY;
-      const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
+      const scale = appScale();
       velocity.set((now - last) / scale);
       last = now;
       // Fade over the last 160 design px of the run (sticker bottom → end of the story).

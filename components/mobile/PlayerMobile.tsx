@@ -152,7 +152,6 @@ export function PlayerMobile({ films, index, onIndex, onClose, longform = false 
   const prev = index !== null ? films[(index - 1 + films.length) % films.length] : null;
   const next = index !== null ? films[(index + 1) % films.length] : null;
   const title = (f: Project) => f.short ?? f.title;
-  const caption = captionOf; // shared with the desktop player
 
   return (
     <AnimatePresence onExitComplete={() => setInfo(false)}>
@@ -235,8 +234,8 @@ export function PlayerMobile({ films, index, onIndex, onClose, longform = false 
 
           {/* Top left: the project's caption, client and title in grey chips (the same pair as the Archive list). */}
           <div className={`pointer-events-none absolute top-[20.5px] left-margin flex max-w-[230px] flex-col items-start transition-opacity duration-300 ${landscape ? "opacity-0" : ""}`}>
-            <span className="chip-client">{caption(film).client}</span>
-            {caption(film).name && <span className="chip-title">{caption(film).name}</span>}
+            <span className="chip-client">{captionOf(film).client}</span>
+            {captionOf(film).name && <span className="chip-title">{captionOf(film).name}</span>}
           </div>
 
           {/* + INFO top right (Amélie, Oct 22); the credits (and the description on Longform) open right under it,

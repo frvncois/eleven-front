@@ -11,8 +11,6 @@ export const COL = (1440 - 2 * MARGIN - (COLS - 1) * GUTTER) / COLS;
 export const span = (n: number) => n * COL + (n - 1) * GUTTER;
 /** Left edge of column `n` (1-based). */
 export const colStart = (n: number) => MARGIN + (n - 1) * (COL + GUTTER);
-/** Right edge of column `n` (1-based). */
-export const colEnd = (n: number) => colStart(n) + COL;
 
 /**
  * Archive thumbnails come from the Figma field in three sizes (S 332 / M 448 / L 564, data/index.json).

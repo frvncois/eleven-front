@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import VimeoPlayer from "@vimeo/player";
-import type { Project } from "@/lib/content";
+import { splitCaption, type Project } from "@/lib/content";
 import { mixerBySlug } from "@/lib/content";
 import { sound, useSound } from "@/lib/sound";
 import { EASE_DISSOLVE } from "@/lib/motion";
@@ -57,13 +57,7 @@ export function creditsOf(film: Project): [string, string][] {
  * A project's caption pair without repeats (Amélie, Oct 22): Longform's labels read "Client · Title", so they are
  * split on the "·" into the two chips; a title that only repeats the client ("Alice Gu") is not shown twice.
  */
-export function captionOf(f: Project) {
-  const t = f.short ?? f.title;
-  const [left, ...rest] = t.split(" · ");
-  const client = rest.length ? left : f.client;
-  const name = rest.length ? rest.join(" · ") : t;
-  return { client, name: name === client ? null : name };
-}
+export const captionOf = (f: Project) => splitCaption(f.short ?? f.title, f.client);
 
 export const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
@@ -219,7 +213,7 @@ export function Player({ films, index, onIndex, onClose, longform = false }: Pro
         >
           {/* Film strip: posters for every film, the live player on the current one. */}
           <div
-            className="absolute inset-y-0 left-0 flex transition-transform duration-[800ms] ease-[cubic-bezier(0.62,0.05,0.01,0.99)]"
+            className="absolute inset-y-0 left-0 flex transition-transform duration-[800ms] ease-sweep"
             style={{
               width: films.length * 1440,
               transform: `translateX(${-index! * 1440}px)`,
