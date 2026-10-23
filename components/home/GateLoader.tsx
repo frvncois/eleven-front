@@ -101,18 +101,18 @@ export function GateLoader({ onDone, phone = false }: { onDone: () => void; phon
       className="absolute inset-0 z-20 bg-light-grey"
       style={leaving ? { clipPath: clip, WebkitClipPath: clip } : { clipPath: rest, WebkitClipPath: rest }}
     >
-      {/* The title, then the choice (plain H4 text, no chip on the gate), 226 from the
-          top, and the aqua hint just below it. Phone: the title wraps to three lines, the choice at 176. */}
+      {/* The title, then the choice (plain text, no chip on the gate; 16 px on desktop per Figma sound-toggle 7770:7135),
+          and the aqua hint in H6 8 below it. Phone: the title wraps to three lines, the choice at 176. */}
       <div className="absolute inset-x-0 top-[90px] flex flex-col items-center text-neutral-1000 phone:top-[72px] phone:px-margin">
         <p className="t-h3 text-center phone:text-[20px] phone:leading-[1.1]">
           {home.gate.line[0]}
           <br />
           {home.gate.line[1]}
         </p>
-        <div className="t-h4 mt-[80px] phone:mt-[38px]">
-          <SoundToggle />
+        <div className="t-h4 mt-[80px] text-[16px] phone:mt-[38px] phone:text-[12px]">
+          <SoundToggle meter={false} />
         </div>
-        <p className="mt-2 font-sans text-[12px] leading-none font-medium text-aqua">{home.gate.hint}</p>
+        <p className="t-h6 mt-2 text-center text-aqua">{home.gate.hint}</p>
       </div>
       {/* The row from 46 to 1416, 68 above the ELEVEN; anchored to the bottom with it. */}
       <div

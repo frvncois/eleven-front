@@ -9,10 +9,10 @@ type Card = { slug: string; name: string; bg: string; ink: string; roles: string
 const OPEN_BAND = 110; // how close to the middle of the screen a bar's centre must be to open
 
 /**
- * The About team on a phone: scroll is the hover. Eight full-width bars, 80 tall and 8
- * apart; the one crossing the middle of the screen opens to 132 (0.3 s ease-out), its name in Card
- * Title and roles in Eyebrow sliding in, and closes as it leaves. Scrolling plays the team like keys:
- * one step note per bar, only when the site's sound is on.
+ * The About team on a phone, the desktop teammate bar (Figma 7741:7018, Oct 23) with scroll as the hover: eight
+ * full-width bars, 80 tall and 8 apart, each name centred in Junicode 20 at rest; the bar crossing the middle of the
+ * screen rolls its name up and out and its roles in from below (bold caps 12, 12 apart, one line, 0.3 s ease-out),
+ * and rolls back as it leaves. Scrolling plays the team like keys: one step note per bar, only with sound on.
  */
 export function TeamBarsMobile({ cards }: { cards: Card[] }) {
   const els = useRef<(HTMLDivElement | null)[]>([]);
@@ -55,18 +55,18 @@ export function TeamBarsMobile({ cards }: { cards: Card[] }) {
           ref={(n) => {
             els.current[i] = n;
           }}
-          className="relative flex w-full flex-col items-center justify-center gap-3 overflow-hidden whitespace-nowrap transition-[height] duration-300 ease-out"
-          style={{ height: open === i ? 132 : 80, background: `var(--color-${c.bg})`, color: `var(--color-${c.ink})` }}
+          className="relative h-20 w-full overflow-hidden whitespace-nowrap"
+          style={{ background: `var(--color-${c.bg})`, color: `var(--color-${c.ink})` }}
         >
           <p
-            className="font-serif text-[20px] leading-none transition-[opacity,translate] duration-300 ease-out"
-            style={{ opacity: open === i ? 1 : 0, translate: open === i ? "0 0" : "0 -24px" }}
+            className="absolute inset-0 flex items-center justify-center font-serif text-[20px] leading-none transition-[opacity,translate] duration-300 ease-out"
+            style={{ opacity: open === i ? 0 : 1, translate: open === i ? "0 -100%" : "0 0" }}
           >
             {c.name}
           </p>
           <div
-            className="t-eyebrow flex flex-col items-center transition-[opacity,translate] duration-300 ease-out"
-            style={{ opacity: open === i ? 1 : 0, translate: open === i ? "0 0" : "0 24px" }}
+            className="absolute inset-0 flex items-center justify-center gap-3 font-sans text-[12px] leading-none font-bold uppercase transition-[opacity,translate] duration-300 ease-out"
+            style={{ opacity: open === i ? 1 : 0, translate: open === i ? "0 0" : "0 100%" }}
           >
             {c.roles.map((r) => (
               <span key={r}>{r}</span>

@@ -26,7 +26,8 @@ export function PrivacyMobile() {
           </div>
         </section>
       ))}
-      <FooterMobile className="mt-6" />
+      {/* Well apart from "Last updated", like the desktop's 360 last section (review note 18, carried to the phone Oct 23). */}
+      <FooterMobile className="mt-[180px]" />
     </main>
   );
 }

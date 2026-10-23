@@ -22,7 +22,7 @@ export function ToggleButterfly() {
       aria-label={on ? "Stop the party" : "Start the party"}
       data-cursor="click me"
       data-cursor-tone="pink"
-      className={`butterfly-chip relative block size-6 cursor-pointer transition-opacity duration-200 ease-out hover:opacity-50 ${on ? "is-party" : ""}`}
+      className={`butterfly-chip relative block size-6 cursor-pointer ${on ? "is-party" : ""}`}
     >
       <span
         aria-hidden

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import home from "@/data/home.json";
 import { sound } from "@/lib/sound";
@@ -8,17 +8,16 @@ import { NavBar } from "@/components/shell/NavBar";
 import { NavSub } from "@/components/shell/NavSub";
 import { gateSeen, setGateSeen, subscribeGate } from "@/lib/gate";
 import { usePhone } from "@/lib/device";
-import { useDockToggle } from "@/components/mobile/dock";
 import { HomeReel } from "./HomeReel";
-import { ReelToggle } from "./ReelToggle";
 import { GATE_EXIT, GateLoader } from "./GateLoader";
 
 
 // Phone: no big ELEVEN on the home; the nav's wordmark is the logo, the reel has the screen.
 
-// Desktop home wordmark: the ELEVEN stepping down from left to
-// right, neutral/200, 320.6 × 80 on the left margin, its foot 22.9 above the screen's bottom (y 921.1 of 1024).
-const HOME_MARK = { src: "/icons/eleven-home-v2.svg", width: 320.59, height: 79.998, bottom: 22.87 };
+// Desktop home wordmark: the original ELEVEN (Figma "shape" 7684:1510, review note 25, Oct 23; replaces the small
+// stepped eleven-home-v2.svg), neutral/200, 1305.6 × 266.5 on the left margin, its foot where the old one stood (22.9).
+// Amélie, Oct 23: 80 % smaller, so 20 % of that size (261.1 × 53.3), same margin and foot.
+const HOME_MARK = { src: "/icons/eleven-home-original.svg", width: 1305.62 * 0.2, height: 266.536 * 0.2, bottom: 22.87 };
 const enterHome = () => setGateSeen(true); // stable, so the loader never restarts on a re-render
 
 /**
@@ -30,10 +29,7 @@ export function Home() {
   const phone = usePhone();
   // Seen earlier in this visit (nav link back home, or a reload): no gate. The home wordmark reopens it.
   const gate = !useSyncExternalStore(subscribeGate, () => gateSeen(), () => false);
-  // The reel loops forever: a pause control for anyone who wants it still (shown once the gate is gone).
-  const [paused, setPaused] = useState(false);
-  const reelToggle = <ReelToggle paused={paused} onChange={setPaused} />;
-  useDockToggle(phone && !gate ? reelToggle : null);
+  // The reel just loops: no pause control on the home, desktop or phone (Amélie, Oct 23).
 
   // The gate always starts silent, even if sound was on earlier in the visit:
   // the visitor turns it on here, deliberately.
@@ -43,7 +39,7 @@ export function Home() {
 
   return (
     <main className="relative h-(--vh) min-h-[700px] overflow-hidden bg-ink phone:min-h-0">
-      <HomeReel src={home.reel.src} poster={home.reel.poster} paused={paused} />
+      <HomeReel src={home.reel.src} poster={home.reel.poster} />
 
       <AnimatePresence>
         {!gate && (
@@ -54,7 +50,8 @@ export function Home() {
             transition={{ duration: 0.2, delay: GATE_EXIT }}
           >
             <NavBar tone="light" />
-            <NavSub wordmark={false} tone="light" toggles={reelToggle} />
+            {/* No reel pause chip (review note 26, Oct 23; the phone dock's went too): only SOUND. */}
+            <NavSub wordmark={false} tone="light" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -80,6 +77,18 @@ export function Home() {
       )}
 
       <AnimatePresence>
+        {/* The reel blurs behind the gate like the page behind the Mixers wedge (review note 24, Oct 23): 10 px, no
+            colour; it clears as the panel swings up. */}
+        {gate && (
+          <motion.div
+            key="gate-blur"
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-[15] backdrop-blur-[10px]"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.7, ease: [0.4, 0, 0.2, 1] } }}
+          />
+        )}
         {gate && <GateLoader key="gate-loader" onDone={enterHome} phone={phone} />}
       </AnimatePresence>
 

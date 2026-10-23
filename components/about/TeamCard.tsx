@@ -2,48 +2,34 @@
 
 import { sound } from "@/lib/sound";
 
-type Props = { name: string; slug: string; bg: string; ink: string; roles: string[]; icon?: string };
-
-// The icon perched on the bar's top edge: 110 tall, half above the bar, 128 past the end
-// of the name (e.g. a name 243 wide puts the drawing at 371), so it never lands on a longer name. Always
-// black.
-const ICON = { gap: 128, top: -55, h: 110 };
+type Props = { name: string; slug: string; bg: string; ink: string; roles: string[] };
 
 /**
- * Card/Team/<Name>, as a full-width bar. Default: a solid brand
- * bar, 90 tall, empty. Hover (0.3 s ease-out): the name (H2, Junicode 64) on the left and the roles (H3, 48 apart) on
- * the right fade up into the bar, both cap-trimmed to its 24 padding, and the person's drawing lands across the bar's
- * top edge. The person's sound plays. Shared step sounds until Eleven's takes arrive: drop
- * /sounds/<slug>-1.mp3 … -3.mp3 and list them in `takes`.
+ * Card/Team/<Name> (Figma "teeammate" 7741:7018, Oct 23): a full-width brand bar, 80 tall, 8 padding, in the person's
+ * colour and ink. At rest the name sits centred in Junicode 40; on hover it rolls up out of the bar and the roles roll
+ * in from below, centred, 24 bold caps, 24 apart, no separators (0.3 s ease-out; reduced motion = a plain swap).
+ * The person's sound plays. Shared step sounds until Eleven's takes arrive: drop /sounds/<slug>-1.mp3 … -3.mp3 and
+ * list them in `takes`.
  */
-export function TeamCard({ name, slug, bg, ink, roles, icon }: Props) {
+export function TeamCard({ name, slug, bg, ink, roles }: Props) {
   const takes: string[] = [];
   const onEnter = () => {
     // Stand-in: the shared step sounds until each person has their own takes (replace before launch).
     if (takes.length) sound.play(takes, slug);
     else sound.cue("step");
   };
+  const roll = "absolute inset-0 flex items-center justify-center transition-[translate,opacity] duration-300 ease-out motion-reduce:transition-none";
   return (
     <div
       onPointerEnter={onEnter}
-      className="group relative h-[90px] w-full p-6 hover:z-10"
+      className="group relative h-20 w-full overflow-hidden p-2"
       style={{ background: `var(--color-${bg})`, color: `var(--color-${ink})` }}
     >
-      <div className="relative flex w-full translate-y-2 items-start justify-between leading-none whitespace-nowrap opacity-0 transition-[translate,opacity] duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:translate-y-0">
-        <div className="relative">
-          <p className="t-h2 [text-box:trim-both_cap_alphabetic]">{name}</p>
-          {icon && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={icon}
-              alt=""
-              aria-hidden
-              className="pointer-events-none absolute w-auto max-w-none"
-              style={{ left: `calc(100% + ${ICON.gap}px)`, top: ICON.top, height: ICON.h }}
-            />
-          )}
-        </div>
-        <div className="t-h3 flex items-center gap-12">
+      <div className="relative size-full whitespace-nowrap">
+        <p className={`${roll} font-serif text-[40px] leading-none group-hover:-translate-y-full group-hover:opacity-0`}>{name}</p>
+        <div
+          className={`${roll} translate-y-full gap-6 font-sans text-[24px] leading-none font-bold uppercase opacity-0 group-hover:translate-y-0 group-hover:opacity-100`}
+        >
           {roles.map((r) => (
             <p key={r}>{r}</p>
           ))}

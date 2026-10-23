@@ -10,7 +10,7 @@ export default function Error({ reset }: { error: Error & { digest?: string }; r
       <h1 className="t-display-big">Oops</h1>
       <p className="t-body-lg">Something on this page went wrong.</p>
       <div className="mt-6 flex gap-2">
-        <button type="button" onClick={reset} className="t-accent inline-block cursor-pointer bg-neutral-100 px-2 py-1 transition-opacity duration-200 ease-out hover:opacity-50">
+        <button type="button" onClick={reset} className="t-accent inline-block cursor-pointer bg-neutral-100 px-2 py-1 transition-colors duration-150 ease-out hover:bg-neutral-200">
           Try again
         </button>
         <Chip href="/">Back to the homepage</Chip>

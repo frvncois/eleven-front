@@ -86,7 +86,8 @@ export function AboutMobile() {
 
       {/* "This is our team" spread over the 358, the bars under it. */}
       <section className="flex flex-col gap-4 px-margin pt-20 pb-20">
-        <h2 className="t-eyebrow flex justify-between">
+        {/* Neue Haas bold caps like the desktop title (Oct 23), at the phone's 20 (half the desktop 40, like the names). */}
+        <h2 className="flex justify-between font-sans text-[20px] leading-none font-bold uppercase">
           {about.team.label.split(" ").map((w) => (
             <span key={w}>{w}</span>
           ))}

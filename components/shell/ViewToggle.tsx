@@ -1,14 +1,12 @@
 "use client";
 
-import { Flip } from "./LetterRoll";
-
 type Option<V extends string> = { value: V; label: string };
 
 /**
- * Toggle/View in Nav/Sub: one word next to the
- * sound toggle. Both sit in their own grey chips (no slash), type and colour from the chip. It names the view you switch to;
- * a click swaps the views and the word rolls letter by letter into the other one, like ON / OFF.
- * Hover rolls the letters. Mixer pages and the Archive use it.
+ * Toggle/View in Nav/Sub: one word next to the sound toggle, in its own grey chip (type and colour from the chip). It
+ * names the view you switch to; a click swaps the views and the word. No motion on hover, like every chip (after
+ * Seventeen, Amélie Oct 23): the chip just steps one grey darker (globals.css). Both words
+ * share one cell, so the chip keeps its width. Mixer pages and the Archive use it.
  */
 export function ViewToggle<V extends string>({
   options,
@@ -26,12 +24,13 @@ export function ViewToggle<V extends string>({
       data-sound="off"
       aria-label={`Show as ${next.label.toLowerCase()}`}
       onClick={() => onChange(next.value)}
-      className="group flex cursor-pointer items-center uppercase"
+      className="flex cursor-pointer items-center uppercase"
     >
-      {/* Both words share one cell, clipped so the letters roll in and out. */}
-      <span className="grid justify-items-end overflow-hidden">
+      <span className="grid justify-items-center">
         {options.map((o) => (
-          <Flip key={o.value} text={o.label} shown={o.value === next.value} />
+          <span key={o.value} aria-hidden className={`col-start-1 row-start-1 ${o.value === next.value ? "" : "invisible"}`}>
+            {o.label}
+          </span>
         ))}
       </span>
     </button>

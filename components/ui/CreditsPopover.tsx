@@ -61,7 +61,7 @@ export function CreditsPopover({ label, items, className = "" }: { label: string
                   transition={{ duration: 0.35, ease: EASE_DISSOLVE }}
                 >
                   {it.href ? (
-                    <a href={it.href} target="_blank" rel="noreferrer" className="flex items-start gap-2 bg-bg-alt px-2 py-1 whitespace-nowrap transition-opacity duration-200 hover:opacity-50">
+                    <a href={it.href} target="_blank" rel="noreferrer" className="flex items-start gap-2 bg-bg-alt px-2 py-1 whitespace-nowrap transition-colors duration-150 ease-out hover:bg-neutral-300">
                       {body}
                     </a>
                   ) : (

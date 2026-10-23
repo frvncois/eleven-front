@@ -7,9 +7,10 @@ import { useSound } from "@/lib/sound";
  * It takes its type and colour from the `chip` around it (globals.css), on desktop as on the phone,
  * so it reads the same on video and on white.
  * The current word is solid, the other dimmed; flipping rolls the solid copy up through a clipped cell.
- * The bars bounce while sound is on and rest as short stubs when it is off.
+ * The bars bounce while sound is on and rest as short stubs when it is off. `meter={false}` drops them (the sound
+ * gate, Figma 7770:7135).
  */
-export function SoundToggle() {
+export function SoundToggle({ meter = true }: { meter?: boolean }) {
   const s = useSound();
   const on = s.unlocked && !s.muted;
 
@@ -26,11 +27,13 @@ export function SoundToggle() {
       <Word text="Off" active={!on} />
       <span className="opacity-35">/</span>
       <Word text="On" active={on} />
-      <span data-on={on} className="sound-meter ml-[0.25em] flex h-[0.7em] items-end gap-[0.12em]" aria-hidden>
-        <span />
-        <span />
-        <span />
-      </span>
+      {meter && (
+        <span data-on={on} className="sound-meter ml-[0.25em] flex h-[0.7em] items-end gap-[0.12em]" aria-hidden>
+          <span />
+          <span />
+          <span />
+        </span>
+      )}
     </button>
   );
 }
@@ -40,7 +43,7 @@ function Word({ text, active }: { text: string; active: boolean }) {
   const roll = "block transition-transform duration-500 ease-[cubic-bezier(0.04,0.69,0.31,0.98)]";
   return (
     <span className="relative block overflow-y-clip">
-      <span className={`${roll} opacity-35 group-hover:opacity-60 ${active ? "-translate-y-full" : "translate-y-0"}`}>{text}</span>
+      <span className={`${roll} opacity-35 ${active ? "-translate-y-full" : "translate-y-0"}`}>{text}</span>
       <span className={`${roll} absolute inset-x-0 bottom-0 ${active ? "translate-y-0" : "translate-y-full"}`}>{text}</span>
     </span>
   );

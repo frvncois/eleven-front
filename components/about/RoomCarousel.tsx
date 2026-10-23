@@ -17,9 +17,11 @@ const FRICTION = 0.92; // throw decay per frame after a drag or a swipe
 // Phone: the rooms stay big, 390/1440 × 1.6 of the desktop size, 8 apart.
 const PHONE_W = Math.round(W * (390 / 1440) * 1.6);
 const PHONE_GAP = 8;
-// Desktop Warp: the mixer carousel's bend. Flat at rest and while drifting; speed (drag,
+// Warp: the mixer carousel's bend. Flat at rest and while drifting; speed (drag,
 // throw, sideways swipe) bends the banner into the ELEVEN wordmark taper, the vanishing point on the side it heads to.
+// Phone: the phone mixer strip's gentler values (MixerMobile), over the 390 screen (Oct 23, it was flat on the phone).
 const WARP = { depth: 1, grow: 1.2, full: 22, bendIn: 0.12, bendOut: 0.05 };
+const PHONE_WARP = { depth: 1, grow: 1.3, full: 18, bendIn: 0.12, bendOut: 0.05 };
 
 /**
  * Rooms: an endless banner of the studio, one
@@ -30,7 +32,7 @@ const WARP = { depth: 1, grow: 1.2, full: 22, bendIn: 0.12, bendOut: 0.05 };
  * Nothing plays on its own. Leaving the section stops the room. Reduced motion: no drift.
  * Phone: 264 wide, a finger drags it; each room has a small pink sound tag bottom left (muted speaker / playing waves).
  * Tapping a room brings it to the middle of the screen and plays it; the banner holds still while it plays.
- * Desktop: moving it fast bends it like the mixer carousel (WARP); each room is placed on its own matrix3d.
+ * Moving it fast bends it like the mixer carousel (WARP, PHONE_WARP on the phone); each room sits on its own matrix3d.
  */
 export function RoomCarousel({ items }: { items: Room[] }) {
   const section = useRef<HTMLElement>(null);
@@ -73,22 +75,25 @@ export function RoomCarousel({ items }: { items: Room[] }) {
     const still = prefersReducedMotion();
     let raf = 0;
     let last = performance.now();
-    // Desktop Warp: each card's flat spot on the stage (track x = stage x), bent by the banner's speed.
-    const fieldOpts = { midY: tallest / 2, hLeft: tallest * WARP.grow, depth: WARP.depth };
+    // Warp: each card's flat spot on the stage (track x = stage x), bent by the banner's speed.
+    const bend = phone ? PHONE_WARP : WARP;
+    const screen = phone ? 390 : 1440;
+    const margin = phone ? 16 : 24;
+    const fieldOpts = { midY: tallest / 2, hLeft: tallest * bend.grow, depth: bend.depth, width: screen };
     const fwd = taperField(fieldOpts);
     const back = taperField({ ...fieldOpts, mirror: true });
     const warp = { amount: 0, dir: 1 };
-    const pitch = W + GAP;
+    const pitch = w + (phone ? PHONE_GAP : GAP);
     let prev = x.current;
     const place = () => {
       for (let k = 0; k < cards.current.length; k++) {
         const el = cards.current[k];
         if (!el) continue;
         const h = heights[k % items.length];
-        const x0 = 24 + x.current + k * pitch;
-        const x1 = x0 + W;
+        const x0 = margin + x.current + k * pitch;
+        const x1 = x0 + w;
         if (warp.amount === 0) {
-          el.style.visibility = x1 < -40 || x0 > 1480 ? "hidden" : "visible";
+          el.style.visibility = x1 < -40 || x0 > screen + 40 ? "hidden" : "visible";
           el.style.transform = `translate3d(${x0}px, 0, 0)`;
           continue;
         }
@@ -102,7 +107,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
           continue;
         }
         el.style.visibility = "visible";
-        el.style.transform = rectToQuadCss(W, h, q);
+        el.style.transform = rectToQuadCss(w, h, q);
       }
     };
     const tick = (now: number) => {
@@ -129,12 +134,9 @@ export function RoomCarousel({ items }: { items: Room[] }) {
       if (centre.current !== null) centre.current += wrapped - x.current;
       x.current = wrapped;
       prev = wrapped;
-      if (phone) {
-        if (track.current) track.current.style.transform = `translate3d(${x.current}px, 0, 0)`;
-        return;
-      }
-      const target = still ? 0 : Math.min(1, Math.abs(speed) / WARP.full);
-      warp.amount += (target - warp.amount) * (target > warp.amount ? WARP.bendIn : WARP.bendOut);
+      // The slow drift (~0.5 px a frame) stays flat: only a drag, throw or swipe bends it.
+      const target = still || Math.abs(speed) < 1.5 ? 0 : Math.min(1, Math.abs(speed) / bend.full);
+      warp.amount += (target - warp.amount) * (target > warp.amount ? bend.bendIn : bend.bendOut);
       if (warp.amount < 0.002) warp.amount = 0;
       if (Math.abs(speed) > 0.8) warp.dir += (Math.sign(speed) - warp.dir) * 0.08;
       place();
@@ -176,7 +178,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
     // overflow-x-clip, not hidden: the bent near side may rise above the banner's top.
     <section ref={section} className="overflow-x-clip pt-margin pb-[120px] select-none">
       <div
-        className={`cursor-grab touch-pan-y active:cursor-grabbing ${phone ? "px-margin" : ""}`}
+        className="cursor-grab touch-pan-y active:cursor-grabbing"
         onPointerDown={(e) => {
           // Dragging the banner never starts a text selection or an image drag.
           if (e.pointerType === "mouse") e.preventDefault();
@@ -201,8 +203,8 @@ export function RoomCarousel({ items }: { items: Room[] }) {
         onPointerUp={() => setTimeout(() => (drag.current = null))}
         onPointerCancel={() => (drag.current = null)}
       >
-        {/* Phone: one flex row, translated as a whole. Desktop: each room placed on its own (Warp), the row only holds the height. */}
-        <div ref={track} className={phone ? "flex w-max items-start gap-gutter will-change-transform" : "relative"} style={phone ? undefined : { height: tallest }}>
+        {/* Each room placed on its own (Warp), on both devices; the row only holds the height. */}
+        <div ref={track} className="relative" style={{ height: tallest }}>
           {Array.from({ length: COPIES }, (_, c) =>
             items.map((r) => (
               <button
@@ -227,7 +229,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
                   }
                   toggle(r);
                 }}
-                className={`block shrink-0 cursor-pointer overflow-hidden ${phone ? "relative" : "absolute top-0 left-0 origin-top-left will-change-transform"}`}
+                className="absolute top-0 left-0 block shrink-0 origin-top-left cursor-pointer overflow-hidden will-change-transform"
                 style={{ width: w, height: (r.height * w) / DATA_W }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}

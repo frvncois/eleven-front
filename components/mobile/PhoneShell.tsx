@@ -15,9 +15,9 @@ import { GATE_EXIT } from "@/components/home/GateLoader";
 
 // Pages whose top sits on video: the logo is dimmed to grey there.
 const ON_VIDEO = ["/", "/longform"];
-// The phone ELEVEN (same drawing as the home wordmark) is the nav logo.
-// 4:1, so 88.2 wide at the nav's 22 tall.
-const WORDMARK = "/icons/eleven-home-v2.svg";
+// The phone ELEVEN is the nav logo: the original ELEVEN, the same drawing as the desktop home wordmark (review note 25,
+// carried to the phone Oct 23; was the stepped eleven-home-v2.svg). 4.9:1, so 107.8 wide at the nav's 22 tall.
+const WORDMARK = "/icons/eleven-home-original.svg";
 // The phone chip (globals.css `chip`: 24 tall, 12 px bold caps).
 const CHIP = "chip pointer-events-auto";
 
@@ -66,7 +66,7 @@ export function PhoneShell() {
               <Link
                 href="/"
                 aria-label="Eleven, home"
-                className={`pointer-events-auto mb-[2px] block h-[22px] w-[88.2px] transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90 ${onVideo ? "text-neutral-300" : "text-neutral-1000"}`}
+                className={`pointer-events-auto mb-[2px] block h-[22px] w-[107.8px] transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90 ${onVideo ? "text-neutral-300" : "text-neutral-1000"}`}
               >
                 {/* The phone wordmark drawing as a mask, so it takes the nav's colour (black, grey on video). */}
                 <span

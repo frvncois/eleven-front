@@ -13,8 +13,8 @@ import { useDialogFocus } from "@/lib/dialog-focus";
 
 const labels = site.player;
 // Every button in the player is the same small grey chip (CLOSE, + INFO, NEXT and SOUND one size,
-// smaller than the site's 24 tall chip): `chip-sm`, 20 tall, 10 px bold caps, 6 px sides, hover 50 %.
-const CHIP_SM = "chip-sm cursor-pointer transition-opacity duration-200 ease-out hover:opacity-50";
+// smaller than the site's 24 tall chip): `chip-sm`, 20 tall, 10 px bold caps, 6 px sides, hover = one grey step darker (the chip rule in globals.css, Oct 23).
+const CHIP_SM = "chip-sm cursor-pointer";
 // Like YouTube: after 5 s without moving the mouse the controls fade out (and the cursor with them); any move brings
 // them back. They stay while the film is paused.
 const IDLE_MS = 5000;

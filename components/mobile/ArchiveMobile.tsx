@@ -295,11 +295,11 @@ function Field({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void }
 }
 
 // List on a phone: one screen, the projects stacked against the right
-// edge, 12 apart; the one crossing the middle grows (16:9 always, 128 → 200 wide) and its neighbours step up with
+// edge, 4 apart (as on desktop since review note 28, Oct 23; was 12); the one crossing the middle grows (16:9 always, 128 → 200 wide) and its neighbours step up with
 // it, a pyramid pointing at the caption on the left (client and title in grey chips). A finger drags the stack and
 // on release it lands on a project (lib/stepper, the same feel as Longform); it loops, no first or last one.
 const ROW_H = 72; // the scroll pitch's base: one project at rest is 72 tall (128 × 72)
-const GAP = 12;
+const GAP = 4;
 const PITCH = ROW_H + GAP;
 const BASE_W = 128;
 const WIDE_W = 200; // the middle one: its left edge stops at 190, clear of the caption

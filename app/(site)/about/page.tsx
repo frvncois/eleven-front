@@ -30,8 +30,8 @@ function AboutDesktop() {
 
       {/* Story + snow globe share one container so the sticker can run through both.
           The second paragraph always starts level with the top of the floss (Nav/Sub,
-          bottom 16 + 90.68 tall = vh − 106.68), the intro (5 lines, 320) sits
-          on top of it, so the padding is vh − 426.68 (≈ 597 on a 1024 screen). The sticker rests at
+          bottom 16 + 72.54 tall = vh − 88.54, the floss at 64 % since Oct 23), the intro (5 lines, 320) sits
+          on top of it, so the padding is vh − 408.54 (≈ 615 on a 1024 screen). The sticker rests at
           120 (held at 12 % ≈ 120 / 1024) and stays until after the snow globe, fading out at its end. */}
       <div className="relative">
         {/* 9-col grid: the sticker starts on col 3. */}
@@ -39,7 +39,7 @@ function AboutDesktop() {
         {/* 9-col grid: text on the 24 margin, the notes 1 col wide, paragraph 1 from col 3, paragraph 2 from col 4, both to 1416.
             Each first line is indented one column step (indent-col), so it starts on the next column:
             intro col 2, paragraph 1 col 4, paragraph 2 col 5. */}
-        <section className="relative flex flex-col px-margin pt-[calc(var(--vh)-426.68px)]">
+        <section className="relative flex flex-col px-margin pt-[calc(var(--vh)-408.54px)]">
           <div className="relative flex w-full flex-col items-end">
             <p className="t-h2 indent-col w-full">{story.intro}</p>
             {story.paragraphs.map((p, i) => (
@@ -93,7 +93,8 @@ function AboutDesktop() {
           full-width colour bar per person. */}
       <section className="flex h-[1024px] flex-col gap-6 px-margin pt-[120px] pb-16">
         {/* 9-col grid: THIS starts col 1, IS starts col 4, OUR ends col 6, TEAM ends col 9. */}
-        <h2 className="t-h6 grid grid-cols-9 gap-x-gutter">
+        {/* Neue Haas bold caps at 40, the sans of the bars' roles (Amélie, Oct 23; was 12 bold, then briefly Junicode). */}
+        <h2 className="grid grid-cols-9 gap-x-gutter font-sans text-[40px] leading-none font-bold uppercase">
           {about.team.label.split(" ").map((w, i) => (
             <span key={w} className={TEAM_WORD_CELLS[i]}>{w}</span>
           ))}

@@ -27,7 +27,7 @@ const LIST_BOTTOM = 0;
 const SMALL_W = span(2);
 const MID_W = span(3);
 const BIG_W = span(4);
-const GAP = 16;
+const GAP = 4; // between the list's projects (review note 28, Oct 23; was 16)
 const STEP = 300; // wheel distance from one project to the next
 // Grid: the designed field spread out a little so there is air between projects, then
 // evened out (relax) so there are no big holes. Tile sizes stay.

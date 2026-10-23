@@ -90,7 +90,7 @@ export function VideoParty({ on }: { on: boolean }) {
           <button
             type="button"
             onClick={() => partyStore.set(false)}
-            className={phone ? "chip absolute right-margin bottom-4 cursor-pointer" : "chip absolute top-[24.38px] right-margin cursor-pointer transition-opacity duration-200 ease-out hover:opacity-50"}
+            className={phone ? "chip absolute right-margin bottom-4 cursor-pointer" : "chip absolute top-[24.38px] right-margin cursor-pointer"}
           >
             {site.player.close}
           </button>

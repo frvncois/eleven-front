@@ -1,22 +1,20 @@
 import type { Metadata } from "next";
 import { Chrome } from "@/components/shell/Chrome";
-import { Chip } from "@/components/ui/Chip";
+import { Stretch404 } from "@/components/ui/Stretch404";
 
 export const metadata: Metadata = { title: "Not found" };
 
-/** 404: the centred "404", one line, one chip home. */
+/**
+ * 404 (Figma 7770:7071): the giant pink "404" bent towards the pointer (Stretch404), "Sorry we lost you." in H2 on
+ * its midline over the 0. The nav takes you back.
+ */
 export default function NotFound() {
   return (
-    <main className="relative flex h-[max(var(--vh),1024px)] flex-col items-center justify-center gap-5 bg-neutral-0 text-center">
-      <h1 className="t-display-big">404</h1>
-      <p className="t-body-lg">
-        This page went one louder and blew out.
-        <br />
-        The rest of the site is fine, we checked.
-      </p>
-      <div className="mt-6">
-        <Chip href="/">Back to the homepage</Chip>
-      </div>
+    <main className="relative h-(--vh) overflow-hidden bg-bg">
+      <Stretch404 />
+      <h1 className="t-h2 absolute inset-x-0 top-[calc(var(--vh)*0.496)] -translate-y-1/2 px-margin text-center text-neutral-1000 [text-box:trim-both_cap_alphabetic] phone:text-[24px]">
+        Sorry we lost you.
+      </h1>
       <Chrome />
     </main>
   );
