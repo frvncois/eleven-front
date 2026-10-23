@@ -8,7 +8,7 @@ import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { BallCanvas } from "./BallCanvas";
 import { preloadArchive } from "@/lib/archive-preload";
-import { colEnd, span } from "@/lib/grid";
+import { span } from "@/lib/grid";
 import { ViewToggle } from "@/components/shell/ViewToggle";
 
 export type Tile = Project & { label: string; client: string; x: number; y: number; w: number; h: number };
@@ -16,11 +16,12 @@ export type Tile = Project & { label: string; client: string; x: number; y: numb
 const MORPH = { duration: 0.6, ease: [0.4, 0, 0.2, 1] as const };
 const r169 = (w: number) => Math.round((w * 9) / 16);
 
-// List: three sizes, S / M / L.
-// 9-col grid (Oct 19): S / M / L = 2 / 3 / 4 columns, every card ends on col 7 (1103), so the left
-// edges land on cols 6, 5 and 4 (Revision on V2 · 08 · Index · List · 9-col: the column moved right;
-// Figma draws it ending at 1119, snapped to the col 7 line).
-const LIST_RIGHT = colEnd(7);
+// List: three sizes, S / M / L = 2 / 3 / 4 columns. Like the phone list (Amélie, Oct 22): every card ends on the
+// screen's right edge, so the widest, in the middle, points left at the caption.
+const LIST_RIGHT = 1440;
+// The stack runs the full height of the screen, from under About and Contact down past the GRID / SOUND chips, which
+// sit on top of it (review note 19, Oct 23; it used to stop 16 above them). Clean cut, no white fade.
+const LIST_BOTTOM = 0;
 const SMALL_W = span(2);
 const MID_W = span(3);
 const BIG_W = span(4);
@@ -28,10 +29,15 @@ const GAP = 16;
 const STEP = 300; // wheel distance from one project to the next
 // Grid: the Figma field spread out a little so there is air between projects (Amélie, Oct 17), then
 // evened out (relax) so there are no big holes. Tile sizes stay.
-const SPREAD = 1.12; // was 0.95: more room so projects sit further apart (Amélie, Oct 17)
-const MIN_GAP = 104; // smallest space between two projects after evening out (was 64)
+const SPREAD = 1.32; // was 1.12 (Oct 17) and 0.95: more room so projects sit further apart (Amélie, Oct 23)
+const MIN_GAP = 136; // smallest space between two projects after evening out (was 104, then 64)
+const GROW = 1.15; // field frames 15 % bigger than the grid's 2 / 3 / 4 columns (Amélie, Oct 23: too crowded)
 // On arrival the nav must read clearly: the opening view (searched over the whole wrapped field)
 // keeps the top nav clear, avoids the floss and toggle corners, and fills the screen.
+// Amélie's chosen opening view (Oct 23): P&G · Best Job on the right, Visa · Typewriter top left, Adidas · Reflections
+// bottom left. Pinned by Best Job's centre as it shows on the ball, measured from the screen centre (from her 1440 ×
+// 1005 capture), so it holds at any window height. The search below is only the fallback if that project goes.
+const OPEN = { slug: "p-g-best-job", x: 371, y: 123 };
 const NAV_TOP = 96;
 const NAV_BOTTOM = 88;
 const FLOSS = { w: 160, h: 145 };
@@ -42,7 +48,6 @@ const BALL_RADIUS = 1150; // smaller = rounder
 const toScreen = (s: number) => BALL_RADIUS * Math.sin(Math.min(s, BALL_RADIUS * 1.5) / BALL_RADIUS);
 const toFlat = (r: number) => BALL_RADIUS * Math.asin(Math.min(r / BALL_RADIUS, 0.999));
 const smooth = (t: number) => t * t * (3 - 2 * t);
-const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 /** Width for a row `d` rows away from the middle: L at 0, M at 1, S from 2, eased in between. */
 const widthAt = (d: number) => {
   const x = Math.abs(d);
@@ -69,7 +74,8 @@ const VIEWS: [{ value: "grid" | "list"; label: string }, { value: "grid" | "list
 ];
 
 export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number; h: number } }) {
-  const [view, setView] = useState<"grid" | "list">("grid");
+  // The Archive opens on the list (review note 19, Oct 23); GRID switches to the fisheye.
+  const [view, setView] = useState<"grid" | "list">("list");
   // The grid only plays its flat morph phase when it comes back from the list.
   const fromList = useRef(false);
   const [playing, setPlaying] = useState<number | null>(null);
@@ -165,7 +171,7 @@ function GridView({
   const field = useMemo(() => ({ w: figmaField.w * SPREAD, h: figmaField.h * SPREAD }), [figmaField.w, figmaField.h]);
   const tiles = useMemo(() => {
     // Evened out once per visit (the layout is the same every time).
-    if (!relaxed || relaxed.source !== figmaTiles) relaxed = { source: figmaTiles, tiles: relax(figmaTiles.map((t) => ({ ...t, x: t.x * SPREAD, y: t.y * SPREAD })), field) };
+    if (!relaxed || relaxed.source !== figmaTiles) relaxed = { source: figmaTiles, tiles: relax(figmaTiles.map((t) => ({ ...t, x: t.x * SPREAD, y: t.y * SPREAD, w: t.w * GROW, h: t.h * GROW })), field) };
     return relaxed.tiles;
   }, [figmaTiles, field]);
   // Each tile's position on the flat grid (screen coordinates), written every frame (no re-render).
@@ -239,6 +245,14 @@ function GridView({
       return cover - fill * 0.25 + Math.hypot(dx, dy) * 2;
     };
     let best = arrival.get(h);
+    const anchor = tiles.find((t) => t.slug === OPEN.slug);
+    if (!best && anchor) {
+      // Where Best Job's centre must sit on the flat grid so the ball shows it at OPEN.
+      const s = Math.hypot(OPEN.x, OPEN.y);
+      const k = s ? toFlat(s) / s : 1;
+      best = { x: 720 + OPEN.x * k - (anchor.x + anchor.w / 2), y: h / 2 + OPEN.y * k - (anchor.y + anchor.h / 2) };
+      arrival.set(h, best);
+    }
     if (!best) {
       let b = { dx: 0, dy: 0, c: Infinity };
       for (let dy = -field.h / 2; dy <= field.h / 2; dy += 96) {
@@ -372,12 +386,13 @@ function GridView({
         ))}
       </div>
       <BallCanvas items={items} pos={pos} height={height} radius={BALL_RADIUS} visible={!morphing} hover={hoverRef} label={label} />
-      {/* Title / client of the hovered project, laid along its bent bottom edge (BallCanvas moves it). */}
-      <div ref={label} aria-live="polite" className="t-h5 pointer-events-none absolute top-0 left-0 flex origin-top-left justify-between gap-4 whitespace-nowrap opacity-0 transition-opacity duration-300 ease-out">
+      {/* The hovered project's caption, the mixer chips (client over title), laid along its bent bottom edge
+          (BallCanvas moves it). */}
+      <div ref={label} aria-live="polite" className="pointer-events-none absolute top-0 left-0 flex origin-top-left flex-col items-start whitespace-nowrap opacity-0 transition-opacity duration-300 ease-out">
         {hover !== null && (
           <>
-            <span className="truncate">{tiles[hover].label}</span>
-            <span>{tiles[hover].client}</span>
+            <span className="chip-client">{tiles[hover].client}</span>
+            <span className="chip-title">{tiles[hover].label}</span>
           </>
         )}
       </div>
@@ -407,8 +422,7 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
     window.__lenis?.stop();
     window.scrollTo(0, 0);
     const n = tiles.length;
-    const vh = vhOf();
-    const C = vh / 2;
+    const C = (vhOf() - LIST_BOTTOM) / 2; // the window's middle
     const mod = (v: number) => ((v % n) + n) % n;
     let target = 0;
     let cur = 0;
@@ -441,7 +455,7 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
         r.width.set(widths[j]);
         r.left.set(LIST_RIGHT - widths[j]);
         r.top.set(centers[j] - heights[j] / 2);
-        r.fade.set(clamp(3.6 - Math.abs(d), 0, 1));
+        r.fade.set(1);
       });
       rows.forEach((r, i) => !shown.has(i) && r.fade.set(0));
     };
@@ -501,20 +515,17 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
   }, [tiles, rows]);
 
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* Revision (V2 · 08 · Index · List · 9-col): one title at a time, the middle project's. It stays
-          put in the middle of the screen (level with the big image's centre) and only its text changes
-          as projects pass (Amélie, Oct 19): the client on the left margin, the title ending on the right. */}
-      {/* The project's number sits before the client, on the left (Amélie, Oct 19). */}
-      <p className="t-h5 pointer-events-none absolute top-[calc(var(--vh)/2)] left-margin z-20 flex -translate-y-1/2 gap-gutter whitespace-nowrap">
-        <span aria-live="polite">
-          {middle + 1}/{tiles.length}
-        </span>
-        <span>{tiles[middle]?.client}</span>
-      </p>
-      <p className="t-h5 pointer-events-none absolute top-[calc(var(--vh)/2)] right-margin z-20 -translate-y-1/2 whitespace-nowrap">
-        {tiles[middle]?.label}
-      </p>
+    <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ bottom: LIST_BOTTOM }}>
+      {/* The middle project's caption, like the phone list: client and title in grey chips (Neue Haas), left-aligned
+          on the left margin under MIXERS, mid-window; only the text changes as projects pass. No counter (the
+          phone has none). */}
+      <div
+        aria-live="polite"
+        className="pointer-events-none absolute top-1/2 left-margin z-20 flex max-w-[calc(3*var(--grid-col)+2*var(--spacing-gutter))] -translate-y-1/2 flex-col items-start"
+      >
+        <span className="chip-client">{tiles[middle]?.client}</span>
+        <span className="chip-title">{tiles[middle]?.label}</span>
+      </div>
       {tiles.map((t, i) => {
         const r = rows[i];
         return (

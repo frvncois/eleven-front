@@ -91,6 +91,24 @@ const KEY = "eleven-sound"
 const FADE = 0.4
 const isBrowser = () => typeof window !== "undefined"
 
+// iPhone: Web Audio follows the ring / silent switch (the films don't), so with the switch on silent every UI sound
+// is dropped even with "sound on". Declaring a playback session (Safari 16.4+) and, for older iOS, keeping a silent
+// <audio> element playing moves the page into the playback category, where the switch no longer applies.
+const SILENT_WAV = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"
+let keepAlive: HTMLAudioElement | null = null
+function playbackSession() {
+  try {
+    const nav = navigator as Navigator & { audioSession?: { type: string } }
+    if (nav.audioSession) nav.audioSession.type = "playback"
+  } catch {}
+  if (!keepAlive) {
+    keepAlive = new Audio(SILENT_WAV)
+    keepAlive.loop = true
+    keepAlive.setAttribute("playsinline", "")
+  }
+  keepAlive.play().catch(() => {})
+}
+
 function createKit() {
   let ctx: AudioContext | null = null
   let master: GainNode | null = null
@@ -168,6 +186,7 @@ function createKit() {
         media.forEach((el) => kit.registerMedia(el))
       }
       ctx.resume()
+      playbackSession()
       unlocked = true
       sessionStorage.setItem(KEY, muted ? "muted" : "on")
       ramp(master, muted ? 0 : 1)
@@ -182,6 +201,9 @@ function createKit() {
         else emit()
         return
       }
+      // Turning sound on is a gesture: wake the engine too, in case iOS put it to sleep.
+      if (!m && ctx && ctx.state !== "running") ctx.resume().catch(() => {})
+      if (!m) playbackSession()
       ramp(master, m ? 0 : 1)
       fadeMedia(m || ducked ? 0 : 1)
       emit()
@@ -458,15 +480,23 @@ function createKit() {
     },
   }
 
-  // Returning visitor in the same session: re-unlock on the first gesture if they had sound on.
+  // Returning visitor in the same session: re-unlock on the first gesture if they had sound on. And on any gesture,
+  // wake the engine if iOS put it to sleep (screen lock, another app, a film taking the audio): it stays "unlocked"
+  // but silent until resumed. iOS only counts touchend / click as gestures that may start audio, not touchstart.
   if (isBrowser()) {
     const resume = (e: Event) => {
       // A click on the sound toggle itself decides on its own (otherwise it would unlock, then flip back off).
       if ((e.target as Element | null)?.closest?.("[data-sound-toggle]")) return
-      if (!unlocked && sessionStorage.getItem(KEY) === "on") kit.unlock()
+      if (!unlocked && sessionStorage.getItem(KEY) === "on") return kit.unlock()
+      if (unlocked && !muted && ctx && ctx.state !== "running") {
+        ctx.resume().catch(() => {})
+        playbackSession()
+      }
     }
-    window.addEventListener("pointerdown", resume, { capture: true })
-    window.addEventListener("keydown", resume, { capture: true })
+    for (const type of ["pointerdown", "touchend", "click", "keydown"]) window.addEventListener(type, resume, { capture: true })
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && unlocked && !muted && ctx && ctx.state !== "running") ctx.resume().catch(() => {})
+    })
   }
   return kit
 }

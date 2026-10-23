@@ -8,8 +8,9 @@ import { CursorTag } from "@/components/shell/CursorTag";
 import { SelectionColor } from "@/components/shell/SelectionColor";
 import { ClickSound } from "@/components/shell/ClickSound";
 import { PartyMode } from "@/components/shell/PartyMode";
-import { DesktopOnly } from "@/components/shell/DesktopOnly";
+import { PhoneShell } from "@/components/mobile/PhoneShell";
 import { GridOverlay } from "@/components/shell/GridOverlay";
+import { ReviewNotes } from "@/components/dev/ReviewNotes";
 
 export const metadata: Metadata = {
   title: { default: "Eleven", template: "%s · Eleven" },
@@ -29,8 +30,9 @@ export const viewport: Viewport = {
  * jumps. The width is the window minus the scrollbar gutter (html reserves it on every page, see
  * globals.css; reserved here too so it does not wait for the stylesheet). The scrollbar is measured
  * on a probe: Chrome's root clientWidth ignores the reserved gutter on pages that don't scroll. Kept in sync on resize by components/shell/StageScale.
+ * A phone (under 1024 px or touch only, lib/device) gets html.phone and the 390 stage instead.
  */
-const SCALE_BEFORE_PAINT = `(function(){var r=document.documentElement,d=document.createElement("div");r.style.scrollbarGutter="stable";d.style.cssText="position:absolute;top:-999px;width:99px;height:99px;overflow:scroll";r.appendChild(d);var b=d.offsetWidth-d.clientWidth;r.removeChild(d);var s=(innerWidth-b)/1440;r.style.setProperty("--app-scale",s.toFixed(4));r.style.setProperty("--vh",(innerHeight/s).toFixed(2)+"px")})()`;
+const SCALE_BEFORE_PAINT = `(function(){var r=document.documentElement,d=document.createElement("div");r.style.scrollbarGutter="stable";d.style.cssText="position:absolute;top:-999px;width:99px;height:99px;overflow:scroll";r.appendChild(d);var b=d.offsetWidth-d.clientWidth;r.removeChild(d);var c=matchMedia("(pointer: coarse)").matches&&!matchMedia("(pointer: fine)").matches,p=innerWidth<1024||c;if(p)r.classList.add("phone");var s=p?innerWidth/390:(innerWidth-b)/1440;r.style.setProperty("--app-scale",s.toFixed(4));r.style.setProperty("--vh",(innerHeight/s).toFixed(2)+"px")})()`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -50,9 +52,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <CursorTag />
           <SelectionColor />
           <GridOverlay />
+          <PhoneShell />
         </div>
         <PageTransition />
-        <DesktopOnly />
+        {/* Review notes (C = comment mode), dev server only: never in a Netlify build. */}
+        {process.env.NODE_ENV === "development" && <ReviewNotes />}
       </body>
     </html>
   );

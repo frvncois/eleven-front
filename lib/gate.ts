@@ -1,9 +1,8 @@
 "use client";
 
 /**
- * The sound gate, once per visit. The ELEVEN wordmark reopens it (Amélie, 15 Oct): going "home" by it
- * asks for sound again, like arriving on the site; nav links do not.
- * The wordmark carries `data-gate`; PageTransition (which intercepts every link click) reopens it.
+ * The sound gate, once per visit (session). The floss logo goes straight to the home (Amélie, Oct 22); on the home
+ * itself, clicking the ELEVEN wordmark reopens the gate (Amélie, Oct 23).
  */
 const KEY = "eleven-gate";
 const EVENT = "eleven-gate";

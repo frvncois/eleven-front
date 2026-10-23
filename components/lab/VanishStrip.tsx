@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 import type { Project } from "@/lib/content";
 import { lerpQuad, quadVisible, rectToQuadCss, squareToQuad, taperField, type Quad } from "@/lib/perspective";
 import { useStrip, wrap } from "./useStrip";
@@ -10,7 +11,12 @@ export type StripMode = "taper" | "vanish" | "warp";
 /** Every card is drawn flat at this size, then mapped onto its quad with one matrix3d. */
 const CW = 480;
 const IMG_H = 270;
-const TITLE_H = 34;
+/**
+ * The caption is the phone's (Oct 23): client chip stacked straight on the title chip, no gap, 8 under the film. Cards
+ * are drawn at 480 and shown at 400, so it is drawn at CAPTION_K to read at the chips' true size (12 / 14) on the stage.
+ */
+const CAPTION_K = 480 / 400;
+const TITLE_H = Math.ceil((8 + 38.8) * CAPTION_K);
 
 /**
  * Options 01–03: one continuous strip (drag, wheel, idle drift, infinite loop) bent along the
@@ -39,6 +45,7 @@ export function VanishStrip({
   const band = useRef<HTMLDivElement>(null);
   const cards = useRef<(HTMLButtonElement | null)[]>([]);
   const warp = useRef({ amount: 0, dir: 1 });
+  const still = useMemo(() => prefersReducedMotion(), []);
   // Warp: titles only on hover (Amélie, Oct 17), so the strip is always laid out with them.
   const hoverTitles = mode === "warp";
   const showTitles = titles || hoverTitles;
@@ -95,7 +102,8 @@ export function VanishStrip({
 
     if (mode === "warp") {
       const wv = warp.current;
-      const target = Math.min(1, Math.abs(s.velocity) / 16);
+      // Reduced motion: the strip stays flat (as on the phone).
+      const target = still ? 0 : Math.min(1, Math.abs(s.velocity) / 16);
       wv.amount += (target - wv.amount) * (target > wv.amount ? 0.12 : 0.05);
       if (Math.abs(s.velocity) > 0.8) wv.dir += (Math.sign(s.velocity) - wv.dir) * 0.08;
       const w = 400, h = (w * CH) / CW, pitch = w + 8, total = n * pitch;
@@ -141,10 +149,14 @@ export function VanishStrip({
             <img src={film.poster ?? ""} alt={`${film.client}, ${film.short ?? film.title}`} draggable={false} className="absolute inset-0 size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]" />
           </span>
           {showTitles && (
-            <span
-              className={`flex items-end justify-between px-2 whitespace-nowrap text-neutral-1000 ${hoverTitles ? "opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100" : ""}`} style={{ height: TITLE_H, fontSize: 22, fontFamily: "var(--font-sans)", fontWeight: 500 }}>
-              <span>{film.short ?? film.title}</span>
-              <span>{film.client}</span>
+            <span className={`block ${hoverTitles ? "opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100" : ""}`} style={{ height: TITLE_H }}>
+              <span
+                className="flex origin-top-left flex-col items-start whitespace-nowrap"
+                style={{ transform: `scale(${CAPTION_K})`, paddingTop: 8 }}
+              >
+                <span className="chip-client">{film.client}</span>
+                <span className="chip-title">{film.short ?? film.title}</span>
+              </span>
             </span>
           )}
         </button>

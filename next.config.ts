@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
   // Screenshots are compared against Figma: keep the dev badge out of the bottom-left wordmark.
   devIndicators: false,
+  // Phone review on the same Wi-Fi (http://<this Mac's IP>:3700): Next blocks dev assets for other hosts otherwise.
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*"],
   // Client review prototype: every response, the password page and redirects included, is noindex.
   // One site now (inline nav only, Oct 17): old versioned links land on the same page.
   async redirects() {

@@ -11,15 +11,26 @@ export const DUR = {
   stagger: 70, // ms between bands
 } as const;
 
+/**
+ * Phone motion, three timings only (standardised Oct 22): `sheet` = something unfolding from the chip that opened it
+ * (the menu card), `reveal` = content appearing inside it or under a control (drawer, credits, the page's chip),
+ * `layer` = a full-screen layer or a view swap (player, GRID / LIST). The page sweep and the party wipe stay their own.
+ */
+export const PHONE_MOTION = {
+  sheet: { duration: 0.45, ease: [0.62, 0.05, 0.01, 0.99] as const },
+  reveal: { duration: 0.35, ease: EASE_DISSOLVE },
+  layer: { duration: 0.4, ease: EASE_DISSOLVE },
+} as const;
+
 /** Destination colour of the page sweep, by path. Longest prefix wins. */
 export const SWEEP_COLORS: Record<string, string> = {
   "/": "#d9d9d9", // home: Eleven light grey (Amélie, 15 Oct), not black
   "/mixers": "#ed2024",
   "/longform": "#1a8240",
-  "/archive": "#f6eb13",
+  "/archive": "#00a7d9", // aqua (Amélie, 22 Oct), was yellow
   "/about": "#ff7fe7",
-  "/contact": "#00a7d9",
-  "/privacy": "#0f0d0d",
+  "/contact": "#032daf", // royal blue (Amélie, 22 Oct), was aqua
+  "/privacy": "#aaff86", // lime / bright green (review note 9, Oct 23), was black
 };
 
 /** The page's theme colour (its sweep colour), longest path prefix wins. */
@@ -32,12 +43,13 @@ export function themeColor(rawPath: string) {
   return SWEEP_COLORS[best];
 }
 
-/** Text that reads on each theme colour: black on the light ones (pink, aqua, yellow, light grey), white on the rest. */
+/** Text that reads on each theme colour: black on the light ones (pink, aqua, yellow, light grey), neutral/300 grey on the rest (no white text anywhere, Amélie Oct 23). */
 export const THEME_INK: Record<string, string> = {
   "#ff7fe7": "#000000",
   "#f6eb13": "#000000",
   "#d9d9d9": "#000000",
   "#00a7d9": "#000000",
+  "#aaff86": "#000000",
 };
 
 export const prefersReducedMotion = () =>

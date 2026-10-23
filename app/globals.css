@@ -68,8 +68,8 @@
 @utility t-h2 { font-family: var(--font-serif); font-size: 64px; line-height: 1; }
 @utility t-h2-indent { font-family: var(--font-serif); font-size: 64px; line-height: 1; text-indent: 120px; }
 @utility t-h3 { font-family: var(--font-sans); font-weight: 700; font-size: 28px; line-height: 1; text-transform: uppercase; }
-@utility t-h4 { font-family: var(--font-sans); font-weight: 700; font-size: 24px; line-height: 1.1; text-transform: uppercase; }
-@utility t-h5 { font-family: var(--font-sans); font-weight: 700; font-size: 18px; line-height: 1.2; }
+@utility t-h4 { font-family: var(--font-sans); font-weight: 700; font-size: 24px; line-height: 1.1; text-transform: uppercase; &:where(html.phone *) { font-size: 12px; } }
+@utility t-h5 { font-family: var(--font-sans); font-weight: 700; font-size: 18px; line-height: 1.2; &:where(html.phone *) { font-size: 14px; } }
 @utility t-h6 { font-family: var(--font-sans); font-weight: 700; font-size: 12px; line-height: 1; text-transform: uppercase; }
 @utility t-card-title { font-family: var(--font-serif); font-size: 24px; line-height: 1; }
 @utility t-lead { font-family: var(--font-serif); font-size: 32px; line-height: 1; }
@@ -167,25 +167,39 @@ html.lenis body { height: auto; }
 /* Text selection in the page's accent (SelectionColor sets the variables per route). */
 ::selection { background-color: var(--accent, #d9d9d9); color: var(--accent-ink, #000000); }
 
-/* Toggle/Butterfly chip: aqua at rest, the accent colours while the party is on (flap speeds up). */
+/* Toggle/Butterfly chip: Contact's royal blue at rest with a grey butterfly (review note 4, Oct 23), the accent
+   colours while the party is on (flap speeds up). */
 @keyframes butterfly-colours {
-  0%, 100% { background-color: var(--color-aqua); }
+  0%, 100% { background-color: var(--color-royal-blue); }
   20% { background-color: var(--color-red); }
   40% { background-color: var(--color-yellow); }
   60% { background-color: var(--color-dark-green); }
   80% { background-color: var(--color-pink); }
+  90% { background-color: var(--color-aqua); }
 }
-.butterfly-chip { background-color: var(--color-aqua); }
+.butterfly-chip { background-color: var(--accent, var(--color-royal-blue)); } /* the page accent: Contact royal blue, Privacy lime (review note 9) */
 .butterfly-chip.is-party { animation: butterfly-colours 2s steps(1, end) infinite; }
 .butterfly-chip.is-party .butterfly-flap { animation-duration: 0.24s; }
 
 /* Sound toggle dot (after gehry.getty.edu): while sound is on, two rings breathe out of it. */
-@keyframes sound-pulse {
-  0% { opacity: 0.35; transform: scale(1); }
-  100% { opacity: 0; transform: scale(4); }
+/* Toggle/Sound meter: three bars on their own uneven loops while sound is on, short stubs when off. */
+.sound-meter > span {
+  width: 0.16em;
+  height: 100%;
+  background-color: currentColor;
+  transform-origin: 50% 100%;
+  transform: scaleY(0.2);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.sound-pulse { animation: sound-pulse 0.8s ease-in infinite; }
-@media (prefers-reduced-motion: reduce) { .sound-pulse { display: none; } }
+.sound-meter[data-on="true"] > span { animation: sound-bar-1 1.3s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+.sound-meter[data-on="true"] > span:nth-child(2) { animation-name: sound-bar-2; animation-duration: 0.9s; }
+.sound-meter[data-on="true"] > span:nth-child(3) { animation-name: sound-bar-3; animation-duration: 1.1s; }
+@keyframes sound-bar-1 { 0%, 100% { transform: scaleY(0.3); } 20% { transform: scaleY(0.9); } 45% { transform: scaleY(0.5); } 70% { transform: scaleY(1); } }
+@keyframes sound-bar-2 { 0%, 100% { transform: scaleY(0.7); } 30% { transform: scaleY(0.25); } 60% { transform: scaleY(0.85); } }
+@keyframes sound-bar-3 { 0%, 100% { transform: scaleY(0.45); } 25% { transform: scaleY(0.75); } 55% { transform: scaleY(0.2); } 80% { transform: scaleY(0.6); } }
+@media (prefers-reduced-motion: reduce) {
+  .sound-meter[data-on="true"] > span { animation: none; transform: scaleY(0.6); }
+}
 
 /* On a coloured section (Who's next), the current-page link would vanish in the same colour: go black. */
 html[data-section] nav [aria-current="page"] {
@@ -193,9 +207,54 @@ html[data-section] nav [aria-current="page"] {
   transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Phones: the prototype is desktop only for now (components/shell/DesktopOnly). */
-@media (max-width: 767px) {
-  .desktop-only { display: flex; }
-  .stage { display: none; }
-  html, body { overflow: hidden; height: 100%; }
+/* ------------------------------------------------------------------ */
+/*  Phone stage (mobile plan, Oct 19; Figma V2 · MOBILE (390) 7696:1980). */
+/*  html.phone is set before paint (app/layout.tsx): the stage is 390   */
+/*  wide, 5 columns, 16 margin, 8 gutter. `phone:` styles phone only.  */
+/*  The hydrated desktop markup stays hidden until the phone layouts   */
+/*  have replaced it (StageScale adds .phone-ready).                   */
+/* ------------------------------------------------------------------ */
+@custom-variant phone (&:where(html.phone, html.phone *));
+
+html.phone {
+  scrollbar-gutter: auto;
+  --spacing-margin: 16px;
+  --spacing-gutter: 8px;
+  --grid-cols: 5;
+  --grid-col: calc((390px - 2 * var(--spacing-margin) - (var(--grid-cols) - 1) * var(--spacing-gutter)) / var(--grid-cols));
+  /* no rubber-band flash of the page colour behind the dock */
+  overscroll-behavior-y: none;
 }
+/* Clip sideways: nothing (the hydrated desktop markup included) may widen the phone's layout viewport. */
+html.phone .stage { width: 390px; overflow-x: clip; }
+html.phone body { overflow-x: clip; }
+/* Mobile/Nav: Heading/H4 drops 24 → 12 on the phone (in the t-h4 utility; 16 in the Figma mock, then 13; 12 after
+   measuring seventeenagency.com, Oct 22: 14 px regular there, so 12 bold caps here). Labels and captions keep their size. */
+html.phone:not(.phone-ready) .stage { visibility: hidden; }
+
+/* Phone chips and captions, after seventeenagency.com (Amélie, Oct 22: ours were too big): their chips are 19–21 tall
+   with 5 px sides and 14 px text. Ours: 24 tall, 8 px sides, 12 px bold caps; the caption pair = client 12 caps over
+   a 14 px bold title, 2 px top / bottom like theirs. One definition for the nav, the player, the menu and captions.
+   Phone type scale (standardised Oct 22): text 16 (reading) / 14 (titles, H5 on the phone) / 12 (UI, captions) / 9
+   (micro labels); serif display 40 (page titles) / 28 (lines, story) / 20 (names). */
+@utility chip {
+  display: flex; align-items: center; height: 24px; padding-inline: 8px;
+  background: var(--color-neutral-200); color: var(--color-neutral-1000);
+  font-family: var(--font-sans); font-weight: 700; font-size: 12px; line-height: 1; text-transform: uppercase;
+}
+/* The small chip, one step down (Amélie, Oct 23): the desktop player's + INFO and NEXT. 20 tall, 6 px sides, 10 px. */
+@utility chip-sm {
+  display: flex; align-items: center; height: 20px; padding-inline: 6px;
+  background: var(--color-neutral-200); color: var(--color-neutral-1000);
+  font-family: var(--font-sans); font-weight: 700; font-size: 10px; line-height: 1; text-transform: uppercase;
+}
+@utility chip-client {
+  display: inline-block; padding: 3px 6px; background: var(--color-neutral-200); color: var(--color-neutral-1000);
+  font-family: var(--font-sans); font-weight: 700; font-size: 12px; line-height: 1; text-transform: uppercase;
+}
+@utility chip-title {
+  display: inline-block; padding: 2px 6px; background: var(--color-neutral-200); color: var(--color-neutral-1000);
+  font-family: var(--font-sans); font-weight: 700; font-size: 14px; line-height: 1.2;
+}
+/* The caption pair: the title chip tucks 1 px under the client chip (Amélie, Oct 23), on every page that stacks them. */
+.chip-client + .chip-title { margin-top: -1px; }

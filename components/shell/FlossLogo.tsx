@@ -17,12 +17,14 @@ import type { DotLottie } from "@lottiefiles/dotlottie-web";
  * it is dimmed to the nav's grey.
  *
  * Canvas sizing: in the 500×500 Lottie the floss box at frame 0 spans x 60–368, y 86–436, so the
- * canvas is scaled and offset to land that box in the 106.651×113.346 slot the webp used.
+ * canvas is scaled and offset to land that box in its slot: the webp's 106.651×113.346, 20 % smaller since Oct 23
+ * (Amélie), so 85.32×90.68.
  */
 const DURATION = 600;
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
-const SCALE = 113.346 / 350; // webp height / floss height in the Lottie
+const SLOT = { w: 106.651 * 0.8, h: 113.346 * 0.8 }; // the webp's slot, 20 % smaller (Oct 23)
+const SCALE = SLOT.h / 350; // slot height / floss height in the Lottie
 const CANVAS = 500 * SCALE;
 const OFFSET_X = 60 * SCALE;
 const OFFSET_BOTTOM = (500 - 436) * SCALE;
@@ -193,7 +195,7 @@ export function FlossLogo({ tone = "dark" }: { tone?: "dark" | "light" }) {
   return (
     <span
       className="relative block"
-      style={{ width: 106.651, height: 113.346 }}
+      style={{ width: SLOT.w, height: SLOT.h }}
       onMouseEnter={() => scrubTo(1)}
       onMouseLeave={() => scrubTo(0)}
       onFocus={() => scrubTo(1)}

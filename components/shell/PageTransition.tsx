@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { DUR, EASE_SWEEP, prefersReducedMotion, themeColor } from "@/lib/motion";
-import { setGateSeen } from "@/lib/gate";
 import { preloadArchive } from "@/lib/archive-preload";
 import { sound } from "@/lib/sound";
 
@@ -49,8 +48,6 @@ export function PageTransition() {
       const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
       if (!a || a.target === "_blank" || a.hasAttribute("download") || a.hasAttribute("data-no-sweep")) return;
       const url = new URL(a.href, location.href);
-      // Logo links home reopen the sound gate (lib/gate). Done here: this handler stops the click.
-      if (a.hasAttribute("data-gate")) setGateSeen(false);
       if (url.origin !== location.origin || url.pathname === location.pathname) return;
       e.preventDefault();
       e.stopImmediatePropagation();

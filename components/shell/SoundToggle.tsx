@@ -1,15 +1,15 @@
 "use client";
 
 import { useSound } from "@/lib/sound";
-import { Flip, Roll } from "./LetterRoll";
 
 /**
- * Toggle/Sound, after gehry.getty.edu (Amélie, 19 Oct): SOUND ● ON / OFF in Heading/H4, no chip.
- * `tone` follows the page like Nav/Bar: "light" = neutral/300 over video and images, "dark" = black on white pages.
- * On = a filled dot breathing two rings out of it; off = a hollow dot, still. ON / OFF rolls letter by letter
- * when the state flips; hovering rolls SOUND and ON / OFF together, each letter by letter, and swells the dot. Replaces the brush-wave chip (git a5dba8b).
+ * Toggle/Sound, after perfectdaymedia.se (Amélie, 22 Oct): SOUND OFF / ON with a three-bar meter.
+ * It takes its type and colour from the `chip` around it (globals.css), on desktop as on the phone (Amélie, 22 Oct:
+ * "little chips like mobile, smaller text"), so it reads the same on video and on white.
+ * The current word is solid, the other dimmed; flipping rolls the solid copy up through a clipped cell.
+ * The bars bounce while sound is on and rest as short stubs when it is off. Replaces the breathing dot after gehry.getty.edu (git 364f6ec).
  */
-export function SoundToggle({ tone = "dark" }: { tone?: "dark" | "light" }) {
+export function SoundToggle() {
   const s = useSound();
   const on = s.unlocked && !s.muted;
 
@@ -20,25 +20,28 @@ export function SoundToggle({ tone = "dark" }: { tone?: "dark" | "light" }) {
       aria-pressed={on}
       data-sound-toggle
       onClick={() => s.toggle()}
-      className={`group t-h4 flex h-8 cursor-pointer items-center gap-3 ${tone === "light" ? "text-neutral-300" : "text-neutral-1000"}`}
+      className="group flex cursor-pointer items-center gap-[0.25em] uppercase"
     >
-      <Roll text="Sound" />
-      <span className="relative block size-3 transition-transform duration-300 ease-out group-hover:scale-150">
-        {on && (
-          <>
-            <span className="sound-pulse absolute inset-0 rounded-full bg-current" />
-            <span className="sound-pulse absolute inset-0 rounded-full bg-current [animation-delay:0.2s]" />
-          </>
-        )}
-        <span
-          className={`absolute inset-0 rounded-full border border-current transition-colors duration-300 ease-out ${on ? "bg-current" : "bg-transparent"}`}
-        />
-      </span>
-      {/* Both words share one cell (sized by the wider OFF), clipped so the letters roll in and out. */}
-      <span className="grid overflow-hidden">
-        <Flip text="On" shown={on} />
-        <Flip text="Off" shown={!on} />
+      <span>Sound</span>
+      <Word text="Off" active={!on} />
+      <span className="opacity-35">/</span>
+      <Word text="On" active={on} />
+      <span data-on={on} className="sound-meter ml-[0.25em] flex h-[0.7em] items-end gap-[0.12em]" aria-hidden>
+        <span />
+        <span />
+        <span />
       </span>
     </button>
+  );
+}
+
+/** One word, two layers in a clipped cell: the dimmed copy leaves upwards as the solid one rises in from below. */
+function Word({ text, active }: { text: string; active: boolean }) {
+  const roll = "block transition-transform duration-500 ease-[cubic-bezier(0.04,0.69,0.31,0.98)]";
+  return (
+    <span className="relative block overflow-y-clip">
+      <span className={`${roll} opacity-35 group-hover:opacity-60 ${active ? "-translate-y-full" : "translate-y-0"}`}>{text}</span>
+      <span className={`${roll} absolute inset-x-0 bottom-0 ${active ? "translate-y-0" : "translate-y-full"}`}>{text}</span>
+    </span>
   );
 }

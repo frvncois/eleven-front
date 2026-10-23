@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MixersOverlay } from "@/components/mixers/MixersOverlay";
+import { MixersBanner } from "@/components/mixers/MixersBanner";
 import { usePathname } from "next/navigation";
 import site from "@/data/site.json";
 import { sound } from "@/lib/sound";
 import { preloadArchive } from "@/lib/archive-preload";
+import { usePhone } from "@/lib/device";
 
 // Column + alignment per link, in site.nav order (Mixers, Archive, Longform, About, Contact).
 const NAV_CELLS = [
@@ -20,13 +22,16 @@ const NAV_CELLS = [
 /**
  * Nav/Bar (Figma 7356:3252): five links on the 9-col grid, Heading/H4: cols 1 / 3 / 5 / 7 / 9,
  * aligned start / start / centre / end / end, so the gaps stay within ~8% of equal (Oct 19).
- * Hover = the link's colour (Mixers red, Archive yellow, Longform dark green, About pink, Contact aqua),
+ * Hover = the link's colour (Mixers red, Archive aqua, Longform dark green, About pink, Contact royal blue),
  * 0.3 s ease-out, + a short sound; the current page keeps the hover state (annotation).
  * `tone="light"` (neutral/300) where it sits on video: home, player.
  */
 export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
   const pathname = usePathname();
   const [mixersOpen, setMixersOpen] = useState(false);
+  const mixersNav = useMixersNav();
+  // Phone: the dock and its colour-bar menu replace the bar (components/mobile/PhoneShell).
+  if (usePhone()) return null;
   return (
     <>
     <nav
@@ -62,7 +67,37 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
         );
       })}
     </nav>
-    <MixersOverlay open={mixersOpen} onClose={() => setMixersOpen(false)} />
+    {mixersNav === "banner" ? (
+      <MixersBanner open={mixersOpen} onClose={() => setMixersOpen(false)} />
+    ) : (
+      <MixersOverlay open={mixersOpen} onClose={() => setMixersOpen(false)} />
+    )}
     </>
   );
+}
+
+type MixersNav = "banner" | "overlay";
+
+/**
+ * Which Mixers nav opens: "banner" = the yellow wedge (option B, 7712:9041), "overlay" = the red
+ * roster overlay (option A, kept as the backup). Default from site.json `mixersNav`; Shift + M swaps
+ * them for comparing, until the next reload (review note 15, Oct 23: a swap remembered in the browser left the
+ * homepage on the red overlay).
+ */
+function useMixersNav(): MixersNav {
+  const [nav, setNav] = useState<MixersNav>((site as { mixersNav?: MixersNav }).mixersNav ?? "overlay");
+  useEffect(() => {
+    try {
+      localStorage.removeItem("eleven-mixers-nav"); // an old remembered swap; swaps no longer persist
+    } catch {}
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code !== "KeyM" || !e.shiftKey || e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      setNav((v) => (v === "banner" ? "overlay" : "banner"));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+  return nav;
 }

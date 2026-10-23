@@ -2,11 +2,13 @@
   "gate": {
     "line": ["We’re a sound studio.", "Of course this site makes noise."],
     "cursor": "Click anywhere to enable sound",
-    "skip": "Continue without sound"
+    "skip": "Continue without sound",
+    "hint": "Activate sound for a better experience",
+    "tap": "Tap anywhere\nto enable sound"
   },
   "reel": {
-    "src": "/media/home/reel.mp4",
-    "poster": "/media/home/reel-poster.webp",
-    "note": "Eleven's current homepage loop, until they send the new reel."
+    "src": "/media/home/reel-v2.mp4",
+    "poster": "/media/home/reel-v2-poster.webp",
+    "note": "Eleven Reel V2 (Oct 17 2026), 720p H.264 2.5 Mbps + AAC, mixed letterboxing kept as edited."
   }
 }

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { sound, type RoomHandle, type RoomPreset } from "@/lib/sound";
+import { usePhone } from "@/lib/device";
+import { lerpQuad, quadVisible, rectToQuadCss, taperField, type Quad } from "@/lib/perspective";
 
 type Room = { room: string; photo: string; preset: string; audio: string | null; height: number };
 
@@ -11,6 +13,12 @@ const DATA_W = 622; // card width the heights in about.json were measured at
 const DRIFT = 28; // design px per second, right to left
 const COPIES = 3; // enough sets to cover the screen while one wraps
 const FRICTION = 0.92; // throw decay per frame after a drag or a swipe
+// Phone (mobile plan 3.7): the rooms stay big, 390/1440 × 1.6 of the desktop size, 8 apart.
+const PHONE_W = Math.round(W * (390 / 1440) * 1.6);
+const PHONE_GAP = 8;
+// Desktop Warp (review note 13, Oct 23): the mixer carousel's bend. Flat at rest and while drifting; speed (drag,
+// throw, sideways swipe) bends the banner into the ELEVEN wordmark taper, the vanishing point on the side it heads to.
+const WARP = { depth: 1, grow: 1.2, full: 22, bendIn: 0.12, bendOut: 0.05 };
 
 /**
  * Rooms (Figma V2 · 09 · About, carousel-img, revisions Oct 19): an endless banner of the studio, one
@@ -19,16 +27,26 @@ const FRICTION = 0.92; // throw decay per frame after a drag or a swipe
  * throw, and it loops forever. Vertical wheel still scrolls the page. Hovering a photo shows the
  * UNMUTE cursor tag; clicking turns the site's sound on and plays that space, clicking again mutes it.
  * Nothing plays on its own. Leaving the section stops the room. Reduced motion: no drift.
+ * Phone: 264 wide, a finger drags it; each room has a small pink sound tag bottom left (muted speaker / playing waves).
+ * Tapping a room brings it to the middle of the screen and plays it; the banner holds still while it plays.
+ * Desktop: moving it fast bends it like the mixer carousel (WARP); each room is placed on its own matrix3d.
  */
 export function RoomCarousel({ items }: { items: Room[] }) {
   const section = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
+  const cards = useRef<(HTMLButtonElement | null)[]>([]);
   const handle = useRef<{ room: string; h: RoomHandle } | null>(null);
   const x = useRef(0);
   const throwV = useRef(0);
   const drag = useRef<{ x: number; last: number; t: number; moved: boolean } | null>(null);
+  // Phone: the banner offset that brings the room just played to the middle of the screen (eased by the loop).
+  const centre = useRef<number | null>(null);
   const [playing, setPlaying] = useState<string | null>(null);
-  const set = items.length * (W + GAP);
+  const phone = usePhone();
+  const w = phone ? PHONE_W : W;
+  const set = items.length * (w + (phone ? PHONE_GAP : GAP));
+  const heights = items.map((r) => (r.height * w) / DATA_W);
+  const tallest = Math.max(...heights);
 
   const scale = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1;
 
@@ -55,21 +73,76 @@ export function RoomCarousel({ items }: { items: Room[] }) {
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let raf = 0;
     let last = performance.now();
+    // Desktop Warp: each card's flat spot on the stage (track x = stage x), bent by the banner's speed.
+    const fieldOpts = { midY: tallest / 2, hLeft: tallest * WARP.grow, depth: WARP.depth };
+    const fwd = taperField(fieldOpts);
+    const back = taperField({ ...fieldOpts, mirror: true });
+    const warp = { amount: 0, dir: 1 };
+    const pitch = W + GAP;
+    let prev = x.current;
+    const place = () => {
+      for (let k = 0; k < cards.current.length; k++) {
+        const el = cards.current[k];
+        if (!el) continue;
+        const h = heights[k % items.length];
+        const x0 = 24 + x.current + k * pitch;
+        const x1 = x0 + W;
+        if (warp.amount === 0) {
+          el.style.visibility = x1 < -40 || x0 > 1480 ? "hidden" : "visible";
+          el.style.transform = `translate3d(${x0}px, 0, 0)`;
+          continue;
+        }
+        // The card hangs from the top: its share of the field's height, from v 0 down to v = h / tallest.
+        const vb = h / tallest;
+        const sub = (f: typeof fwd): Quad => [f.at(x0, 0), f.at(x1, 0), f.at(x1, vb), f.at(x0, vb)];
+        const flat: Quad = [[x0, 0], [x1, 0], [x1, h], [x0, h]];
+        const q = lerpQuad(flat, lerpQuad(sub(back), sub(fwd), (warp.dir + 1) / 2), warp.amount);
+        if (!quadVisible(q)) {
+          el.style.visibility = "hidden";
+          continue;
+        }
+        el.style.visibility = "visible";
+        el.style.transform = rectToQuadCss(W, h, q);
+      }
+    };
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
       if (!drag.current) {
-        x.current -= (still ? 0 : DRIFT * dt) + throwV.current;
-        throwV.current *= FRICTION;
-        if (Math.abs(throwV.current) < 0.01) throwV.current = 0;
+        if (centre.current !== null) {
+          x.current += (centre.current - x.current) * 0.12;
+          if (Math.abs(centre.current - x.current) < 0.5) {
+            x.current = centre.current;
+            centre.current = null;
+          }
+        } else {
+          // While a room plays the banner holds still, so the room stays in the middle.
+          x.current -= (still || handle.current ? 0 : DRIFT * dt) + throwV.current;
+          throwV.current *= FRICTION;
+          if (Math.abs(throwV.current) < 0.01) throwV.current = 0;
+        }
       }
-      x.current = ((x.current % set) - set) % set; // keep in (-set, 0]
-      if (track.current) track.current.style.transform = `translate3d(${x.current}px, 0, 0)`;
+      // Speed in stage px per frame, positive heading left (measured before the wrap's jump).
+      const speed = prev - x.current;
+      const wrapped = ((x.current % set) - set) % set; // keep in (-set, 0]
+      if (centre.current !== null) centre.current += wrapped - x.current;
+      x.current = wrapped;
+      prev = wrapped;
+      if (phone) {
+        if (track.current) track.current.style.transform = `translate3d(${x.current}px, 0, 0)`;
+        return;
+      }
+      const target = still ? 0 : Math.min(1, Math.abs(speed) / WARP.full);
+      warp.amount += (target - warp.amount) * (target > warp.amount ? WARP.bendIn : WARP.bendOut);
+      if (warp.amount < 0.002) warp.amount = 0;
+      if (Math.abs(speed) > 0.8) warp.dir += (Math.sign(speed) - warp.dir) * 0.08;
+      place();
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [set]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- heights follow items + w, already covered by set
+  }, [set, phone, tallest]);
 
   // Sideways wheel / trackpad swipe moves the banner; vertical wheel is left to the page.
   useEffect(() => {
@@ -100,15 +173,17 @@ export function RoomCarousel({ items }: { items: Room[] }) {
   useEffect(() => sound.subscribe(() => sound.muted && handle.current && stop()), []);
 
   return (
-    <section ref={section} className="overflow-hidden pt-margin pb-[120px] select-none">
+    // overflow-x-clip, not hidden: the bent near side may rise above the banner's top.
+    <section ref={section} className="overflow-x-clip pt-margin pb-[120px] select-none">
       <div
-        className="cursor-grab touch-pan-y px-margin active:cursor-grabbing"
+        className={`cursor-grab touch-pan-y active:cursor-grabbing ${phone ? "px-margin" : ""}`}
         onPointerDown={(e) => {
           // Dragging the banner never starts a text selection or an image drag (Amélie, Oct 19).
           if (e.pointerType === "mouse") e.preventDefault();
           window.getSelection()?.removeAllRanges();
           drag.current = { x: e.clientX, last: e.clientX, t: performance.now(), moved: false };
           throwV.current = 0;
+          centre.current = null;
         }}
         onPointerMove={(e) => {
           const d = drag.current;
@@ -126,11 +201,15 @@ export function RoomCarousel({ items }: { items: Room[] }) {
         onPointerUp={() => setTimeout(() => (drag.current = null))}
         onPointerCancel={() => (drag.current = null)}
       >
-        <div ref={track} className="flex w-max items-start gap-gutter will-change-transform">
+        {/* Phone: one flex row, translated as a whole. Desktop: each room placed on its own (Warp), the row only holds the height. */}
+        <div ref={track} className={phone ? "flex w-max items-start gap-gutter will-change-transform" : "relative"} style={phone ? undefined : { height: tallest }}>
           {Array.from({ length: COPIES }, (_, c) =>
             items.map((r) => (
               <button
                 key={`${c}-${r.photo}`}
+                ref={(el) => {
+                  cards.current[c * items.length + items.indexOf(r)] = el;
+                }}
                 type="button"
                 tabIndex={c ? -1 : 0}
                 aria-hidden={c ? true : undefined}
@@ -138,12 +217,38 @@ export function RoomCarousel({ items }: { items: Room[] }) {
                 aria-pressed={playing === r.room}
                 data-cursor={playing === r.room ? "mute" : "unmute"}
                 data-sound="off"
-                onClick={() => !drag.current?.moved && toggle(r)}
-                className="relative block shrink-0 cursor-pointer overflow-hidden"
-                style={{ width: W, height: (r.height * W) / DATA_W }}
+                onClick={(e) => {
+                  if (drag.current?.moved) return;
+                  // Phone: the room comes to the middle of the screen as its sound starts.
+                  if (phone && handle.current?.room !== r.room) {
+                    const b = e.currentTarget.getBoundingClientRect();
+                    const k = scale();
+                    centre.current = x.current + (window.innerWidth / 2 - (b.left + b.width / 2)) / k;
+                  }
+                  toggle(r);
+                }}
+                className={`block shrink-0 cursor-pointer overflow-hidden ${phone ? "relative" : "absolute top-0 left-0 origin-top-left will-change-transform"}`}
+                style={{ width: w, height: (r.height * w) / DATA_W }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={r.photo} alt={c ? "" : r.room} draggable={false} className="block size-full object-cover" />
+                {/* Phone: a small pink sound tag bottom left (Amélie, Oct 22, instead of the UNMUTE chip): a crossed-out
+                    speaker at rest, the speaker with its waves (breathing) while the room plays. */}
+                {phone && (
+                  <span aria-hidden className="absolute bottom-2 left-2 flex size-4 items-center justify-center bg-pink text-neutral-1000">
+                    <svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="square">
+                      <path d="M1.5 5h2.5l3-2.5v9L4 9H1.5z" fill="currentColor" stroke="none" />
+                      {playing === r.room ? (
+                        <g className="animate-pulse">
+                          <path d="M9.2 5.2a2.4 2.4 0 0 1 0 3.6" />
+                          <path d="M10.9 3.6a4.6 4.6 0 0 1 0 6.8" />
+                        </g>
+                      ) : (
+                        <path d="M9 5.2l3.4 3.6M12.4 5.2L9 8.8" />
+                      )}
+                    </svg>
+                  </span>
+                )}
               </button>
             )),
           )}

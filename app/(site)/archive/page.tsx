@@ -3,10 +3,12 @@ import index from "@/data/index.json";
 import projects from "@/data/projects.json";
 import { toGridTile } from "@/lib/grid";
 import { IndexView, type Tile } from "@/components/index/IndexView";
+import { ArchiveMobile } from "@/components/mobile/ArchiveMobile";
+import { ByDevice } from "@/components/mobile/ByDevice";
 
 export const metadata: Metadata = { title: "Archive" };
 
-/** Archive (Figma V1 · 08 · Index, renamed by Amélie 2026-10-15). */
+/** Archive (Figma V1 · 08 · Index, renamed by Amélie 2026-10-15). Phone: Figma M · 06 · Archive. */
 export default function ArchivePage() {
   const tiles = index.tiles
     .map((t) => {
@@ -15,5 +17,5 @@ export default function ArchivePage() {
       return p ? (toGridTile({ ...p, short: t.title, label: t.title, client: t.client, x: t.x, y: t.y, w: t.w, h: t.h }) as Tile) : null;
     })
     .filter((t): t is Tile => t !== null);
-  return <IndexView tiles={tiles} field={index.field} />;
+  return <ByDevice desktop={<IndexView tiles={tiles} field={index.field} />} phone={<ArchiveMobile tiles={tiles} field={index.field} />} />;
 }

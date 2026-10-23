@@ -5,20 +5,28 @@ import { AnimatePresence, motion } from "framer-motion";
 import party from "@/data/party.json";
 import { party as partyStore, usePartyPick } from "@/lib/party";
 import { sound } from "@/lib/sound";
+import { usePhone } from "@/lib/device";
+import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
+import site from "@/data/site.json";
 
 const ITEMS = party.items;
 
 /**
- * The butterfly easter egg (Contact, Privacy), both versions. Click the butterfly: a random picture
- * (later a video) fills the screen behind the nav, with its own music when Eleven's audio arrives.
- * No interface at all: the flapping butterfly is the only way out (Esc works too). Each time it
- * opens, a different one appears.
+ * The butterfly easter egg (Contact, Privacy), desktop and phone. Click the butterfly: a random picture (later a
+ * video) opens from it in a circle wipe and covers everything, navs and dock included (Amélie, Oct 22), with its own
+ * music when Eleven's audio arrives. Only the butterfly stays, in the same spot (flapping fast, it closes the party),
+ * plus a CLOSE tag: bottom right on the phone (MENU's spot), top right on desktop (the player's). Esc closes too.
+ * Each time it opens, a different one appears.
  */
 export function VideoParty({ on }: { on: boolean }) {
   const pick = usePartyPick();
   const item = ITEMS[Math.max(0, pick) % ITEMS.length];
-  // The reveal opens from the butterfly, bottom right in Nav/Sub.
-  const origin = "97% 97%";
+  const phone = usePhone();
+  // The pressed butterfly (viewport px) in stage units (the stage is zoomed), and the reveal's centre on it.
+  const o = partyStore.origin;
+  const k = typeof document !== "undefined" ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-scale")) || 1 : 1;
+  const b = o ? { left: o.x / k, top: o.y / k, width: o.w / k, height: o.h / k } : null;
+  const origin = o ? `${o.x + o.w / 2}px ${o.y + o.h / 2}px` : "97% 97%";
 
   useEffect(() => partyStore.setSize(ITEMS.length), []);
 
@@ -51,9 +59,10 @@ export function VideoParty({ on }: { on: boolean }) {
       {on && item && (
         <motion.div
           key={pick}
-          aria-hidden
-          // Under the navs (z-50), so the butterfly stays on top and closes it.
-          className="fixed inset-0 z-[45] overflow-hidden bg-neutral-1000"
+          role="dialog"
+          aria-label="Easter egg"
+          // Over everything (desktop navs z-50, phone dock z-80, menu z-79): only its own butterfly and CLOSE show.
+          className="fixed inset-0 z-[96] overflow-hidden bg-neutral-1000"
           initial={{ clipPath: `circle(0% at ${origin})` }}
           animate={{ clipPath: `circle(160% at ${origin})` }}
           exit={{ opacity: 0 }}
@@ -65,6 +74,18 @@ export function VideoParty({ on }: { on: boolean }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={item.image} alt="" className="absolute inset-0 size-full object-cover" />
           )}
+          {b && (
+            <div className="absolute" style={b}>
+              <ToggleButterfly />
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => partyStore.set(false)}
+            className={phone ? "chip absolute right-margin bottom-4 cursor-pointer" : "chip absolute top-[24.38px] right-margin cursor-pointer transition-opacity duration-200 ease-out hover:opacity-50"}
+          >
+            {site.player.close}
+          </button>
         </motion.div>
       )}
     </AnimatePresence>

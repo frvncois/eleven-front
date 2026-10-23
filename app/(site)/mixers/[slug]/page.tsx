@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { mixers, mixerBySlug, spotsOf } from "@/lib/content";
 import { MixerPage } from "@/components/mixers/MixerPage";
+import { MixerMobile } from "@/components/mobile/MixerMobile";
+import { ByDevice } from "@/components/mobile/ByDevice";
 
 export const dynamicParams = false;
 
@@ -20,5 +22,6 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
   const mixer = mixerBySlug(slug);
   if (!mixer) notFound();
-  return <MixerPage mixer={mixer} spots={spotsOf(slug)} />;
+  const spots = spotsOf(slug);
+  return <ByDevice desktop={<MixerPage mixer={mixer} spots={spots} />} phone={<MixerMobile mixer={mixer} spots={spots} />} />;
 }

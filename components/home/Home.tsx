@@ -7,27 +7,26 @@ import { sound } from "@/lib/sound";
 import { NavBar } from "@/components/shell/NavBar";
 import { NavSub } from "@/components/shell/NavSub";
 import { gateSeen, setGateSeen, subscribeGate } from "@/lib/gate";
+import { usePhone } from "@/lib/device";
 import { HomeReel } from "./HomeReel";
-import { GateCursor } from "./GateCursor";
+import { GATE_EXIT, GateLoader } from "./GateLoader";
 
-const EASE = [0.42, 0, 0.58, 1] as const; // Figma "ease in and out", the gate → home smart animate
-const DURATION = 1.2;
 
-// The ELEVEN shape: big on the gate (Figma 7449:6447), bottom-left on the home (7427:6782).
-const SHAPE = {
-  gate: { x: 16, y: 621, width: 1400.008, rotate: 0 },
-  home: { x: 32, y: 814, width: 915, rotate: 0 },
-};
+// Phone: no big ELEVEN on the home any more (Amélie, Oct 22); the nav's wordmark is the logo, the reel has the screen.
+
+// Desktop home wordmark, new version (Figma 7741:2181, review note 7, Oct 23): the ELEVEN stepping down from left to
+// right, neutral/200, 320.6 × 80 on the left margin, its foot 22.9 above the screen's bottom (Figma y 921.1 of 1024).
+const HOME_MARK = { src: "/icons/eleven-home-v2.svg", width: 320.59, height: 79.998, bottom: 22.87 };
+const enterHome = () => setGateSeen(true); // stable, so the loader never restarts on a re-render
 
 /**
- * Gate (V1 · 01 · Gate, 7449:6439) → Home (V1 · 02 · Home, 7345:1333).
- * The gate asks for sound once per visit (session), and again whenever the logo takes you home. Since 19 Oct it works like
- * gehry.getty.edu: no buttons, a cursor tag "Click anywhere to enable sound" and a click anywhere on the panel turns sound on
- * (that click is the gesture the browser needs to unlock audio). "Continue without sound" at the foot enters muted.
- * Either way the aqua panel lifts away while the ELEVEN shape shrinks into its home position, 1.2 s ease-in-out.
+ * The gate (GateLoader, Figma V2 · 01 · Gate · 9-col 7684:1491, new version Oct 23) is a grey panel over the playing
+ * reel on both devices: it counts "one" … "ten", one word at a time, then swings up like the Mixers wedge; sound is
+ * chosen with the toggle on it. Once per visit (session), and again whenever the logo takes you home.
  */
 export function Home() {
-  // Seen earlier in this visit (nav link back home, or a reload): no gate. The logo reopens it.
+  const phone = usePhone();
+  // Seen earlier in this visit (nav link back home, or a reload): no gate. The home wordmark reopens it.
   const gate = !useSyncExternalStore(subscribeGate, () => gateSeen(), () => false);
 
   // The gate always starts silent, even if sound was on earlier in the visit (Amélie, 15 Oct):
@@ -36,96 +35,48 @@ export function Home() {
     if (gate) sound.setMuted(true);
   }, [gate]);
 
-  const choose = (on: boolean) => {
-    if (on) {
-      sound.setMuted(false);
-      sound.unlock();
-    } else sound.setMuted(true);
-    setGateSeen(true);
-  };
-
-  // Keyboard: Enter or Space while the gate is up = sound on (Tab reaches the skip link).
-  useEffect(() => {
-    if (!gate) return;
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.key === "Enter" || e.key === " ") && !(e.target as Element | null)?.closest?.("[data-gate-skip]")) {
-        e.preventDefault();
-        choose(true);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  });
-
-  const pos = gate ? SHAPE.gate : SHAPE.home;
-
   return (
-    // While the gate is up the whole screen is the "sound on" button, the reel strip under the panel included.
-    <main
-      className={`relative h-(--vh) min-h-[700px] overflow-hidden bg-ink ${gate ? "cursor-pointer" : ""}`}
-      onClick={gate ? () => choose(true) : undefined}
-    >
+    <main className="relative h-(--vh) min-h-[700px] overflow-hidden bg-ink phone:min-h-0">
       <HomeReel src={home.reel.src} poster={home.reel.poster} />
 
       <AnimatePresence>
         {!gate && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: DURATION * 0.6 }}>
+          // In as the gate's panel swings up out of the way.
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2, delay: GATE_EXIT }}
+          >
             <NavBar tone="light" />
             <NavSub wordmark={false} tone="light" />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* The shape sits on the bottom edge: anchor it to the bottom so it holds on any screen height. */}
-      <motion.img
-        src="/icons/eleven-shape.svg"
-        alt="Eleven"
-        className="pointer-events-none absolute left-0 z-10 max-w-none"
-        style={{ bottom: 0, transformOrigin: "0 100%" }}
-        initial={false}
-        animate={{
-          x: pos.x,
-          y: -(1024 - pos.y - (285.806 * pos.width) / 1400.008),
-          width: pos.width,
-          rotate: pos.rotate,
-        }}
-        transition={{ duration: DURATION, ease: EASE }}
-      />
+      {/* Desktop: the home wordmark, in with the nav (under the gate it would peek out below the panel's edge).
+          Clicking it brings the sound gate back, from the home only (Amélie, Oct 23, "for now"); the floss logo on the
+          other pages still just goes home. */}
+      {!phone && (
+        <motion.button
+          type="button"
+          aria-label="Eleven, back to the sound gate"
+          onClick={() => setGateSeen(false)}
+          disabled={gate}
+          className="absolute left-margin z-10 block cursor-pointer transition-opacity duration-200 ease-out hover:opacity-50 disabled:pointer-events-none"
+          style={{ bottom: HOME_MARK.bottom }}
+          initial={false}
+          animate={{ opacity: gate ? 0 : 1 }}
+          transition={{ duration: 0.4, delay: gate ? 0 : GATE_EXIT }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={HOME_MARK.src} alt="" width={HOME_MARK.width} height={HOME_MARK.height} className="block max-w-none" />
+        </motion.button>
+      )}
 
       <AnimatePresence>
-        {gate && (
-          <motion.section
-            key="gate"
-            aria-label="Sound"
-            className={`absolute inset-x-0 top-0 z-[5] h-[calc(100%-92px)] bg-aqua`}
-            exit={{ y: "-101%" }}
-            transition={{ duration: DURATION, ease: EASE }}
-          >
-            {/* 9-col grid: the copy block is centred over cols 3 to 7 (766). */}
-            <div className="absolute top-[calc(50%-227px)] left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-8">
-              <p className="t-h4 w-span-5 text-center text-neutral-200 [text-box:trim-both_cap_alphabetic]">
-                {home.gate.line[0]}
-                <br />
-                {home.gate.line[1]}
-              </p>
-              {/* The way in without sound, quiet under the line. The cursor tag steps aside over it. */}
-              <button
-                type="button"
-                data-gate-skip
-                onClick={(e) => {
-                  e.stopPropagation();
-                  choose(false);
-                }}
-                className="t-accent cursor-pointer text-neutral-1000 transition-opacity duration-200 ease-out hover:opacity-50"
-              >
-                {home.gate.skip}
-              </button>
-            </div>
-          </motion.section>
-        )}
+        {gate && <GateLoader key="gate-loader" onDone={enterHome} phone={phone} />}
       </AnimatePresence>
 
-      <AnimatePresence>{gate && <GateCursor key="gate-cursor" label={home.gate.cursor} />}</AnimatePresence>
     </main>
   );
 }

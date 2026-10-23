@@ -10,7 +10,7 @@
       "label": "Archive",
       "href": "/archive",
       "match": "/archive",
-      "color": "yellow"
+      "color": "aqua"
     },
     {
       "label": "Longform",
@@ -28,9 +28,10 @@
       "label": "Contact",
       "href": "/contact",
       "match": "/contact",
-      "color": "aqua"
+      "color": "royal-blue"
     }
   ],
+  "mixersNav": "banner",
   "contact": {
     "title": "Say hi. We’re good listeners. Professionally, even.",
     "people": [

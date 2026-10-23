@@ -29,7 +29,8 @@
       "name": "9 Volt Battery",
       "white": "/media/icons/icon-jeff-payne-battery.webp",
       "black": "/media/icons/icon-jeff-payne-battery-black.webp"
-    }
+    },
+    "aboutIcon": "/media/icons/icon-jeff-payne-airplane-black.png"
   },
   {
     "slug": "aj-murillo",

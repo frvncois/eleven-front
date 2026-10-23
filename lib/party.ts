@@ -11,6 +11,8 @@ let on = false;
 let plays = -1;
 let pick = -1; // V2: which item shows, random but never the same twice in a row
 let size = 1;
+// Where the butterfly that opened the party sits (viewport px), so the party keeps one in the same spot.
+let origin: { x: number; y: number; w: number; h: number } | null = null;
 const KEY = "eleven-party-plays";
 
 export const party = {
@@ -19,6 +21,13 @@ export const party = {
   },
   get plays() {
     return plays;
+  },
+  get origin() {
+    return origin;
+  },
+  /** The butterfly that was pressed: the party opens from it and keeps a butterfly right there. */
+  setOrigin(r: { x: number; y: number; w: number; h: number }) {
+    origin = r;
   },
   /** V2 registers how many items it can show, so each switch-on picks a new random one. */
   setSize(n: number) {

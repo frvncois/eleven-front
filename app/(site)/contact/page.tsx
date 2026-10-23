@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import site from "@/data/site.json";
 import { Chrome } from "@/components/shell/Chrome";
 import { ContactLink } from "@/components/ui/ContactLink";
-import { MiniLink } from "@/components/ui/MiniLink";
-import { CreditsPopover } from "@/components/ui/CreditsPopover";
+import { FooterLinks } from "@/components/ui/FooterLinks";
 import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
+import { ContactMobile } from "@/components/mobile/ContactMobile";
+import { ByDevice } from "@/components/mobile/ByDevice";
 
 export const metadata: Metadata = { title: "Contact" };
 
@@ -16,22 +17,26 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, "")}`;
  * gif in the first columns, Jordan / Adrea / Studio. The block starts at the frame's 22% so it keeps
  * its place on taller screens. Footer © / credits / legal / socials.
  * 9-col grid (Oct 19): title 6 cols, gif 3 cols, Jordan col 4, Adrea col 6, Studio col 8; the footer
- * under them (Credits col 4, Privacy col 6), © on col 2 (col 1 is the floss logo's). LinkedIn and
- * Instagram end on col 7, right-aligned like the nav's About link (Amélie, Oct 19).
+ * under them, © on col 2 (col 1 is the floss logo's).
+ * Footer realigned on V2 · 10 · Contact · 9-col (7684:2720, Oct 22): © col 2, Privacy col 3, Credits
+ * col 4, LinkedIn over Instagram on col 6 (left-aligned), the butterfly on col 8 (no "Click me"
+ * label since Oct 22), out of the bottom-right toggles; the sound toggle stays bottom right.
+ * One bottom line (Amélie, Oct 22): every footer text sits on SOUND / OFF's baseline (23.6 above the
+ * screen bottom; Label/Mini's baseline is 1.8 above its box), LinkedIn and Instagram side by side,
+ * the butterfly chip's bottom on the same line.
  */
 const L = {
   block: "top-[22.17%] inset-x-0",
-  copyright: "bottom-[22px] left-col-2",
-  credits: "bottom-[23px] left-col-4",
-  privacy: "bottom-[23px] left-col-6",
-  linkedin: "bottom-[39px] right-col-7",
-  instagram: "bottom-[23px] right-col-7",
+  butterfly: "bottom-[23.6px] left-col-8",
 };
 
 export default function ContactPage() {
-  const { contact, footer } = site;
+  return <ByDevice desktop={<ContactDesktop />} phone={<ContactMobile />} />;
+}
+
+function ContactDesktop() {
+  const { contact } = site;
   const [jordan, adrea] = contact.people;
-  const social = (label: string) => footer.social.find((x) => x.label === label)!;
   return (
     <main className="relative h-(--vh) overflow-hidden bg-neutral-0">
       <div className={`absolute flex flex-col gap-[82px] ${L.block}`}>
@@ -73,20 +78,13 @@ export default function ContactPage() {
       </div>
 
       <footer>
-        <p className={`t-mini absolute ${L.copyright}`}>{footer.copyright}</p>
-        <MiniLink href={footer.legal[0].href} className={`absolute ${L.privacy}`}>
-          {footer.legal[0].label}
-        </MiniLink>
-        <CreditsPopover label={footer.credits.label} items={footer.credits.items} className={`absolute ${L.credits}`} />
-        <MiniLink href={social("LinkedIn").href} className={`absolute ${L.linkedin}`}>
-          {social("LinkedIn").label}
-        </MiniLink>
-        <MiniLink href={social("Instagram").href} className={`absolute ${L.instagram}`}>
-          {social("Instagram").label}
-        </MiniLink>
+        <FooterLinks />
+        <div className={`fixed z-50 ${L.butterfly}`}>
+          <ToggleButterfly />
+        </div>
       </footer>
 
-      <Chrome toggles={<ToggleButterfly />} />
+      <Chrome />
     </main>
   );
 }

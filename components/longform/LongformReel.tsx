@@ -7,11 +7,11 @@ import { Chrome } from "@/components/shell/Chrome";
 import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { EASE_SWEEP } from "@/lib/motion";
+import { LongformTag } from "./LongformTag";
 
-export type Film = Project & { label: string; color: string };
+/** `position`: object-position of the still when the phone crops it to portrait (data/longform.json). */
+export type Film = Project & { label: string; color: string; position?: string };
 
-// Black legend text on the light brand colours, white on the dark ones (Figma strip-title).
-const DARK = new Set(["purple", "ink", "dark-green", "royal-blue"]);
 const SLIDE_MS = 900;
 
 /**
@@ -100,7 +100,7 @@ export function LongformReel({ films }: { films: Film[] }) {
         ))}
       </div>
 
-      {/* Legend: one square per film; the current one holds its title and hugs it (revisions). */}
+      {/* Legend: one square per film; the current one opens into a tag of client over title (LongformTag). */}
       <nav aria-label="Films" className="absolute top-1/2 left-6 z-10 flex -translate-y-1/2 flex-col items-start">
         {films.map((f, i) => (
           <motion.button
@@ -109,29 +109,12 @@ export function LongformReel({ films }: { films: Film[] }) {
             onClick={() => go(i)}
             aria-label={f.label}
             aria-current={i === index ? "true" : undefined}
-            className="flex h-[25px] items-center overflow-hidden"
+            className="block text-left"
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 + i * 0.04, ease: [0, 0, 0.58, 1] }}
           >
-            <motion.span
-              className="flex h-[25px] items-center overflow-hidden whitespace-nowrap"
-              style={{ background: `var(--color-${f.color})`, color: DARK.has(f.color) ? "#fff" : "#000" }}
-              initial={false}
-              animate={{ width: i === index ? "auto" : 25 }}
-              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-            >
-              {/* The title is in the square from the start (8 px in) and the square opens to hug it, so
-                  it reads as one box revealing its title, not a square plus a colour strip. */}
-              <motion.span
-                className="t-h6 px-2"
-                initial={false}
-                animate={{ opacity: i === index ? 1 : 0 }}
-                transition={{ duration: i === index ? 0.15 : 0.2 }}
-              >
-                {f.label}
-              </motion.span>
-            </motion.span>
+            <LongformTag film={f} open={i === index} size={25} />
           </motion.button>
         ))}
       </nav>
