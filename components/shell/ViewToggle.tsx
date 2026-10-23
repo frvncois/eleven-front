@@ -5,7 +5,7 @@ type Option<V extends string> = { value: V; label: string };
 /**
  * Toggle/View in Nav/Sub: one word next to the sound toggle, in its own grey chip (type and colour from the chip). It
  * names the view you switch to; a click swaps the views and the word. No motion on hover, like every chip (after
- * Seventeen, Amélie Oct 23): the chip just steps one grey darker (globals.css). Both words
+ * no motion): the chip just steps one grey darker (globals.css). Both words
  * share one cell, so the chip keeps its width. Mixer pages and the Archive use it.
  */
 export function ViewToggle<V extends string>({

@@ -190,7 +190,7 @@ export function BallCanvas({
       gl.deleteProgram(prog);
       // Each list → grid toggle mounts a new canvas: release its context instead of waiting for GC, but only once the
       // canvas has really left the page. This cleanup also runs when the effect re-runs on the same canvas (a height
-      // change after mount, React's dev double-mount), and losing the context then left the grid blank (Oct 23).
+      // change after mount, React's dev double-mount), and losing the context then left the grid blank.
       setTimeout(() => {
         if (!el.isConnected) gl.getExtension("WEBGL_lose_context")?.loseContext();
       });

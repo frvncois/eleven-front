@@ -9,7 +9,7 @@ type Card = { slug: string; name: string; bg: string; ink: string; roles: string
 const OPEN_BAND = 110; // how close to the middle of the screen a bar's centre must be to open
 
 /**
- * The About team on a phone, the desktop teammate bar (Figma 7741:7018, Oct 23) with scroll as the hover: eight
+ * The About team on a phone, the desktop teammate bar with scroll as the hover: eight
  * full-width bars, 80 tall and 8 apart, each name centred in Junicode 20 at rest; the bar crossing the middle of the
  * screen rolls its name up and out and its roles in from below (bold caps 12, 12 apart, one line, 0.3 s ease-out),
  * and rolls back as it leaves. Scrolling plays the team like keys: one step note per bar, only with sound on.

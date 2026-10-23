@@ -6,11 +6,11 @@ import { appScale } from "@/lib/device";
 import { prefersReducedMotion } from "@/lib/motion";
 
 /**
- * The 404 (Figma 7770:7071 + its annotation, Oct 23): a giant pink "404" in Neue Haas Bold, bent in the wordmark's
- * perspective, the near side towards the pointer. The pointer at the right edge = the Figma frame (left side 414
+ * The 404: a giant pink "404" in Neue Haas Bold, bent in the wordmark's
+ * perspective, the near side towards the pointer. The pointer at the right edge = the resting shape (left side 414
  * tall, right side 858, on one midline); at the left edge the mirror; in between it eases through flat. Live text
  * mapped onto that quad with one matrix3d (like the mixer Warp). Proportions from the 1440 frame, so the phone gets
- * the same shape at its width; touch drags it the same way, and it rests on the Figma frame.
+ * the same shape at its width; touch drags it the same way, and it settles back on the resting shape.
  */
 const SHAPE = {
   midY: 508 / 1024, // the midline, share of the screen height
@@ -27,7 +27,7 @@ export function Stretch404() {
     const el = box.current;
     const t = text.current;
     if (!el || !t) return;
-    let aim = 1; // 0 = pointer at the left edge, 1 = at the right (the Figma frame)
+    let aim = 1; // 0 = pointer at the left edge, 1 = at the right (the resting shape)
     let at = 1;
     let raf = 0;
     const draw = () => {

@@ -27,7 +27,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, "")}`;
  */
 const L = {
   block: "top-[22.17%] inset-x-0",
-  butterfly: "bottom-4 left-col-8", // the 24 square on the SOUND chip line, bottom 16 (review note 29, Oct 23)
+  butterfly: "bottom-4 left-col-8", // the 24 square on the SOUND chip line, bottom 16
 };
 
 export default function ContactPage() {

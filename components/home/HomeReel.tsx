@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { sound } from "@/lib/sound";
 
 /** Media/Reel: the full-screen reel. On the sound bus, so the gate, mute and overlays control it. */
-export function HomeReel({ src, poster, paused = false }: { src: string; poster: string; paused?: boolean }) {
+export function HomeReel({ src, poster }: { src: string; poster: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -15,12 +15,6 @@ export function HomeReel({ src, poster, paused = false }: { src: string; poster:
     el.play().catch(() => {});
     return off;
   }, []);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (paused) el.pause();
-    else el.play().catch(() => {});
-  }, [paused]);
   return (
     <video
       ref={ref}

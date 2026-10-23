@@ -15,8 +15,8 @@ import { GATE_EXIT } from "@/components/home/GateLoader";
 
 // Pages whose top sits on video: the logo is dimmed to grey there.
 const ON_VIDEO = ["/", "/longform"];
-// The phone ELEVEN is the nav logo: the original ELEVEN, the same drawing as the desktop home wordmark (review note 25,
-// carried to the phone Oct 23; was the stepped eleven-home-v2.svg). 4.9:1, so 107.8 wide at the nav's 22 tall.
+// The phone ELEVEN is the nav logo: the original ELEVEN, the same drawing as the desktop home wordmark. 4.9:1, so
+// 107.8 wide at the nav's 22 tall.
 const WORDMARK = "/icons/eleven-home-original.svg";
 // The phone chip (globals.css `chip`: 24 tall, 12 px bold caps).
 const CHIP = "chip pointer-events-auto";

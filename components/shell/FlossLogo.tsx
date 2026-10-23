@@ -8,7 +8,7 @@ import { prefersReducedMotion } from "@/lib/motion";
  * The floss logo, animated: hover scrubs the hand-drawn Lottie
  * (28 frames, the floss pulls out) forward over 600 ms with an ease-in-out cubic, leaving scrubs it
  * back from wherever it is. Off for reduced motion and touch. It is the Lottie drawing (solid
- * box, "SINCE 1999"), not the line-drawn logo-floss.webp.
+ * box, "SINCE 1999").
  *
  * The Lottie is one white fill with the details (ELEVEN, the swoosh, the text, the drawn lines) cut
  * out as holes. The player renders into a hidden canvas; each frame is copied to the visible one with
@@ -24,7 +24,7 @@ import { prefersReducedMotion } from "@/lib/motion";
 const DURATION = 600;
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
-const SLOT = { w: 106.651 * 0.64, h: 113.346 * 0.64 }; // the webp's slot, 20 % smaller twice (Oct 23, then review note 27)
+const SLOT = { w: 106.651 * 0.64, h: 113.346 * 0.64 }; // the logo's slot, at 64 %
 const SCALE = SLOT.h / 350; // slot height / floss height in the Lottie
 const CANVAS = 500 * SCALE;
 const OFFSET_X = 60 * SCALE;

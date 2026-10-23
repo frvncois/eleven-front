@@ -8,7 +8,7 @@ import { useSound } from "@/lib/sound";
  * so it reads the same on video and on white.
  * The current word is solid, the other dimmed; flipping rolls the solid copy up through a clipped cell.
  * The bars bounce while sound is on and rest as short stubs when it is off. `meter={false}` drops them (the sound
- * gate, Figma 7770:7135).
+ * gate).
  */
 export function SoundToggle({ meter = true }: { meter?: boolean }) {
   const s = useSound();

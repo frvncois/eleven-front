@@ -30,7 +30,7 @@ function AboutDesktop() {
 
       {/* Story + snow globe share one container so the sticker can run through both.
           The second paragraph always starts level with the top of the floss (Nav/Sub,
-          bottom 16 + 72.54 tall = vh − 88.54, the floss at 64 % since Oct 23), the intro (5 lines, 320) sits
+          bottom 16 + 72.54 tall = vh − 88.54, the floss at 64 %), the intro (5 lines, 320) sits
           on top of it, so the padding is vh − 408.54 (≈ 615 on a 1024 screen). The sticker rests at
           120 (held at 12 % ≈ 120 / 1024) and stays until after the snow globe, fading out at its end. */}
       <div className="relative">
@@ -93,7 +93,7 @@ function AboutDesktop() {
           full-width colour bar per person. */}
       <section className="flex h-[1024px] flex-col gap-6 px-margin pt-[120px] pb-16">
         {/* 9-col grid: THIS starts col 1, IS starts col 4, OUR ends col 6, TEAM ends col 9. */}
-        {/* Neue Haas bold caps at 40, the sans of the bars' roles (Amélie, Oct 23; was 12 bold, then briefly Junicode). */}
+        {/* Neue Haas bold caps at 40, the sans of the bars' roles. */}
         <h2 className="grid grid-cols-9 gap-x-gutter font-sans text-[40px] leading-none font-bold uppercase">
           {about.team.label.split(" ").map((w, i) => (
             <span key={w} className={TEAM_WORD_CELLS[i]}>{w}</span>

@@ -14,9 +14,8 @@ import { GATE_EXIT, GateLoader } from "./GateLoader";
 
 // Phone: no big ELEVEN on the home; the nav's wordmark is the logo, the reel has the screen.
 
-// Desktop home wordmark: the original ELEVEN (Figma "shape" 7684:1510, review note 25, Oct 23; replaces the small
-// stepped eleven-home-v2.svg), neutral/200, 1305.6 × 266.5 on the left margin, its foot where the old one stood (22.9).
-// Amélie, Oct 23: 80 % smaller, so 20 % of that size (261.1 × 53.3), same margin and foot.
+// Desktop home wordmark: the original ELEVEN, neutral/200, drawn 1305.6 × 266.5 and shown at 20 % (261.1 × 53.3)
+// on the left margin, its foot 22.9 above the screen's bottom.
 const HOME_MARK = { src: "/icons/eleven-home-original.svg", width: 1305.62 * 0.2, height: 266.536 * 0.2, bottom: 22.87 };
 const enterHome = () => setGateSeen(true); // stable, so the loader never restarts on a re-render
 
@@ -29,7 +28,7 @@ export function Home() {
   const phone = usePhone();
   // Seen earlier in this visit (nav link back home, or a reload): no gate. The home wordmark reopens it.
   const gate = !useSyncExternalStore(subscribeGate, () => gateSeen(), () => false);
-  // The reel just loops: no pause control on the home, desktop or phone (Amélie, Oct 23).
+  // The reel just loops: no pause control on the home, desktop or phone.
 
   // The gate always starts silent, even if sound was on earlier in the visit:
   // the visitor turns it on here, deliberately.
@@ -50,7 +49,7 @@ export function Home() {
             transition={{ duration: 0.2, delay: GATE_EXIT }}
           >
             <NavBar tone="light" />
-            {/* No reel pause chip (review note 26, Oct 23; the phone dock's went too): only SOUND. */}
+            {/* No reel pause chip: only SOUND. */}
             <NavSub wordmark={false} tone="light" />
           </motion.div>
         )}
@@ -77,7 +76,7 @@ export function Home() {
       )}
 
       <AnimatePresence>
-        {/* The reel blurs behind the gate like the page behind the Mixers wedge (review note 24, Oct 23): 10 px, no
+        {/* The reel blurs behind the gate like the page behind the Mixers wedge: 10 px, no
             colour; it clears as the panel swings up. */}
         {gate && (
           <motion.div

@@ -101,7 +101,7 @@ export function GateLoader({ onDone, phone = false }: { onDone: () => void; phon
       className="absolute inset-0 z-20 bg-light-grey"
       style={leaving ? { clipPath: clip, WebkitClipPath: clip } : { clipPath: rest, WebkitClipPath: rest }}
     >
-      {/* The title, then the choice (plain text, no chip on the gate; 16 px on desktop per Figma sound-toggle 7770:7135),
+      {/* The title, then the choice (plain text, no chip on the gate; 16 px on desktop),
           and the aqua hint in H6 8 below it. Phone: the title wraps to three lines, the choice at 176. */}
       <div className="absolute inset-x-0 top-[90px] flex flex-col items-center text-neutral-1000 phone:top-[72px] phone:px-margin">
         <p className="t-h3 text-center phone:text-[20px] phone:leading-[1.1]">

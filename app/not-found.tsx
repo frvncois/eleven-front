@@ -5,7 +5,7 @@ import { Stretch404 } from "@/components/ui/Stretch404";
 export const metadata: Metadata = { title: "Not found" };
 
 /**
- * 404 (Figma 7770:7071): the giant pink "404" bent towards the pointer (Stretch404), "Sorry we lost you." in H2 on
+ * 404: the giant pink "404" bent towards the pointer (Stretch404), "Sorry we lost you." in H2 on
  * its midline over the 0. The nav takes you back.
  */
 export default function NotFound() {

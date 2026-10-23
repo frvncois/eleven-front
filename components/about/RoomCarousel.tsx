@@ -19,7 +19,7 @@ const PHONE_W = Math.round(W * (390 / 1440) * 1.6);
 const PHONE_GAP = 8;
 // Warp: the mixer carousel's bend. Flat at rest and while drifting; speed (drag,
 // throw, sideways swipe) bends the banner into the ELEVEN wordmark taper, the vanishing point on the side it heads to.
-// Phone: the phone mixer strip's gentler values (MixerMobile), over the 390 screen (Oct 23, it was flat on the phone).
+// Phone: the phone mixer strip's gentler values (MixerMobile), over the 390 screen.
 const WARP = { depth: 1, grow: 1.2, full: 22, bendIn: 0.12, bendOut: 0.05 };
 const PHONE_WARP = { depth: 1, grow: 1.3, full: 18, bendIn: 0.12, bendOut: 0.05 };
 

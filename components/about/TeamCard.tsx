@@ -5,7 +5,7 @@ import { sound } from "@/lib/sound";
 type Props = { name: string; slug: string; bg: string; ink: string; roles: string[] };
 
 /**
- * Card/Team/<Name> (Figma "teeammate" 7741:7018, Oct 23): a full-width brand bar, 80 tall, 8 padding, in the person's
+ * Card/Team/<Name>: a full-width brand bar, 80 tall, 8 padding, in the person's
  * colour and ink. At rest the name sits centred in Junicode 40; on hover it rolls up out of the bar and the roles roll
  * in from below, centred, 24 bold caps, 24 apart, no separators (0.3 s ease-out; reduced motion = a plain swap).
  * The person's sound plays. Shared step sounds until Eleven's takes arrive: drop /sounds/<slug>-1.mp3 … -3.mp3 and
