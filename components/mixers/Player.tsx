@@ -9,6 +9,7 @@ import { sound, useSound } from "@/lib/sound";
 import { EASE_DISSOLVE } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 import site from "@/data/site.json";
+import { useDialogFocus } from "@/lib/dialog-focus";
 
 const labels = site.player;
 // Every button in the player is the same small grey chip (CLOSE, + INFO, NEXT and SOUND one size,
@@ -61,11 +62,37 @@ export const captionOf = (f: Project) => splitCaption(f.short ?? f.title, f.clie
 
 export const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
-/** The film's scrub line and time, one look on both players: a 1 px line, the time as "0:12 / 0:30". */
-export function Scrub({ time, duration, onSeek }: { time: number; duration: number; onSeek: (e: React.PointerEvent<HTMLDivElement>) => void }) {
+/**
+ * The film's scrub line and time, one look on both players: a 1 px line, the time as "0:12 / 0:30". A slider for
+ * keyboards too: arrows ±5 s, Page Up / Down ±10 %, Home / End (the player's own previous / next arrows skip it).
+ */
+export function Scrub({ time, duration, onSeek }: { time: number; duration: number; onSeek: (seconds: number) => void }) {
+  const at = (s: number) => onSeek(Math.min(duration, Math.max(0, s)));
+  const onKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const step = { ArrowRight: 5, ArrowUp: 5, ArrowLeft: -5, ArrowDown: -5, PageUp: duration / 10, PageDown: -duration / 10 }[e.key];
+    if (step !== undefined) at(time + step);
+    else if (e.key === "Home") at(0);
+    else if (e.key === "End") at(duration);
+    else return;
+    e.preventDefault();
+  };
   return (
     <>
-      <div onPointerDown={onSeek} className="relative flex h-8 flex-1 cursor-pointer items-center">
+      <div
+        role="slider"
+        tabIndex={0}
+        aria-label="Seek"
+        aria-valuemin={0}
+        aria-valuemax={Math.round(duration)}
+        aria-valuenow={Math.round(time)}
+        aria-valuetext={`${fmt(time)} of ${fmt(duration)}`}
+        onPointerDown={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          at(((e.clientX - r.left) / r.width) * duration);
+        }}
+        onKeyDown={onKey}
+        className="relative flex h-8 flex-1 cursor-pointer items-center"
+      >
         <div className="h-px w-full bg-neutral-700">
           <div className="h-full bg-neutral-300" style={{ width: duration ? `${(time / duration) * 100}%` : 0 }} />
         </div>
@@ -140,6 +167,7 @@ export function Player({ films, index, onIndex, onClose, longform = false }: Pro
     window.__lenis?.stop();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
+      if ((e.target as HTMLElement | null)?.closest?.('[role="slider"]')) return;
       if (e.key === "ArrowRight") onIndex((index! + 1) % films.length);
       if (e.key === "ArrowLeft") onIndex((index! - 1 + films.length) % films.length);
     };
@@ -190,22 +218,24 @@ export function Player({ films, index, onIndex, onClose, longform = false }: Pro
     (playing ? p.pause() : p.play()).catch(() => {});
   }, [playing]);
 
-  const seek = (e: React.PointerEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    const k = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-    if (duration) playerRef.current?.setCurrentTime(k * duration).catch(() => {});
+  const seek = (seconds: number) => {
+    if (duration) playerRef.current?.setCurrentTime(seconds).catch(() => {});
   };
 
   const credits = film ? creditsOf(film) : [];
+  const layer = useRef<HTMLDivElement>(null);
+  useDialogFocus(open, layer);
 
   return (
     <AnimatePresence onExitComplete={() => setInfo(false)}>
       {film && (
         <motion.div
+          ref={layer}
+          tabIndex={-1}
           role="dialog"
           aria-modal="true"
           aria-label={`${film.client}, ${film.short ?? film.title}`}
-          className="fixed inset-0 z-[70] overflow-hidden bg-neutral-1000 text-neutral-300"
+          className="fixed inset-0 z-[70] overflow-hidden outline-none bg-neutral-1000 text-neutral-300"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -229,6 +259,8 @@ export function Player({ films, index, onIndex, onClose, longform = false }: Pro
                     ref={frameRef}
                     src={embedUrl(f.vimeo, muted)}
                     title={f.title}
+                    // Controls are our own (the frame takes no pointer either): keep keyboard focus out of the Vimeo frame.
+                    tabIndex={-1}
                     allow="autoplay; fullscreen; picture-in-picture"
                     // Cover the screen like object-fit: cover, whatever the film's ratio.
                     className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"

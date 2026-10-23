@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { animate, motion, useMotionTemplate, useMotionValue, useReducedMotion } from "framer-motion";
 import { mixers } from "@/lib/content";
 import { sound } from "@/lib/sound";
 import { usePathname } from "next/navigation";
 import { EASE_DISSOLVE, SWING, THEME_INK, themeColor } from "@/lib/motion";
+import { useDialogFocus } from "@/lib/dialog-focus";
 
 // The wedge (in the page accent) runs full width from the top, its lower edge from
 // 179.7 at the left to 581.9 at the right. Names sit in a stair along that edge.
@@ -44,6 +45,8 @@ export function MixersBanner({ open, onClose }: { open: boolean; onClose: () => 
   const accent = themeColor(usePathname());
   const ink = THEME_INK[accent] ?? "#bdbdbd";
   const [mounted, setMounted] = useState(open);
+  const layer = useRef<HTMLDivElement>(null);
+  useDialogFocus(open, layer);
   const [hover, setHover] = useState<string | null>(null);
   const right = useMotionValue(0);
   const left = useMotionValue(0);
@@ -98,7 +101,7 @@ export function MixersBanner({ open, onClose }: { open: boolean; onClose: () => 
 
   if (!mounted) return null;
   return (
-    <div role="dialog" aria-modal="true" aria-label="Mixers" className="fixed inset-0 z-[60]">
+    <div ref={layer} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Mixers" className="fixed inset-0 z-[60] outline-none">
       <motion.button
         type="button"
         aria-label="Close"

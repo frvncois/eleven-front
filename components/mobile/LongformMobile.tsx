@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { Film } from "@/components/longform/LongformReel";
 import { openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
@@ -19,6 +19,8 @@ import { appScale } from "@/lib/device";
  */
 export function LongformMobile({ films }: { films: Film[] }) {
   const [index, setIndex] = useState(0);
+  // Reduced motion: no endless push-in, the still sits at rest.
+  const pushIn = !useReducedMotion();
   const [playing, setPlaying] = useState<number | null>(null);
   const track = useRef<HTMLDivElement>(null);
   // Position in films (fractional) and where it is landing; the loop below draws it.
@@ -129,8 +131,8 @@ export function LongformMobile({ films }: { films: Film[] }) {
               key={i === index ? `on-${f.slug}` : f.slug}
               className="absolute inset-0"
               initial={{ scale: 1 }}
-              animate={i === index ? { scale: [1, 1.06] } : { scale: 1 }}
-              transition={i === index ? { duration: 10, ease: "linear", repeat: Infinity, repeatType: "loop" } : { duration: 0 }}
+              animate={i === index && pushIn ? { scale: [1, 1.06] } : { scale: 1 }}
+              transition={i === index && pushIn ? { duration: 10, ease: "linear", repeat: Infinity, repeatType: "loop" } : { duration: 0 }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

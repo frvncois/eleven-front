@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useMemo } from "react";
 import { LayoutGroup, motion, motionValue, type MotionValue } from "framer-motion";
 import type { Project } from "@/lib/content";
 import { Chrome } from "@/components/shell/Chrome";
@@ -93,7 +93,7 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
         {view === "grid" ? (
           <GridView tiles={tiles} field={field} fromList={fromList} onPlay={(i) => openWithSound(() => setPlaying(i))} paused={playing !== null} />
         ) : (
-          <ListView tiles={tiles} onPlay={(i) => openWithSound(() => setPlaying(i))} />
+          <ListView tiles={tiles} onPlay={(i) => openWithSound(() => setPlaying(i))} paused={playing !== null} />
         )}
       </LayoutGroup>
 
@@ -178,6 +178,11 @@ function GridView({
   // Each tile's position on the flat grid (screen coordinates), written every frame (no re-render).
   const [pos] = useState(() => tiles.map(() => ({ left: motionValue(0), top: motionValue(0) })));
   const drag = useRef<{ x: number; y: number; tx: number; ty: number; moved: boolean } | null>(null);
+  // Read by the scroll listeners: a ref, so opening a film doesn't restart the field (and lose the visitor's place).
+  const pausedRef = useRef(paused);
+  useLayoutEffect(() => {
+    pausedRef.current = paused;
+  });
   const target = useRef({ x: 0, y: 0 });
   const box = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<number | null>(null);
@@ -298,7 +303,7 @@ function GridView({
     raf = requestAnimationFrame(tick);
 
     const onWheel = (e: WheelEvent) => {
-      if (paused) return;
+      if (pausedRef.current) return;
       e.preventDefault();
       const s = appScale();
       // Vertical scroll moves the field up/down, horizontal (trackpad, shift) sideways.
@@ -325,7 +330,7 @@ function GridView({
       window.removeEventListener("pointerup", onUp);
       window.__lenis?.start();
     };
-  }, [tiles, field.w, field.h, pos, paused]);
+  }, [tiles, field.w, field.h, pos]);
 
   // The ball is only drawn: find the project under the pointer by mapping it back to the flat grid.
   const tileAt = (clientX: number, clientY: number) => {
@@ -390,7 +395,7 @@ function GridView({
       <BallCanvas items={items} pos={pos} height={height} radius={BALL_RADIUS} visible={!morphing} hover={hoverRef} label={label} />
       {/* The hovered project's caption, the mixer chips (client over title), laid along its bent bottom edge
           (BallCanvas moves it). */}
-      <div ref={label} aria-live="polite" className="pointer-events-none absolute top-0 left-0 flex origin-top-left flex-col items-start whitespace-nowrap opacity-0 transition-opacity duration-300 ease-out">
+      <div ref={label} aria-hidden className="pointer-events-none absolute top-0 left-0 flex origin-top-left flex-col items-start whitespace-nowrap opacity-0 transition-opacity duration-300 ease-out">
         {hover !== null && (
           <>
             <span className="chip-client">{tiles[hover].client}</span>
@@ -406,8 +411,19 @@ function GridView({
 
 type Row = { left: MotionValue<number>; top: MotionValue<number>; width: MotionValue<number>; fade: MotionValue<number> };
 
-function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => void }) {
+function ListView({ tiles, onPlay, paused }: { tiles: Tile[]; onPlay: (i: number) => void; paused: boolean }) {
   const [middle, setMiddle] = useState(0);
+  // Wheel, keys and touch reach the window: ignore them while a film is open on top.
+  const pausedRef = useRef(paused);
+  useLayoutEffect(() => {
+    pausedRef.current = paused;
+  });
+  // Only the middle project is in the tab order; arrow keys step the list and focus follows the middle.
+  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  useEffect(() => {
+    const active = document.activeElement;
+    if (active && buttons.current.includes(active as HTMLButtonElement)) buttons.current[middle]?.focus({ preventScroll: true });
+  }, [middle]);
   // One set of motion values per row, written every frame from the scroll position (no re-render).
   const [rows] = useState<Row[]>(() =>
     tiles.map(() => ({
@@ -483,16 +499,20 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
       settle = window.setTimeout(() => (target = Math.round(target)), 160);
     };
     const onWheel = (e: WheelEvent) => {
+      if (pausedRef.current) return;
       e.preventDefault();
       target += e.deltaY / appScale() / STEP;
       scheduleSettle();
     };
     const onKey = (e: KeyboardEvent) => {
+      if (pausedRef.current) return;
       if (e.key === "ArrowDown") target = Math.round(target) + 1;
       if (e.key === "ArrowUp") target = Math.round(target) - 1;
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") e.preventDefault();
     };
     const onTouchStart = (e: TouchEvent) => (touchY = e.touches[0].clientY);
     const onTouchMove = (e: TouchEvent) => {
+      if (pausedRef.current) return;
       const y = e.touches[0].clientY;
       target += (touchY - y) / appScale() / STEP;
       touchY = y;
@@ -521,7 +541,7 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
           on the left margin under MIXERS, mid-window; only the text changes as projects pass. No counter (the
           phone has none). */}
       <div
-        aria-live="polite"
+        aria-hidden
         className="pointer-events-none absolute top-1/2 left-margin z-20 flex max-w-[calc(3*var(--grid-col)+2*var(--spacing-gutter))] -translate-y-1/2 flex-col items-start"
       >
         <span className="chip-client">{tiles[middle]?.client}</span>
@@ -535,7 +555,11 @@ function ListView({ tiles, onPlay }: { tiles: Tile[]; onPlay: (i: number) => voi
               layoutId={t.slug}
               transition={MORPH}
               type="button"
+              ref={(el) => {
+                buttons.current[i] = el;
+              }}
               data-cursor="play"
+              tabIndex={i === middle ? 0 : -1}
               onClick={() => onPlay(i)}
               className="absolute block cursor-pointer"
               style={{ left: r.left, top: r.top, width: r.width, opacity: r.fade }}

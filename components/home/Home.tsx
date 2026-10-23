@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import home from "@/data/home.json";
 import { sound } from "@/lib/sound";
@@ -8,7 +8,9 @@ import { NavBar } from "@/components/shell/NavBar";
 import { NavSub } from "@/components/shell/NavSub";
 import { gateSeen, setGateSeen, subscribeGate } from "@/lib/gate";
 import { usePhone } from "@/lib/device";
+import { useDockToggle } from "@/components/mobile/dock";
 import { HomeReel } from "./HomeReel";
+import { ReelToggle } from "./ReelToggle";
 import { GATE_EXIT, GateLoader } from "./GateLoader";
 
 
@@ -28,6 +30,10 @@ export function Home() {
   const phone = usePhone();
   // Seen earlier in this visit (nav link back home, or a reload): no gate. The home wordmark reopens it.
   const gate = !useSyncExternalStore(subscribeGate, () => gateSeen(), () => false);
+  // The reel loops forever: a pause control for anyone who wants it still (shown once the gate is gone).
+  const [paused, setPaused] = useState(false);
+  const reelToggle = <ReelToggle paused={paused} onChange={setPaused} />;
+  useDockToggle(phone && !gate ? reelToggle : null);
 
   // The gate always starts silent, even if sound was on earlier in the visit:
   // the visitor turns it on here, deliberately.
@@ -37,7 +43,7 @@ export function Home() {
 
   return (
     <main className="relative h-(--vh) min-h-[700px] overflow-hidden bg-ink phone:min-h-0">
-      <HomeReel src={home.reel.src} poster={home.reel.poster} />
+      <HomeReel src={home.reel.src} poster={home.reel.poster} paused={paused} />
 
       <AnimatePresence>
         {!gate && (
@@ -48,7 +54,7 @@ export function Home() {
             transition={{ duration: 0.2, delay: GATE_EXIT }}
           >
             <NavBar tone="light" />
-            <NavSub wordmark={false} tone="light" />
+            <NavSub wordmark={false} tone="light" toggles={reelToggle} />
           </motion.div>
         )}
       </AnimatePresence>

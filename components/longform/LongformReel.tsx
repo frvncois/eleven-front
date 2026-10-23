@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { Project } from "@/lib/content";
 import { Chrome } from "@/components/shell/Chrome";
 import { Player, openWithSound } from "@/components/mixers/Player";
@@ -24,6 +24,8 @@ const SLIDE_MS = 900;
  */
 export function LongformReel({ films }: { films: Film[] }) {
   const [index, setIndex] = useState(0);
+  // Reduced motion: no endless push-in, the still sits at rest.
+  const pushIn = !useReducedMotion();
   const [playing, setPlaying] = useState<number | null>(null);
   const lock = useRef(false);
 
@@ -89,8 +91,8 @@ export function LongformReel({ films }: { films: Film[] }) {
               key={i === index ? `on-${f.slug}` : f.slug}
               className="absolute inset-0"
               initial={{ scale: 1 }}
-              animate={i === index ? { scale: [1, 1.06] } : { scale: 1 }}
-              transition={i === index ? { duration: 10, ease: "linear", repeat: Infinity, repeatType: "loop" } : { duration: 0 }}
+              animate={i === index && pushIn ? { scale: [1, 1.06] } : { scale: 1 }}
+              transition={i === index && pushIn ? { duration: 10, ease: "linear", repeat: Infinity, repeatType: "loop" } : { duration: 0 }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={f.poster ?? ""} alt="" className="absolute inset-0 size-full object-cover" loading={i < 2 ? "eager" : "lazy"} />

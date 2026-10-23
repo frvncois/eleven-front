@@ -10,6 +10,7 @@ import { SoundToggle } from "@/components/shell/SoundToggle";
 import { Scrub, captionOf, creditsOf, embedUrl } from "@/components/mixers/Player";
 import site from "@/data/site.json";
 import { useDockCovered } from "./dock";
+import { useDialogFocus } from "@/lib/dialog-focus";
 
 type Props = {
   films: Project[];
@@ -51,6 +52,8 @@ const CHIP = "chip cursor-pointer";
  */
 export function PlayerMobile({ films, index, onIndex, onClose, longform = false }: Props) {
   const open = index !== null;
+  const layer = useRef<HTMLDivElement>(null);
+  useDialogFocus(open, layer);
   const film = open ? films[index] : null;
   const s = useSound();
   const muted = !(s.unlocked && !s.muted);
@@ -143,10 +146,8 @@ export function PlayerMobile({ films, index, onIndex, onClose, longform = false 
     else frameRef.current?.requestFullscreen?.().catch(() => {});
   };
 
-  const seek = (e: React.PointerEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    const k = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-    if (duration) playerRef.current?.setCurrentTime(k * duration).catch(() => {});
+  const seek = (seconds: number) => {
+    if (duration) playerRef.current?.setCurrentTime(seconds).catch(() => {});
   };
 
   const prev = index !== null ? films[(index - 1 + films.length) % films.length] : null;
@@ -157,10 +158,12 @@ export function PlayerMobile({ films, index, onIndex, onClose, longform = false 
     <AnimatePresence onExitComplete={() => setInfo(false)}>
       {film && (
         <motion.div
+          ref={layer}
+          tabIndex={-1}
           role="dialog"
           aria-modal="true"
           aria-label={`${film.client}, ${title(film)}`}
-          className="fixed inset-0 z-[90] overflow-hidden bg-neutral-1000 text-neutral-300"
+          className="fixed inset-0 z-[90] overflow-hidden outline-none bg-neutral-1000 text-neutral-300"
           // Any touch in the player is a gesture iOS accepts: use it to give the film its sound.
           onPointerUpCapture={() => {
             if (silent && playerRef.current) unmute(playerRef.current);
@@ -193,6 +196,8 @@ export function PlayerMobile({ films, index, onIndex, onClose, longform = false 
                     ref={frameRef}
                     src={embedUrl(f.vimeo, true)}
                     title={f.title}
+                    // Controls are our own (the frame takes no pointer either): keep keyboard focus out of the Vimeo frame.
+                    tabIndex={-1}
                     allow="autoplay; fullscreen; picture-in-picture"
                     className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                     style={landscape ? { width: "max(390px, calc(var(--vh) * 16 / 9))", height: `max(var(--vh), ${FILM_H}px)` } : { width: 390, height: FILM_H }}

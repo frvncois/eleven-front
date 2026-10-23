@@ -477,7 +477,12 @@ function List({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void })
             tabIndex={c === 1 ? 0 : -1}
             aria-hidden={c === 1 ? undefined : true}
             aria-label={`${p.client}, ${p.short ?? p.label}`}
-            onKeyDown={(e) => e.key === "Enter" && cb.current.onOpen(i)}
+            // Taps go through the list's own gesture code (no onClick), so keyboards open a row here: Enter or Space.
+            onKeyDown={(e) => {
+              if (e.key !== "Enter" && e.key !== " ") return;
+              e.preventDefault();
+              cb.current.onOpen(i);
+            }}
             className="absolute top-0 right-0 block origin-top-right overflow-hidden bg-neutral-100 will-change-transform"
             style={{ width: WIDE_W, height: WIDE_W * R169 }}
           >

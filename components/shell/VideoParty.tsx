@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { SWING } from "@/lib/motion";
 import party from "@/data/party.json";
@@ -9,6 +9,7 @@ import { sound } from "@/lib/sound";
 import { usePhone, appScale } from "@/lib/device";
 import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
 import site from "@/data/site.json";
+import { useDialogFocus } from "@/lib/dialog-focus";
 
 const ITEMS = party.items;
 
@@ -28,6 +29,9 @@ export function VideoParty({ on }: { on: boolean }) {
   const k = typeof document !== "undefined" ? appScale() : 1;
   const b = o ? { left: o.x / k, top: o.y / k, width: o.w / k, height: o.h / k } : null;
   const origin = o ? `${o.x + o.w / 2}px ${o.y + o.h / 2}px` : "97% 97%";
+
+  const layer = useRef<HTMLDivElement>(null);
+  useDialogFocus(on, layer);
 
   useEffect(() => partyStore.setSize(ITEMS.length), []);
 
@@ -60,10 +64,13 @@ export function VideoParty({ on }: { on: boolean }) {
       {on && item && (
         <motion.div
           key={pick}
+          ref={layer}
+          tabIndex={-1}
           role="dialog"
+          aria-modal="true"
           aria-label="Easter egg"
           // Over everything (desktop navs z-50, phone dock z-80, menu z-79): only its own butterfly and CLOSE show.
-          className="fixed inset-0 z-[96] overflow-hidden bg-neutral-1000"
+          className="fixed inset-0 z-[96] overflow-hidden bg-neutral-1000 outline-none"
           initial={{ clipPath: `circle(0% at ${origin})` }}
           animate={{ clipPath: `circle(160% at ${origin})` }}
           exit={{ opacity: 0 }}
