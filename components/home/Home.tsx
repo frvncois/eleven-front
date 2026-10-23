@@ -8,15 +8,13 @@ import { NavBar } from "@/components/shell/NavBar";
 import { NavSub } from "@/components/shell/NavSub";
 import { gateSeen, setGateSeen, subscribeGate } from "@/lib/gate";
 import { usePhone } from "@/lib/device";
+import { FlossLogo } from "@/components/shell/FlossLogo";
 import { HomeReel } from "./HomeReel";
 import { GATE_EXIT, GateLoader } from "./GateLoader";
 
 
 // Phone: no big ELEVEN on the home; the nav's wordmark is the logo, the reel has the screen.
 
-// Desktop home wordmark: the original ELEVEN, neutral/200, drawn 1305.6 × 266.5 and shown at 20 % (261.1 × 53.3)
-// on the left margin, its foot 22.9 above the screen's bottom.
-const HOME_MARK = { src: "/icons/eleven-home-original.svg", width: 1305.62 * 0.2, height: 266.536 * 0.2, bottom: 22.87 };
 const enterHome = () => setGateSeen(true); // stable, so the loader never restarts on a re-render
 
 /**
@@ -26,7 +24,7 @@ const enterHome = () => setGateSeen(true); // stable, so the loader never restar
  */
 export function Home() {
   const phone = usePhone();
-  // Seen earlier in this visit (nav link back home, or a reload): no gate. The home wordmark reopens it.
+  // Seen earlier in this visit (nav link back home, or a reload): no gate. The floss logo reopens it.
   const gate = !useSyncExternalStore(subscribeGate, () => gateSeen(), () => false);
   // The reel just loops: no pause control on the home, desktop or phone.
 
@@ -55,23 +53,21 @@ export function Home() {
         )}
       </AnimatePresence>
 
-      {/* Desktop: the home wordmark, in with the nav (under the gate it would peek out below the panel's edge).
-          Clicking it brings the sound gate back, from the home only; the floss logo on the
-          other pages still just goes home. */}
+      {/* Desktop: the floss logo, the same as on every page (Nav/Sub spot, dimmed over the reel), in with the nav
+          (under the gate it would peek out below the panel's edge). Here it brings the sound gate back; on the other
+          pages it just goes home. */}
       {!phone && (
         <motion.button
           type="button"
           aria-label="Eleven, back to the sound gate"
           onClick={() => setGateSeen(false)}
           disabled={gate}
-          className="absolute left-margin z-10 block cursor-pointer transition-opacity duration-200 ease-out hover:opacity-50 disabled:pointer-events-none"
-          style={{ bottom: HOME_MARK.bottom }}
+          className="absolute bottom-4 left-margin z-10 block cursor-pointer transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90 disabled:pointer-events-none"
           initial={false}
           animate={{ opacity: gate ? 0 : 1 }}
           transition={{ duration: 0.4, delay: gate ? 0 : GATE_EXIT }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={HOME_MARK.src} alt="" width={HOME_MARK.width} height={HOME_MARK.height} className="block max-w-none" />
+          <FlossLogo tone="light" />
         </motion.button>
       )}
 
