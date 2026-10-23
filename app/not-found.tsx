@@ -4,11 +4,7 @@ import { Chip } from "@/components/ui/Chip";
 
 export const metadata: Metadata = { title: "Not found" };
 
-/**
- * 404. Only V2 has one in Figma (7345:1673, still wireframe copy + the dropped sound-shop samples);
- * this is the V1 adaptation: V1 nav, the centred Display/Big "404", one line, one chip home.
- * Copy is a proposal, to confirm with Amélie.
- */
+/** 404: the centred "404", one line, one chip home. */
 export default function NotFound() {
   return (
     <main className="relative flex h-[max(var(--vh),1024px)] flex-col items-center justify-center gap-5 bg-neutral-0 text-center">

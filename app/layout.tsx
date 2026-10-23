@@ -10,11 +10,14 @@ import { ClickSound } from "@/components/shell/ClickSound";
 import { PartyMode } from "@/components/shell/PartyMode";
 import { PhoneShell } from "@/components/mobile/PhoneShell";
 import { ReviewNotes } from "@/components/dev/ReviewNotes";
+import { INDEXABLE, SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: { default: "Eleven", template: "%s · Eleven" },
-  description: "Eleven, audio post-production in West LA. Website prototype.",
-  robots: { index: false, follow: false, noarchive: true },
+  description: "Eleven, audio post-production in West LA since 1999: mixing and sound design for advertising and longform.",
+  openGraph: { siteName: "Eleven", type: "website", locale: "en_US" },
+  robots: INDEXABLE ? { index: true, follow: true } : { index: false, follow: false, noarchive: true },
 };
 
 export const viewport: Viewport = {
@@ -24,7 +27,7 @@ export const viewport: Viewport = {
 };
 
 /**
- * The mockup is drawn at 1440. Zoom the stage to the viewport width and expose
+ * The desktop design is drawn at 1440. Zoom the stage to the viewport width and expose
  * the viewport height in design units (--vh) before first paint, so nothing
  * jumps. The width is the window minus the scrollbar gutter (html reserves it on every page, see
  * globals.css; reserved here too so it does not wait for the stylesheet). The scrollbar is measured
