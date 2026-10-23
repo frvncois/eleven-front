@@ -12,18 +12,22 @@ import { SoundToggle } from "@/components/shell/SoundToggle";
 import { useDock } from "./dock";
 import { MenuCard } from "./MenuCard";
 import { GATE_EXIT } from "@/components/home/GateLoader";
+import { FlossLogo, SLOT } from "@/components/shell/FlossLogo";
 
 // Pages whose top sits on video: the logo is dimmed to grey there.
 const ON_VIDEO = ["/", "/longform"];
 // The phone ELEVEN is the nav logo: the original ELEVEN, the same drawing as the desktop home wordmark. 4.9:1, so
 // 107.8 wide at the nav's 22 tall.
 const WORDMARK = "/icons/eleven-home-original.svg";
+// On the home the logo is the floss instead, like the desktop home: 40 tall, its foot on the wordmark's line.
+const FLOSS_H = 40;
+const FLOSS_K = FLOSS_H / SLOT.h;
 // The phone chip (globals.css `chip`: 24 tall, 12 px bold caps).
 const CHIP = "chip pointer-events-auto";
 
 /**
  * The phone dock, mounted once for the whole visit so it
- * never jumps between pages. Top: the ELEVEN wordmark on the left (straight to the home, never back to the sound gate)
+ * never jumps between pages. Top: the ELEVEN wordmark on the left, the floss on the home (straight to the home, never back to the sound gate)
  * and the page's own control as a chip on the right (GRID / LIST on Mixer and Archive, the butterfly
  * on Contact). Bottom, 16 from the edges: SOUND as a chip on the left, MENU on the right, which opens
  * the menu card (components/mobile/MenuCard) and becomes CLOSE. The chips read the same on video and
@@ -63,18 +67,32 @@ export function PhoneShell() {
             {/* Top: the ELEVEN wordmark left, 52.4 × 22,
                 its bottom 2 above the page's chip's bottom; the chip right, 20.5 from the top. */}
             <div className="relative flex h-[44.5px] items-end justify-between px-margin">
-              <Link
-                href="/"
-                aria-label="Eleven, home"
-                className={`pointer-events-auto mb-[2px] block h-[22px] w-[107.8px] transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90 ${onVideo ? "text-neutral-300" : "text-neutral-1000"}`}
-              >
-                {/* The phone wordmark drawing as a mask, so it takes the nav's colour (black, grey on video). */}
-                <span
-                  aria-hidden
-                  className="block size-full bg-current"
-                  style={{ maskImage: `url(${WORDMARK})`, WebkitMaskImage: `url(${WORDMARK})`, maskSize: "100% 100%", WebkitMaskSize: "100% 100%" }}
-                />
-              </Link>
+              {pathname === "/" ? (
+                <Link
+                  href="/"
+                  aria-label="Eleven, home"
+                  className="pointer-events-auto mb-[2px] block transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90"
+                  style={{ width: SLOT.w * FLOSS_K, height: FLOSS_H }}
+                >
+                  {/* Drawn at its desktop size (sharp), scaled down from the top-left corner. */}
+                  <span className="block origin-top-left" style={{ transform: `scale(${FLOSS_K})` }}>
+                    <FlossLogo tone="light" />
+                  </span>
+                </Link>
+              ) : (
+                <Link
+                  href="/"
+                  aria-label="Eleven, home"
+                  className={`pointer-events-auto mb-[2px] block h-[22px] w-[107.8px] transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90 ${onVideo ? "text-neutral-300" : "text-neutral-1000"}`}
+                >
+                  {/* The phone wordmark drawing as a mask, so it takes the nav's colour (black, grey on video). */}
+                  <span
+                    aria-hidden
+                    className="block size-full bg-current"
+                    style={{ maskImage: `url(${WORDMARK})`, WebkitMaskImage: `url(${WORDMARK})`, maskSize: "100% 100%", WebkitMaskSize: "100% 100%" }}
+                  />
+                </Link>
+              )}
               <AnimatePresence>
                 {toggle && !menu && (
                   <motion.div key="toggle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={PHONE_MOTION.reveal}>

@@ -24,7 +24,7 @@ import { prefersReducedMotion } from "@/lib/motion";
 const DURATION = 600;
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
-const SLOT = { w: 106.651 * 0.64, h: 113.346 * 0.64 }; // the logo's slot, at 64 %
+export const SLOT = { w: 106.651 * 0.64, h: 113.346 * 0.64 }; // the logo's slot, at 64 %
 const SCALE = SLOT.h / 350; // slot height / floss height in the Lottie
 const CANVAS = 500 * SCALE;
 const OFFSET_X = 60 * SCALE;
