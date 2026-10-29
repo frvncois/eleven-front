@@ -3,7 +3,7 @@
     "line": ["We’re a sound studio.", "Of course this site makes noise."],
     "cursor": "Click anywhere to enable sound",
     "skip": "Continue without sound",
-    "hint": "Activate the sound for a better experience.",
+    "hint": "Click “on” for noise.",
     "tap": "Tap anywhere\nto enable sound"
   },
   "reel": {

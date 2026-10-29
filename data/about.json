@@ -1,20 +1,20 @@
 {
   "story": {
-    "intro": "Founded in 1999 by Jeff Payne, Eleven is a boutique audio post-production studio in West Los Angeles. Its work covers mix, sound design, voiceover, ADR, music and voice casting. The name is a nod to Spinal Tap, the studio that goes one louder.",
+    "intro": "Founded by Jeff Payne in 1999 (yup, the century before this one), Eleven is a boutique audio post-production studio in West Los Angeles, CA. Our thing is mix, sound design, voiceover, ADR, music, voice casting as well as being known as good hangs. The name Eleven… let’s just say it’s an homage to Spinal Tap. Not familiar? Stop by Google.",
     "paragraphs": [
       {
-        "text": "In 2022, after 24 years in Santa Monica, Jeff and partner Jordan Meltzer bought a building in West LA and built three new studios from scratch.{01} AJ Murillo has since joined them as a partner.",
+        "text": "In 2022, after 24 years in Santa Monica, Jeff and partner Jordan Meltzer bought a building in West LA and built three brand spanking new studios from scratch.{01} The design vision for the facility was that it feel like a fine 5-star hotel but without the beds. Cuz that would be weird.",
         "note": {
           "n": "01",
-          "text": " The original plan was America’s largest Hot Dog-On-A-Stick franchise. Legal squabbles killed the dream, so we settled for three primo studios."
+          "text": " The original plan was to build and open America’s largest Hot Dog-On-A-Stick franchise. Legal squabbles arose with the HDOAS overlords, so we settled for 3 primo studios."
         },
         "width": 1147
       },
       {
-        "text": "More than 100 brands work with Eleven, including Nike, Apple, Adidas, Uber Eats, Lexus and Verizon.{02} We take sound very seriously. Everything else, we’re still working on.",
+        "text": "Over the years we’ve worked on just about every brand known in the vast ad industry universe.{02} We take sound very seriously. Everything else, well, we’re still working on.",
         "note": {
           "n": "02",
-          "text": "Yes, we know. Bragging. Marketing made us put it here."
+          "text": "Yes, we know. Bragging. Those marketing tools made us put it here."
         },
         "width": 922
       }
@@ -43,23 +43,23 @@
       ],
       [
         "Voice Casting",
-        "Choosing who talks for each character"
+        "We find people who talk good on a microphone"
       ],
       [
         "Mix",
-        "Making all the sounds not too loud, not too quiet"
+        "Making all the sounds not too loud, not too quiet, but juuuust right"
       ],
       [
         "Music",
-        "The songs"
+        "Dooo Wapaa Dooodoo"
       ],
       [
         "ADR",
-        "Redoing the take, the first one was bad."
+        "Redoing the on camera take, the original one was… meh"
       ],
       [
         "VO",
-        "Someone talking, but you can’t see them"
+        "We record someone talking, but you can’t see them"
       ]
     ]
   },
@@ -184,8 +184,8 @@
   },
   "contact": {
     "title": "Is it time now to work together?",
-    "line": "That would be nice.",
-    "aside": "(we even have snacks)",
+    "line": "That would be swell.",
+    "aside": "(we’ll bring the artisanal snacks)",
     "cursor": "contact us",
     "href": "/contact"
   }

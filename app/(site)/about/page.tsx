@@ -30,8 +30,8 @@ function AboutDesktop() {
 
       {/* Story + snow globe share one container so the sticker can run through both.
           The second paragraph always starts level with the top of the floss (Nav/Sub,
-          bottom 16 + 72.54 tall = vh − 88.54, the floss at 64 %), the intro (5 lines, 320) sits
-          on top of it, so the padding is vh − 408.54 (≈ 615 on a 1024 screen). The sticker rests at
+          bottom 16 + 72.54 tall = vh − 88.54, the floss at 64 %), the intro (7 lines, 448) sits
+          on top of it, so the padding is vh − 536.54 (≈ 487 on a 1024 screen). The sticker rests at
           120 (held at 12 % ≈ 120 / 1024) and stays until after the snow globe, fading out at its end. */}
       <div className="relative">
         {/* 9-col grid: the sticker starts on col 3. */}
@@ -39,7 +39,7 @@ function AboutDesktop() {
         {/* 9-col grid: text on the 24 margin, the notes 1 col wide, paragraph 1 from col 3, paragraph 2 from col 4, both to 1416.
             Each first line is indented one column step (indent-col), so it starts on the next column:
             intro col 2, paragraph 1 col 4, paragraph 2 col 5. */}
-        <section className="relative flex flex-col px-margin pt-[calc(var(--vh)-408.54px)]">
+        <section className="relative flex flex-col px-margin pt-[calc(var(--vh)-536.54px)]">
           <div className="relative flex w-full flex-col items-end">
             <p className="t-h2 indent-col w-full">{story.intro}</p>
             {story.paragraphs.map((p, i) => (
