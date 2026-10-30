@@ -78,7 +78,7 @@ export function AboutMobile() {
         </div>
       </div>
 
-      {/* Services: the label, then each service as its name (condensed serif caps) over its note, all centred (Figma Mockup V3, 03 · Phone · About). */}
+      {/* Services: the label, then each service as its name (condensed serif caps) over its note, all centred. */}
       <section className="border-t border-neutral-1000 px-margin pt-margin pb-20">
         <h2 className="t-eyebrow pb-8 text-center">{services.label}</h2>
         <ul className="flex flex-col">

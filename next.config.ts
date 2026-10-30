@@ -38,14 +38,14 @@ const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || ".next",
   // The studio root (../../..) has its own package.json; keep Turbopack scoped here.
   turbopack: { root: path.resolve(__dirname) },
-  // Media is pre-sized WebP/MP4 (scripts/build_data.py): no runtime image optimisation.
+  // Media in public/ is pre-sized WebP/MP4: no runtime image optimisation.
   images: { unoptimized: true },
   // Keep the dev badge out of the bottom-left wordmark.
   devIndicators: false,
   // Phone review on the same Wi-Fi (http://<this Mac's IP>:3700): Next blocks dev assets for other hosts otherwise.
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "172.20.*.*"],
   // Security headers everywhere; until launch every response, redirects included, is also noindex (lib/site.ts).
-  // The page was /privacy until Oct 23 2026.
+  // The page used to be /privacy.
   async redirects() {
     return [{ source: "/privacy", destination: "/legal", permanent: true }];
   },

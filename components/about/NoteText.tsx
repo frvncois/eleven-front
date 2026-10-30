@@ -19,10 +19,19 @@ export function NoteText({ text, photo }: { text: string; photo?: Photo }) {
         i % 2 ? (
           <span
             key={i}
+            role="button"
+            tabIndex={0}
+            aria-expanded={open}
             className="cursor-pointer underline decoration-dotted underline-offset-[1px]"
             onPointerEnter={(e) => e.pointerType === "mouse" && setOpen(true)}
             onPointerLeave={(e) => e.pointerType === "mouse" && setOpen(false)}
             onClick={() => setOpen((v) => !v)}
+            onKeyDown={(e) => {
+              if (e.key !== "Enter" && e.key !== " ") return;
+              e.preventDefault();
+              setOpen((v) => !v);
+            }}
+            onBlur={() => setOpen(false)}
           >
             {part}
           </span>

@@ -14,7 +14,7 @@ type Cue = { files: string[]; volume: number; sequence?: boolean; placeholder: (
 
 // UI sound cues. `files`: takes from public/sounds, a random take each time (never twice in a row),
 // or played in order when `sequence` is set. A cue with no files plays its synthesized fallback (`placeholder`).
-// Eleven's own sounds (Jordan, Oct 2026) in public/sounds/eleven.
+// Eleven's own sounds, in public/sounds/eleven.
 const E = (n: string) => `/sounds/eleven/${n}.mp3`
 const takes = (name: string, n: number) => Array.from({ length: n }, (_, i) => E(`${name}-${i + 1}`))
 const CUES = {
