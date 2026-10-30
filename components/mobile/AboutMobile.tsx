@@ -4,6 +4,8 @@ import team from "@/data/team.json";
 import { RoomCarousel } from "@/components/about/RoomCarousel";
 import { StorySticker } from "@/components/about/StorySticker";
 import { NoteNumber, StoryText } from "@/components/about/NoteNumber";
+import { NoteText } from "@/components/about/NoteText";
+import { ServiceText } from "@/components/about/ServiceText";
 import { TeamBarsMobile } from "./TeamBarsMobile";
 
 const nameOf = (slug: string) => team.find((p) => p.slug === slug)?.name ?? slug;
@@ -37,7 +39,7 @@ export function AboutMobile() {
       <div className="relative">
         {/* The sticker at 60 %, resting in the intro's first-line indent (col 1), held at 14 % of the
             screen and riding over the story like desktop. */}
-        <StorySticker src={story.sticker.src} width={72} height={43} top={170} left={16} hold="14%" />
+        <StorySticker src={story.sticker.src} width={72} height={31} top={170} left={16} hold="14%" />
         {/* Top padding 324. */}
         <section className="flex flex-col px-margin pt-[324px]">
           <p className="font-serif text-[28px] leading-none" style={block(0)}>
@@ -52,7 +54,9 @@ export function AboutMobile() {
             {story.paragraphs.map((p) => (
               <aside key={p.note.n} className="t-body-sm flex w-span-3 gap-2">
                 <NoteNumber n={p.note.n} className="shrink-0" />
-                <span>{p.note.text}</span>
+                <span>
+                  <NoteText text={p.note.text} photo={"photo" in p.note ? p.note.photo : undefined} />
+                </span>
               </aside>
             ))}
           </div>
@@ -74,14 +78,16 @@ export function AboutMobile() {
         </div>
       </div>
 
-      {/* Services: the label, then each service as its name (condensed serif caps) over its note, right-aligned. */}
+      {/* Services: the label, then each service as its name (condensed serif caps) over its note, all centred (Figma Mockup V3, 03 · Phone · About). */}
       <section className="border-t border-neutral-1000 px-margin pt-margin pb-20">
-        <h2 className="t-eyebrow pb-8">{services.label}</h2>
+        <h2 className="t-eyebrow pb-8 text-center">{services.label}</h2>
         <ul className="flex flex-col">
           {services.items.map(([name, note], i) => (
-            <li key={name} className={`flex flex-col gap-3 py-4 ${i < services.items.length - 1 ? "border-b border-neutral-1000" : ""}`}>
+            <li key={name} className={`flex flex-col items-center gap-3 py-4 text-center ${i < services.items.length - 1 ? "border-b border-neutral-1000" : ""}`}>
               <span className="font-serif text-[20px] leading-none uppercase [font-stretch:87.5%]">{name}</span>
-              <span className="ml-auto w-span-4 text-right font-sans text-[16px] leading-[1.15] font-bold text-pretty">{note}</span>
+              <span className="font-sans text-[16px] leading-[1.15] font-bold text-balance">
+                <ServiceText text={note} />
+              </span>
             </li>
           ))}
         </ul>

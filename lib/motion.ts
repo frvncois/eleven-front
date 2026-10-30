@@ -43,6 +43,9 @@ export function themeColor(path: string) {
   return SWEEP_COLORS[best];
 }
 
+/** The Mixers wedge's colour: the page accent, except on the home (grey), where it wears Mixers red like the phone menu's drawer. */
+export const wedgeColor = (path: string) => (themeColor(path) === SWEEP_COLORS["/"] ? SWEEP_COLORS["/mixers"] : themeColor(path));
+
 /** Text that reads on each theme colour: black on the light ones (pink, aqua, yellow, light grey), neutral/300 grey on the rest (no white text anywhere). */
 export const THEME_INK: Record<string, string> = {
   "#ff7fe7": "#000000",

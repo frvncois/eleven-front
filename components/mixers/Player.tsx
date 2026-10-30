@@ -40,14 +40,13 @@ export function embedUrl(vimeo: string, muted: boolean) {
 
 const MIXER_TBC = "Mixer to confirm";
 
-/** The film's credits rows, [name, role]: always a Mix row. */
+/** The film's credits rows, [name, role]: always the mixer, one row for mix and sound design. */
 export function creditsOf(film: Project): [string, string][] {
   const mixer = film.mixer ? mixerBySlug(film.mixer) : undefined;
   return [
     // Always name the mixer. Six longform films are not credited on
     // Eleven's site, so they show a placeholder until Eleven sends the names.
-    [mixer?.name ?? MIXER_TBC, "Mix"],
-    mixer && [mixer.name, "Sound design"],
+    [mixer?.name ?? MIXER_TBC, mixer ? "Mix / Sound design" : "Mix"],
     film.agency && [film.agency, "Agency"],
     film.production && [film.production, "Production"],
     film.director && [film.director, "Director"],

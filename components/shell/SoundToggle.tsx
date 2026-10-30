@@ -8,9 +8,9 @@ import { useSound } from "@/lib/sound";
  * so it reads the same on video and on white.
  * The current word is solid, the other dimmed; flipping rolls the solid copy up through a clipped cell.
  * The bars bounce while sound is on and rest as short stubs when it is off. `meter={false}` drops them (the sound
- * gate).
+ * gate). `stacked` (the sound gate): SOUND on its own line, OFF / ON centred 4 under it.
  */
-export function SoundToggle({ meter = true }: { meter?: boolean }) {
+export function SoundToggle({ meter = true, stacked = false }: { meter?: boolean; stacked?: boolean }) {
   const s = useSound();
   const on = s.unlocked && !s.muted;
 
@@ -21,12 +21,14 @@ export function SoundToggle({ meter = true }: { meter?: boolean }) {
       aria-pressed={on}
       data-sound-toggle
       onClick={() => s.toggle()}
-      className="group flex cursor-pointer items-center gap-[0.25em] uppercase"
+      className={`group flex cursor-pointer items-center uppercase ${stacked ? "flex-col gap-1" : "gap-[0.25em]"}`}
     >
       <span>Sound</span>
-      <Word text="Off" active={!on} />
-      <span className="opacity-35">/</span>
-      <Word text="On" active={on} />
+      <span className="flex items-center gap-[0.25em]">
+        <Word text="Off" active={!on} />
+        <span className="opacity-35">/</span>
+        <Word text="On" active={on} />
+      </span>
       {meter && (
         <span data-on={on} className="sound-meter ml-[0.25em] flex h-[0.7em] items-end gap-[0.12em]" aria-hidden>
           <span />

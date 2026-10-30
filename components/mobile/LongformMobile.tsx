@@ -60,7 +60,7 @@ export function LongformMobile({ films }: { films: Film[] }) {
       const i = Math.max(0, Math.min(n - 1, Math.round(pos.current)));
       if (i !== last) {
         last = i;
-        sound.cue("step");
+        sound.cue("longformStep");
         setIndex(i);
       }
     };

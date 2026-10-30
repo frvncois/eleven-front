@@ -11,14 +11,35 @@ import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
 import site from "@/data/site.json";
 import { useDialogFocus } from "@/lib/dialog-focus";
 
-const ITEMS = party.items;
+type Item = (typeof party.items)[number];
+const ITEMS: Item[] = party.items;
+
+// Where the picture sits on its colour, from the 1440 × 900 frames: a corner or the middle on the 24 margins
+// (16 on the phone), or a set height from the top. On the phone the pictures run at 62 % of their desktop width.
+function placeOf(item: Item, phone: boolean): React.CSSProperties {
+  const m = phone ? 16 : 24;
+  const width = phone ? Math.min(358, Math.round(item.width * 0.62)) : item.width;
+  const s: React.CSSProperties = { width, aspectRatio: `${item.width} / ${item.height}`, maxHeight: `calc(100% - ${2 * m}px)` };
+  if (item.x === "left") s.left = m;
+  else if (item.x === "right") s.right = m;
+  else s.left = "50%";
+  if (item.y === "top") s.top = m;
+  else if (item.y === "bottom") s.bottom = m;
+  else if (item.y === "center") s.top = "50%";
+  else s.top = `${Number(item.y) * 100}%`;
+  const tx = item.x === "center" ? "-50%" : "0";
+  const ty = item.y === "center" ? "-50%" : "0";
+  if (tx !== "0" || ty !== "0") s.translate = `${tx} ${ty}`;
+  return s;
+}
 
 /**
- * The butterfly easter egg (Contact, Legal), desktop and phone. Click the butterfly: a random picture (later a
- * video) opens from it in a circle wipe and covers everything, navs and dock included, with its own
+ * The butterfly easter egg (Contact, Legal), desktop and phone. Click the butterfly: a picture on a brand colour
+ * (later a video) opens from it in a circle wipe and covers everything, navs and dock included, with its own
  * music when Eleven's audio arrives. Only the butterfly stays, in the same spot (flapping fast, it closes the party),
- * plus a CLOSE tag: bottom right on the phone (MENU's spot), top right on desktop (the player's). Esc closes too.
- * Each time it opens, a different one appears.
+ * plus a way out: on desktop a click anywhere, with the CLOSE cursor tag; on the phone a CLOSE chip bottom right (MENU's spot).
+ * Esc closes too.
+ * Each time it opens, the next one in order appears.
  */
 export function VideoParty({ on }: { on: boolean }) {
   const pick = usePartyPick();
@@ -69,31 +90,50 @@ export function VideoParty({ on }: { on: boolean }) {
           role="dialog"
           aria-modal="true"
           aria-label="Easter egg"
-          // Over everything (desktop navs z-50, phone dock z-80, menu z-79): only its own butterfly and CLOSE show.
-          className="fixed inset-0 z-[96] overflow-hidden bg-neutral-1000 outline-none"
+          // Over everything (desktop navs z-50, phone dock z-80, menu z-79): only its own butterfly (and the phone's CLOSE) show.
+          className="fixed inset-0 z-[96] overflow-hidden outline-none"
+          style={{ backgroundColor: `var(--color-${item.bg})` }}
           initial={{ clipPath: `circle(0% at ${origin})` }}
           animate={{ clipPath: `circle(160% at ${origin})` }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: SWING }}
         >
+          {/* Desktop: the whole screen closes it, with the CLOSE cursor tag (like the Mixers wedge), no corner chip. */}
+          {!phone && (
+            <button
+              type="button"
+              aria-label={site.player.close}
+              data-cursor="close"
+              data-cursor-tone="chip"
+              onClick={() => partyStore.set(false)}
+              className="absolute inset-0 cursor-default"
+            />
+          )}
           {item.video ? (
-            <video src={item.video} autoPlay loop muted playsInline className="absolute inset-0 size-full object-cover" />
+            <video src={item.video} autoPlay loop muted playsInline className="pointer-events-none absolute inset-0 size-full object-cover" />
           ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={item.image} alt="" className="absolute inset-0 size-full object-cover" />
+            <motion.img
+              src={item.image}
+              alt=""
+              width={item.width}
+              height={item.height}
+              className="pointer-events-none absolute object-cover"
+              style={placeOf(item, phone)}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.35, ease: SWING }}
+            />
           )}
           {b && (
             <div className="absolute" style={b}>
               <ToggleButterfly />
             </div>
           )}
-          <button
-            type="button"
-            onClick={() => partyStore.set(false)}
-            className={phone ? "chip absolute right-margin bottom-4 cursor-pointer" : "chip absolute top-[24.38px] right-margin cursor-pointer"}
-          >
-            {site.player.close}
-          </button>
+          {phone && (
+            <button type="button" onClick={() => partyStore.set(false)} className="chip absolute right-margin bottom-4 cursor-pointer">
+              {site.player.close}
+            </button>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

@@ -6,7 +6,13 @@
         "text": "In 2022, after 24 years in Santa Monica, Jeff and partner Jordan Meltzer bought a building in West LA and built three brand spanking new studios from scratch.{01} The design vision for the facility was that it feel like a fine 5-star hotel but without the beds. Cuz that would be weird.",
         "note": {
           "n": "01",
-          "text": " The original plan was to build and open America’s largest Hot Dog-On-A-Stick franchise. Legal squabbles arose with the HDOAS overlords, so we settled for 3 primo studios."
+          "text": " The original plan was to build and open America’s largest [[Hot Dog-On-A-Stick]] franchise. Legal squabbles arose with the HDOAS overlords, so we settled for 3 primo studios.",
+          "photo": {
+            "src": "/media/about/hot-dog-on-a-stick.webp",
+            "alt": "A Hot Dog on a Stick stand with its crew in the striped uniforms and hats",
+            "width": 960,
+            "height": 640
+          }
         },
         "width": 1147
       },
@@ -20,9 +26,9 @@
       }
     ],
     "sticker": {
-      "src": "/media/about/ointment.webp",
+      "src": "/media/about/ointment-light.webp",
       "width": 254.027,
-      "height": 153.323
+      "height": 108.909
     },
     "globe": {
       "src": "/media/about/snow-globe.webp",
@@ -39,29 +45,30 @@
     "items": [
       [
         "Sound Design",
-        "Making the noises, like boom, splash and vroom"
+        "Making the noises, like [[boom]], [[splash]] and [[vroom]]"
       ],
       [
         "Voice Casting",
-        "We find people who talk good on a microphone"
+        "We find people who [[talk good]] on a microphone"
       ],
       [
         "Mix",
-        "Making all the sounds not too loud, not too quiet, but juuuust right"
+        "Making all the sounds not too loud, not too quiet, but [[juuuust right]]"
       ],
       [
         "Music",
-        "Dooo Wapaa Dooodoo"
+        "[[Dooo Wapaa Dooodoo]]"
       ],
       [
         "ADR",
-        "Redoing the on camera take, the original one was… meh"
+        "Redoing the on camera take, the original one was… [[meh]]"
       ],
       [
         "VO",
-        "We record someone talking, but you can’t see them"
+        "We record [[someone talking]], but you can’t see them"
       ]
-    ]
+    ],
+    "sounds": {}
   },
   "team": {
     "label": "These are our humans",
@@ -83,6 +90,16 @@
           "ink": "neutral-1000",
           "roles": [
             "Founder",
+            "Sound designer",
+            "Mixer"
+          ]
+        },
+        {
+          "slug": "aj-murillo",
+          "bg": "bright-green",
+          "ink": "neutral-1000",
+          "roles": [
+            "Sound designer",
             "Mixer"
           ]
         },
@@ -91,37 +108,28 @@
           "bg": "yellow",
           "ink": "neutral-1000",
           "roles": [
-            "Mixer",
-            "Sound designer"
-          ]
-        },
-        {
-          "slug": "bruce-bueckert",
-          "bg": "red",
-          "ink": "neutral-300",
-          "roles": [
-            "Mixer",
-            "Sound designer"
+            "Sound designer",
+            "Mixer"
           ]
         }
       ],
       [
         {
+          "slug": "bruce-bueckert",
+          "bg": "red",
+          "ink": "neutral-300",
+          "roles": [
+            "Sound designer",
+            "Mixer"
+          ]
+        },
+        {
           "slug": "marco-tornillo",
           "bg": "pink",
           "ink": "neutral-1000",
           "roles": [
-            "Mixer",
-            "Sound designer"
-          ]
-        },
-        {
-          "slug": "aj-murillo",
-          "bg": "bright-green",
-          "ink": "neutral-1000",
-          "roles": [
-            "Mixer",
-            "Sound designer"
+            "Sound designer",
+            "Mixer"
           ]
         },
         {

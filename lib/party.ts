@@ -7,7 +7,7 @@ import { useSyncExternalStore } from "react";
  */
 const listeners = new Set<() => void>();
 let on = false;
-let pick = -1; // which item shows, random but never the same twice in a row
+let pick = -1; // which item shows: the next one in order each time, back to the first after the last
 let size = 1;
 // Where the butterfly that opened the party sits (viewport px), so the party keeps one in the same spot.
 let origin: { x: number; y: number; w: number; h: number } | null = null;
@@ -23,16 +23,12 @@ export const party = {
   setOrigin(r: { x: number; y: number; w: number; h: number }) {
     origin = r;
   },
-  /** The party layer registers how many items it can show, so each switch-on picks a new random one. */
+  /** The party layer registers how many items it can show, so each switch-on steps to the next one. */
   setSize(n: number) {
     size = Math.max(1, n);
   },
   set(v: boolean) {
-    if (v && !on) {
-      let next = Math.floor(Math.random() * size);
-      if (size > 1 && next === pick) next = (next + 1 + Math.floor(Math.random() * (size - 1))) % size;
-      pick = next;
-    }
+    if (v && !on) pick = (pick + 1) % size;
     on = v;
     listeners.forEach((l) => l());
   },

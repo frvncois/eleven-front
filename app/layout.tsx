@@ -15,7 +15,7 @@ import { INDEXABLE, SITE_URL } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "Eleven", template: "%s · Eleven" },
-  description: "Eleven, audio post-production in West LA since 1999: mixing and sound design for advertising and longform.",
+  description: "Eleven is a boutique audio post-production studio in West LA since 1999. Mix, sound design, VO, ADR, music and voice casting. Good hangs, too.",
   openGraph: { siteName: "Eleven", type: "website", locale: "en_US" },
   robots: INDEXABLE ? { index: true, follow: true } : { index: false, follow: false, noarchive: true },
 };

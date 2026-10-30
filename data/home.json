@@ -8,6 +8,10 @@
   },
   "reel": {
     "src": "/media/home/reel-v2.mp4",
-    "poster": "/media/home/reel-v2-poster.webp"
+    "poster": "/media/home/reel-v2-poster.webp",
+    "phone": {
+      "src": "/media/home/reel-v2-9x16.mp4",
+      "poster": "/media/home/reel-v2-9x16-poster.webp"
+    }
   }
 }

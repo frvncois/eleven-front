@@ -1,16 +1,13 @@
-const ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
-
 /**
- * A story note's number as a Roman numeral: Neue Haas bold 8, black, centred in a small pink square.
+ * A story note's number as two digits ("01", "02"…): Neue Haas bold 10, black, centred in a 16 px pink square.
  * The same mark in the text (raised like a footnote) and beside the side note, so the pair reads.
  */
 export function NoteNumber({ n, className = "" }: { n: string; className?: string }) {
-  const numeral = ROMAN[parseInt(n, 10)] ?? n;
   return (
     <span
-      className={`inline-flex h-3 min-w-3 items-center justify-center bg-pink px-[2px] indent-0 font-sans text-[8px] leading-none font-bold not-italic text-neutral-1000 ${className}`}
+      className={`inline-flex size-4 items-center justify-center bg-pink indent-0 font-sans text-[10px] leading-none font-bold not-italic text-neutral-1000 ${className}`}
     >
-      {numeral}
+      {n}
     </span>
   );
 }

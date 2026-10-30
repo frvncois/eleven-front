@@ -5,7 +5,7 @@ import { useCallback, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePhone } from "@/lib/device";
-import { gateSeen, subscribeGate } from "@/lib/gate";
+import { gateSeen, setGateSeen, subscribeGate } from "@/lib/gate";
 import { sound } from "@/lib/sound";
 import { EASE_DISSOLVE, PHONE_MOTION } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
@@ -14,12 +14,9 @@ import { MenuCard } from "./MenuCard";
 import { GATE_EXIT } from "@/components/home/GateLoader";
 import { FlossLogo, SLOT } from "@/components/shell/FlossLogo";
 
-// Pages whose top sits on video: the logo is dimmed to grey there.
+// Pages whose top sits on video: the floss stays plain there (no black outline).
 const ON_VIDEO = ["/", "/longform"];
-// The phone ELEVEN is the nav logo: the original ELEVEN, the same drawing as the desktop home wordmark. 4.9:1, so
-// 107.8 wide at the nav's 22 tall.
-const WORDMARK = "/icons/eleven-home-original.svg";
-// On the home the logo is the floss instead, like the desktop home: 40 tall, its foot on the wordmark's line.
+// The nav logo on every page is the floss, like the desktop nav: 40 tall.
 const FLOSS_H = 40;
 const FLOSS_K = FLOSS_H / SLOT.h;
 // The phone chip (globals.css `chip`: 24 tall, 12 px bold caps).
@@ -27,7 +24,7 @@ const CHIP = "chip pointer-events-auto";
 
 /**
  * The phone dock, mounted once for the whole visit so it
- * never jumps between pages. Top: the ELEVEN wordmark on the left, the floss on the home (straight to the home, never back to the sound gate)
+ * never jumps between pages. Top: the floss on the left (home; on the home itself it brings the sound gate back)
  * and the page's own control as a chip on the right (GRID / LIST on Mixer and Archive, the butterfly
  * on Contact). Bottom, 16 from the edges: SOUND as a chip on the left, MENU on the right, which opens
  * the menu card (components/mobile/MenuCard) and becomes CLOSE. The chips read the same on video and
@@ -64,35 +61,26 @@ export function PhoneShell() {
             animate={{ opacity: 1, transition: { duration: 0.6, delay: pathname === "/" ? GATE_EXIT : 0, ease: EASE_DISSOLVE } }}
             exit={{ opacity: 0, transition: { duration: 0.2 } }}
           >
-            {/* Top: the ELEVEN wordmark left, 52.4 × 22,
-                its bottom 2 above the page's chip's bottom; the chip right, 20.5 from the top. */}
+            {/* Top: the floss left, 40 tall, 16 lower than the page's chip's line; the chip right, 20.5 from the top. */}
             <div className="relative flex h-[44.5px] items-end justify-between px-margin">
-              {pathname === "/" ? (
-                <Link
-                  href="/"
-                  aria-label="Eleven, home"
-                  className="pointer-events-auto mb-[2px] block transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90"
-                  style={{ width: SLOT.w * FLOSS_K, height: FLOSS_H }}
-                >
-                  {/* Drawn at its desktop size (sharp), scaled down from the top-left corner. */}
-                  <span className="block origin-top-left" style={{ transform: `scale(${FLOSS_K})` }}>
-                    <FlossLogo tone="light" />
-                  </span>
-                </Link>
-              ) : (
-                <Link
-                  href="/"
-                  aria-label="Eleven, home"
-                  className={`pointer-events-auto mb-[2px] block h-[22px] w-[107.8px] transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90 ${onVideo ? "text-neutral-300" : "text-neutral-1000"}`}
-                >
-                  {/* The phone wordmark drawing as a mask, so it takes the nav's colour (black, grey on video). */}
-                  <span
-                    aria-hidden
-                    className="block size-full bg-current"
-                    style={{ maskImage: `url(${WORDMARK})`, WebkitMaskImage: `url(${WORDMARK})`, maskSize: "100% 100%", WebkitMaskSize: "100% 100%" }}
-                  />
-                </Link>
-              )}
+              <Link
+                href="/"
+                aria-label={pathname === "/" ? "Eleven, back to the sound gate" : "Eleven, home"}
+                // On the home it brings the sound gate back, like the desktop floss; elsewhere it just goes home.
+                onClick={(e) => {
+                  if (pathname !== "/") return;
+                  e.preventDefault();
+                  setGateSeen(false);
+                }}
+                className="pointer-events-auto relative top-4 mb-[2px] block transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90"
+                style={{ width: SLOT.w * FLOSS_K, height: FLOSS_H }}
+              >
+                {/* Drawn at its desktop size (sharp), scaled down from the top-left corner. White on video, outlined
+                    in black on white pages, like the desktop nav. */}
+                <span className="block origin-top-left" style={{ transform: `scale(${FLOSS_K})` }}>
+                  <FlossLogo tone={onVideo ? "light" : "dark"} />
+                </span>
+              </Link>
               <AnimatePresence>
                 {toggle && !menu && (
                   <motion.div key="toggle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={PHONE_MOTION.reveal}>

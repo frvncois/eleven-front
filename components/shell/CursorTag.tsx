@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { DUR, EASE_OUT, THEME_INK, themeColor } from "@/lib/motion";
+import { DUR, EASE_OUT, THEME_INK, themeColor, wedgeColor } from "@/lib/motion";
 import { appScale } from "@/lib/device";
 
 /**
@@ -19,8 +19,12 @@ import { appScale } from "@/lib/device";
 export function CursorTag() {
   const [label, setLabel] = useState<string | null>(null);
   const [tone, setTone] = useState<string | null>(null);
-  const bg = themeColor(usePathname());
+  const path = usePathname();
+  const bg = themeColor(path);
   const ink = THEME_INK[bg] ?? "#bdbdbd"; // grey, never white
+  // The Mixers wedge's CLOSE wears the wedge's colour (Mixers red on the home).
+  const wedge = wedgeColor(path);
+  const wedgeInk = THEME_INK[wedge] ?? "#bdbdbd";
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
   const sx = useSpring(x, { stiffness: 900, damping: 60, mass: 0.4 });
@@ -59,7 +63,7 @@ export function CursorTag() {
                 ? { background: "var(--color-neutral-200)", color: "var(--color-neutral-1000)" }
                 : tone === "accent"
                   ? // black on the light accents, grey on red / dark green / royal blue
-                    { background: bg, color: ink }
+                    { background: wedge, color: wedgeInk }
                   : tone
                   ? { background: `var(--color-${tone})`, color: "var(--color-neutral-1000)" }
                   : { background: bg, color: ink }

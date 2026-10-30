@@ -6,6 +6,8 @@ import home from "@/data/home.json";
 import { sound } from "@/lib/sound";
 import { NavBar } from "@/components/shell/NavBar";
 import { NavSub } from "@/components/shell/NavSub";
+import { PacificClock } from "./PacificClock";
+import { useDockToggle } from "@/components/mobile/dock";
 import { gateSeen, setGateSeen, subscribeGate } from "@/lib/gate";
 import { usePhone } from "@/lib/device";
 import { FlossLogo } from "@/components/shell/FlossLogo";
@@ -27,6 +29,15 @@ export function Home() {
   // Seen earlier in this visit (nav link back home, or a reload): no gate. The floss logo reopens it.
   const gate = !useSyncExternalStore(subscribeGate, () => gateSeen(), () => false);
   // The reel just loops: no pause control on the home, desktop or phone.
+  // Phone: the studio clock takes the top-right corner, on the middle line a chip would have.
+  useDockToggle(
+    phone ? (
+      <span className="flex h-6 items-center">
+        <PacificClock />
+      </span>
+    ) : null,
+    true,
+  );
 
   // The gate always starts silent, even if sound was on earlier in the visit:
   // the visitor turns it on here, deliberately.
@@ -36,7 +47,12 @@ export function Home() {
 
   return (
     <main className="relative h-(--vh) min-h-[700px] overflow-hidden bg-ink phone:min-h-0">
-      <HomeReel src={home.reel.src} poster={home.reel.poster} />
+      {/* Phone: Eleven's own 9:16 cut, so nothing is cropped away. */}
+      {phone ? (
+        <HomeReel key="phone" src={home.reel.phone.src} poster={home.reel.phone.poster} />
+      ) : (
+        <HomeReel key="desktop" src={home.reel.src} poster={home.reel.poster} />
+      )}
 
       <AnimatePresence>
         {!gate && (
@@ -47,8 +63,8 @@ export function Home() {
             transition={{ duration: 0.2, delay: GATE_EXIT }}
           >
             <NavBar tone="light" />
-            {/* No reel pause chip: only SOUND. */}
-            <NavSub wordmark={false} tone="light" />
+            {/* No reel pause chip: the studio clock, then SOUND. */}
+            <NavSub wordmark={false} tone="light" toggles={<PacificClock />} bareToggles />
           </motion.div>
         )}
       </AnimatePresence>

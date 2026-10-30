@@ -14,21 +14,22 @@ type Cue = { files: string[]; volume: number; sequence?: boolean; placeholder: (
 
 // UI sound cues. `files`: takes from public/sounds, a random take each time (never twice in a row),
 // or played in order when `sequence` is set. A cue with no files plays its synthesized fallback (`placeholder`).
-// Stand-in sounds (AUGE, auge-xp.com): the files in public/sounds/placeholder-auge must be replaced with
-// Eleven's own before launch, and that folder removed.
-const A = (n: string) => `/sounds/placeholder-auge/${n}.mp3`
-const HOVERS = [A("hover-1"), A("hover-2"), A("hover-3"), A("hover-4")]
-const STEPS = [A("step-1"), A("step-2"), A("step-3"), A("step-4"), A("step-5"), A("step-6")]
+// Eleven's own sounds (Jordan, Oct 2026) in public/sounds/eleven.
+const E = (n: string) => `/sounds/eleven/${n}.mp3`
+const takes = (name: string, n: number) => Array.from({ length: n }, (_, i) => E(`${name}-${i + 1}`))
 const CUES = {
-  navHover: { files: HOVERS, volume: 0.6, placeholder: (k: Kit) => k.tone(880, 0.12, 0.08) },
-  click: { files: [A("click")], volume: 0.6, placeholder: (k: Kit) => k.tone(520, 0.1, 0.1) },
-  menuOpen: { files: [A("menu-open")], volume: 0.7, placeholder: (k: Kit) => k.whoosh(0.5, 0.12, 300, 1800) },
-  sweepIn: { files: [A("transition")], volume: 0.7, placeholder: (k: Kit) => k.whoosh(0.9, 0.14, 250, 2200) },
+  navHover: { files: takes("hover", 9), volume: 0.6, placeholder: (k: Kit) => k.tone(880, 0.12, 0.08) },
+  click: { files: takes("click", 5), volume: 0.6, placeholder: (k: Kit) => k.tone(520, 0.1, 0.1) },
+  menuOpen: { files: takes("menu", 3), volume: 0.7, placeholder: (k: Kit) => k.whoosh(0.5, 0.12, 300, 1800) },
+  sweepIn: { files: [E("transition")], volume: 0.7, placeholder: (k: Kit) => k.whoosh(0.9, 0.14, 250, 2200) },
   sweepOut: { files: [] as string[], volume: 0.6, placeholder: () => {} }, // the transition file covers both halves
-  step: { files: STEPS, volume: 0.6, sequence: true, placeholder: (k: Kit) => k.tone(660, 0.15, 0.1) },
-  // Archive list → grid: the line explodes with a sound.
-  explode: { files: [A("scramble")], volume: 0.8, placeholder: (k: Kit) => (k.whoosh(0.5, 0.22, 3000, 120), k.tone(90, 0.5, 0.25)) },
-  gather: { files: [A("menu-open")], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.6, 0.12, 400, 2600) },
+  // Six plucks played in order, like a little scale.
+  step: { files: takes("pluck", 6), volume: 0.6, sequence: true, placeholder: (k: Kit) => k.tone(660, 0.15, 0.1) },
+  // Longform: moving to the next film plays the next of its colour notes.
+  longformStep: { files: takes("longform", 8), volume: 0.6, sequence: true, placeholder: (k: Kit) => k.tone(660, 0.15, 0.1) },
+  // Archive list → grid and back: the two index rolls.
+  explode: { files: [E("index-roll-1")], volume: 0.8, placeholder: (k: Kit) => (k.whoosh(0.5, 0.22, 3000, 120), k.tone(90, 0.5, 0.25)) },
+  gather: { files: [E("index-roll-2")], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.6, 0.12, 400, 2600) },
 } satisfies Record<string, Cue>
 const seqPos = new Map<string, number>()
 

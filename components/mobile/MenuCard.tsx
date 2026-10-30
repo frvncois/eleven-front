@@ -13,9 +13,10 @@ const UNFOLD = PHONE_MOTION.sheet;
 
 /**
  * The phone menu: a card that unfolds upward from the
- * MENU chip, just above the chips. A small "Menu" label, then one row per page in Heading/H3 and its
+ * MENU chip, just above the chips. One row per page (no label on top) in Heading/H3 and its
  * colour, hairlines between them, the current page marked with a dot. MIXERS doesn't go anywhere: it
- * opens a drawer inside the card with the six mixers (the other pages fold away meanwhile, so it never scrolls), each with its icon, names and icons in Mixers red. Studio address and
+ * opens a drawer inside the card with the six mixers (the other pages fold away meanwhile, so it never scrolls), each with its icon.
+ * While the drawer is open the card turns Mixers red, everything on it in red's grey ink (like the desktop wedge). Studio address and
  * Instagram at the foot. The page behind blurs; tapping it closes the card.
  */
 export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -53,16 +54,15 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
           />
           <motion.nav
             aria-label="Main"
-            className="absolute inset-x-margin bottom-[48px] max-h-[calc(var(--vh)-110px)] overflow-y-auto bg-neutral-200"
+            className={`absolute inset-x-margin bottom-[48px] max-h-[calc(var(--vh)-110px)] overflow-y-auto transition-colors duration-300 ${drawer ? "bg-red text-neutral-300" : "bg-neutral-200"}`}
             data-lenis-prevent
             variants={{ out: { clipPath: "inset(100% 0 0 0)" }, in: { clipPath: "inset(0% 0 0 0)" } }}
             transition={UNFOLD}
           >
-            <p className="t-h6 border-b border-neutral-300 px-3 py-2.5">Menu</p>
             <ul>
               {site.nav.map((item, i) => {
-                // One colour per page, the same as the sweep and the nav (site.json).
-                const color = `var(--color-${item.color})`;
+                // One colour per page, the same as the sweep and the nav (site.json); grey ink on the red card.
+                const color = drawer ? "var(--color-neutral-300)" : `var(--color-${item.color})`;
                 const current = isCurrent(item.match);
                 const row = (
                   <span className="flex items-center gap-2.5">
@@ -89,7 +89,7 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
                             sound.cue("navHover");
                             setDrawer((v) => !v);
                           }}
-                          className={`${cls} flex cursor-pointer items-center justify-between uppercase`}
+                          className={`${cls} flex cursor-pointer items-center justify-between uppercase transition-colors duration-300`}
                           style={{ color }}
                         >
                           {row}
@@ -97,7 +97,7 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
                             +
                           </span>
                         </button>
-                        {/* The drawer: the six mixers, each with their icon (Pez, battery, Oreo, plate, broccoli, grater). */}
+                        {/* The drawer: the six mixers, each with their icon (Pez, calculator, Oreo, plate, broccoli, grater). */}
                         <AnimatePresence initial={false}>
                           {drawer && (
                             <motion.ul
@@ -115,10 +115,10 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
                                     onClick={() => pathname === `/mixers/${m.slug}` && onClose()}
                                     className="flex items-center gap-3 px-3 py-1"
                                   >
-                                    {/* The icon in Mixers red: its drawing used as a mask over a red fill. */}
+                                    {/* The icon in grey on the red card: its drawing used as a mask over a grey fill. */}
                                     <span
                                       aria-hidden
-                                      className="block h-8 w-6 shrink-0 bg-red"
+                                      className="block h-8 w-6 shrink-0 bg-neutral-300"
                                       style={
                                         m.icon?.black
                                           ? {
@@ -134,8 +134,8 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
                                           : { background: "none" }
                                       }
                                     />
-                                    <span className="font-serif text-[20px] leading-none text-red">{m.name}</span>
-                                    {isCurrent(`/mixers/${m.slug}`) && <span aria-hidden className="size-2.5 rounded-full bg-red" />}
+                                    <span className="font-serif text-[20px] leading-none">{m.name}</span>
+                                    {isCurrent(`/mixers/${m.slug}`) && <span aria-hidden className="size-2.5 rounded-full bg-neutral-300" />}
                                   </Link>
                                 </li>
                               ))}

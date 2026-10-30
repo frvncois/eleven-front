@@ -34,7 +34,7 @@ export function LongformReel({ films }: { films: Film[] }) {
     if (next === index || lock.current) return;
     lock.current = true;
     setIndex(next);
-    sound.cue("step");
+    sound.cue("longformStep");
     window.setTimeout(() => (lock.current = false), SLIDE_MS);
   };
 

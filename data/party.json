@@ -1,8 +1,10 @@
 {
   "items": [
-    { "image": "/media/party/dog-surfing.webp", "video": null, "audio": null },
-    { "image": "/media/party/sheep-bucket.webp", "video": null, "audio": null },
-    { "image": "/media/party/cows-hedge.webp", "video": null, "audio": null },
-    { "image": "/media/party/hamster-desk.webp", "video": null, "audio": null }
+    { "image": "/media/party/egg-01-venice-skater.webp", "bg": "purple", "x": "left", "y": "top", "width": 459, "height": 679, "video": null, "audio": null },
+    { "image": "/media/party/egg-02-dog-convertible.webp", "bg": "red", "x": "center", "y": "center", "width": 375, "height": 507, "video": null, "audio": null },
+    { "image": "/media/party/egg-03-facelift.webp", "bg": "pink", "x": "right", "y": "center", "width": 542, "height": 338, "video": null, "audio": null },
+    { "image": "/media/party/egg-04-cow-car.webp", "bg": "bright-green", "x": "left", "y": "bottom", "width": 579, "height": 579, "video": null, "audio": null },
+    { "image": "/media/party/egg-05-la-brea-circus.webp", "bg": "aqua", "x": "left", "y": 0.1878, "width": 601, "height": 510, "video": null, "audio": null },
+    { "image": "/media/party/egg-06-venice-sunglasses.webp", "bg": "yellow", "x": "center", "y": "center", "width": 626, "height": 414, "video": null, "audio": null }
   ]
 }

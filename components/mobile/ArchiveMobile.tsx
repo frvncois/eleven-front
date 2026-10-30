@@ -19,18 +19,18 @@ const VIEWS: [{ value: View; label: string }, { value: View; label: string }] = 
   { value: "field", label: "Grid" },
 ];
 
-// The desktop field (lib/grid tiles, 2 / 3 / 4 columns) drawn at 26 %: S ≈ 78, M ≈ 118, L ≈ 157 wide
-// (22 % felt crowded).
-const K = 0.26;
+// The desktop field (lib/grid tiles, 2 / 3 / 4 columns) drawn at 34 %: S ≈ 102, M ≈ 154, L ≈ 205 wide
+// (22 % felt crowded, 26 % too small).
+const K = 0.34;
 // Positions: the desktop field's are uneven (and leave white holes on the phone), so the
 // phone lays the 66 projects on its own even, staggered grid: 6 rows (even, so the stagger repeats
 // cleanly where the field wraps), each row a band of the desktop field read left to right, so
-// neighbours stay neighbours. 205 / 170 apart: the L tile plus its two-chip caption still
-// has ~40 around it.
+// neighbours stay neighbours. 268 / 222 apart (scaled with K): the L tile plus its two-chip caption still
+// has ~50 around it.
 // A small fixed jitter keeps it from reading as a spreadsheet.
 const ROWS = 6;
-const DX = 205;
-const DY = 170;
+const DX = 268;
+const DY = 222;
 const JITTER = { x: 10, y: 8 };
 
 function phoneField(tiles: Tile[]) {
@@ -295,14 +295,14 @@ function Field({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void }
 }
 
 // List on a phone: one screen, the projects stacked against the right
-// edge, 4 apart (as on desktop); the one crossing the middle grows (16:9 always, 128 → 200 wide) and its neighbours step up with
+// edge, 4 apart (as on desktop); the one crossing the middle grows (16:9 always, 160 → 248 wide) and its neighbours step up with
 // it, a pyramid pointing at the caption on the left (client and title in grey chips). A finger drags the stack and
 // on release it lands on a project (lib/stepper, the same feel as Longform); it loops, no first or last one.
-const ROW_H = 72; // the scroll pitch's base: one project at rest is 72 tall (128 × 72)
+const ROW_H = 90; // the scroll pitch's base: one project at rest is 90 tall (160 × 90)
 const GAP = 4;
 const PITCH = ROW_H + GAP;
-const BASE_W = 128;
-const WIDE_W = 200; // the middle one: its left edge stops at 190, clear of the caption
+const BASE_W = 160;
+const WIDE_W = 248; // the middle one: its left edge stops at 142, clear of the caption (max 118 wide)
 const R169 = 9 / 16;
 const REACH = 2.4; // projects over which the pyramid steps back down to BASE_W
 
@@ -500,7 +500,7 @@ function List({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void })
     <section ref={root} aria-label="Projects" data-lenis-prevent className="absolute inset-0 touch-none overflow-hidden select-none">
       {stack}
       {/* The caption, pinned mid-screen on the left: client and title in grey chips. */}
-      <div className="pointer-events-none absolute top-1/2 left-margin flex max-w-[166px] -translate-y-1/2 flex-col items-start">
+      <div className="pointer-events-none absolute top-1/2 left-margin flex max-w-[118px] -translate-y-1/2 flex-col items-start">
         <span className="chip-client">{t.client}</span>
         <span className="chip-title">{t.short ?? t.label}</span>
       </div>

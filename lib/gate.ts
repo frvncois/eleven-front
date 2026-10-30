@@ -2,7 +2,7 @@
 
 /**
  * The sound gate, once per visit (session). The floss logo goes straight to the home; on the home
- * itself, clicking the ELEVEN wordmark reopens the gate.
+ * itself, clicking the floss reopens the gate (desktop and phone).
  */
 const KEY = "eleven-gate";
 const EVENT = "eleven-gate";

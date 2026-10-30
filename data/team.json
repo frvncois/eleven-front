@@ -2,7 +2,7 @@
   {
     "slug": "jordan-meltzer",
     "name": "Jordan Meltzer",
-    "role": "Mixer | Sound Designer",
+    "role": "Sound Designer / Mixer",
     "email": "jordan@elevensound.com",
     "instagram": "https://www.instagram.com/_jmeltz_/",
     "linkedin": "https://www.linkedin.com/in/jordanmeltzer/",
@@ -18,7 +18,7 @@
   {
     "slug": "jeff-payne",
     "name": "Jeff Payne",
-    "role": "Mixer | Sound Designer",
+    "role": "Sound Designer / Mixer",
     "email": null,
     "instagram": "https://www.instagram.com/jeff_payne_13/",
     "linkedin": "https://www.linkedin.com/in/jeffpayne2/",
@@ -26,16 +26,16 @@
     "order": 1,
     "photo": "/media/team/jeff-payne.webp",
     "icon": {
-      "name": "9 Volt Battery",
-      "white": "/media/icons/icon-jeff-payne-battery.webp",
-      "black": "/media/icons/icon-jeff-payne-battery-black.webp"
+      "name": "Calculator",
+      "white": "/media/icons/icon-jeff-payne-calculator.webp",
+      "black": "/media/icons/icon-jeff-payne-calculator-black.webp"
     },
     "aboutIcon": "/media/icons/icon-jeff-payne-airplane-black.png"
   },
   {
     "slug": "aj-murillo",
     "name": "AJ Murillo",
-    "role": "Mixer | Sound Designer",
+    "role": "Sound Designer / Mixer",
     "email": null,
     "instagram": "https://www.instagram.com/aj__murillo/",
     "linkedin": "https://www.linkedin.com/in/aj-murillo-91a187379/",
@@ -51,7 +51,7 @@
   {
     "slug": "bob-gremore",
     "name": "Bob Gremore",
-    "role": "Mixer | Sound Designer",
+    "role": "Sound Designer / Mixer",
     "email": null,
     "instagram": null,
     "linkedin": "https://www.linkedin.com/in/bob-gremore-564924168/",
@@ -67,7 +67,7 @@
   {
     "slug": "bruce-bueckert",
     "name": "Bruce Bueckert",
-    "role": "Mixer | Sound Designer",
+    "role": "Sound Designer / Mixer",
     "email": null,
     "instagram": null,
     "linkedin": "https://www.linkedin.com/in/bruce-bueckert-32287390/",
@@ -83,7 +83,7 @@
   {
     "slug": "marco-tornillo",
     "name": "Marco Tornillo",
-    "role": "Mixer | Sound Designer",
+    "role": "Sound Designer / Mixer",
     "email": null,
     "instagram": null,
     "linkedin": null,

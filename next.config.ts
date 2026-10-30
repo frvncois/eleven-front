@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
   // Keep the dev badge out of the bottom-left wordmark.
   devIndicators: false,
   // Phone review on the same Wi-Fi (http://<this Mac's IP>:3700): Next blocks dev assets for other hosts otherwise.
-  allowedDevOrigins: ["192.168.*.*", "10.*.*.*"],
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "172.20.*.*"],
   // Security headers everywhere; until launch every response, redirects included, is also noindex (lib/site.ts).
   // The page was /privacy until Oct 23 2026.
   async redirects() {

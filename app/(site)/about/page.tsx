@@ -5,6 +5,8 @@ import team from "@/data/team.json";
 import { Chrome } from "@/components/shell/Chrome";
 import { TeamCard } from "@/components/about/TeamCard";
 import { NoteNumber, StoryText } from "@/components/about/NoteNumber";
+import { NoteText } from "@/components/about/NoteText";
+import { ServiceText } from "@/components/about/ServiceText";
 import { RoomCarousel } from "@/components/about/RoomCarousel";
 import { StorySticker } from "@/components/about/StorySticker";
 import { AboutMobile } from "@/components/mobile/AboutMobile";
@@ -46,7 +48,9 @@ function AboutDesktop() {
               <div key={p.note.n} className={`flex w-full justify-between ${i === 0 ? "items-end" : "items-center"}`}>
                 <aside className="t-body-sm flex w-span-1 shrink-0 gap-2">
                   <NoteNumber n={p.note.n} className="shrink-0" />
-                  <span className="w-[151.8px] shrink-0">{p.note.text}</span>
+                  <span className="w-[151.8px] shrink-0">
+                    <NoteText text={p.note.text} photo={"photo" in p.note ? p.note.photo : undefined} />
+                  </span>
                 </aside>
                 <p className={`t-h2 indent-col shrink-0 ${i === 0 ? "w-span-7" : "w-span-6"}`}>
                   <StoryText text={p.text} />
@@ -86,7 +90,9 @@ function AboutDesktop() {
               className={`flex items-start justify-between pr-margin pb-margin ${i ? "pt-margin" : ""} ${i < services.items.length - 1 ? "border-b border-neutral-1000" : ""}`}
             >
               <span className="w-[322px] shrink-0 font-serif text-[50px] leading-none uppercase [font-stretch:87.5%]">{name}</span>
-              <span className="min-w-0 flex-1 text-right font-sans text-[46px] leading-none font-bold text-pretty">{note}</span>
+              <span className="min-w-0 flex-1 text-right font-sans text-[46px] leading-none font-bold text-pretty">
+                <ServiceText text={note} />
+              </span>
             </li>
           ))}
         </ul>

@@ -8,17 +8,17 @@ import { SWING, prefersReducedMotion } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 
 const WORDS = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
-// The count, one word at a time over 7 s: a word every 0.64 s from 0.4 s, ten lands at 6.16 s,
-// held 0.84 s, then the panel swings up at 7 s.
-const FIRST_MS = 400;
-const STEP_MS = 640;
-const HOLD_MS = 840;
+// The count, one word at a time over about 4.3 s: a word every 0.38 s from 0.3 s, ten lands at 3.72 s,
+// held 0.6 s, then the panel swings up at 4.32 s.
+const FIRST_MS = 300;
+const STEP_MS = 380;
+const HOLD_MS = 600;
 const SWING_S = 0.7;
 const SWING_LAG_S = 0.14; // the right corner follows the left, like the Mixers wedge closing
 /** When the home's nav (Home, PhoneShell) fades in, counted from the moment the gate starts to leave. */
 export const GATE_EXIT = 0.45;
 
-// The panel: an aqua panel over the home reel, its lower edge 65 above
+// The panel: a yellow panel over the home reel, its lower edge 65 above
 // the screen's bottom at the left and 135 at the right, so a band of the playing video shows under it. Kept relative
 // to the screen's bottom so the band survives any height. Phone: the same slope, scaled to 390.
 const EDGE = { left: 65.15, right: 135.08 };
@@ -98,52 +98,57 @@ export function GateLoader({ onDone, phone = false }: { onDone: () => void; phon
     <motion.section
       ref={panel}
       aria-label="Sound"
-      className="absolute inset-0 z-20 bg-aqua"
+      className="absolute inset-0 z-20 flex flex-col justify-between gap-10 bg-yellow"
       style={leaving ? { clipPath: clip, WebkitClipPath: clip } : { clipPath: rest, WebkitClipPath: rest }}
     >
       {/* The title, then the choice (plain text, no chip on the gate; 16 px on desktop),
-          and the hint in H6 8 below it, all black on the aqua. Phone: the title wraps to three lines, the choice at 176. */}
-      <div className="absolute inset-x-0 top-[90px] flex flex-col items-center text-neutral-1000 phone:top-[72px] phone:px-margin">
+          stacked (SOUND, then OFF / ON 4 under it) and the hint in H6 24 below, all black on the yellow. Phone: the title
+          wraps to three lines, the choice 38 under it. In flow above the count, never under it: on a short window the
+          58 above the choice gives way first (down to 32), then the count and the ELEVEN slide down behind the panel's edge, at least 40 below the hint. */}
+      <div className="flex shrink-0 flex-col items-center pt-[90px] text-neutral-1000 phone:px-margin phone:pt-[72px]">
         <p className="t-h3 text-center phone:text-[20px] phone:leading-[1.1]">
           {home.gate.line[0]}
           <br />
           {home.gate.line[1]}
         </p>
-        <div className="t-h4 mt-[80px] text-[16px] phone:mt-[38px] phone:text-[12px]">
-          <SoundToggle meter={false} />
+        <div className="t-h4 mt-[clamp(32px,calc(var(--vh)-750px),58px)] text-[16px] phone:mt-[38px] phone:text-[12px]">
+          <SoundToggle meter={false} stacked />
         </div>
-        <p className="t-h6 mt-2 text-center">{home.gate.hint}</p>
+        <p className="t-h6 mt-6 text-center">{home.gate.hint}</p>
       </div>
-      {/* The row from 46 to 1416, 68 above the ELEVEN; anchored to the bottom with it. */}
-      <div
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={WORDS.length}
-        aria-valuenow={shown}
-        className="t-h5 absolute right-margin left-[46px] flex justify-between text-neutral-1000 phone:left-margin phone:text-[11px]"
-        style={{ bottom: phone ? 173 : 466.4 }}
-      >
-        {/* Each word fades up as it is counted (a CSS transition: no animation frames needed). */}
-        {WORDS.map((w, i) => (
-          <span
-            key={w}
-            className={`transition-[opacity,translate] duration-300 ease-out ${i < shown ? "translate-y-0 opacity-100" : "translate-y-1.5 opacity-0"}`}
-          >
-            {w}
-          </span>
-        ))}
+      {/* The count and the ELEVEN, anchored to the bottom together: the ELEVEN's foot 114 above the screen's bottom
+          (phone 80), the row 68 above it (phone 20). */}
+      <div className="flex shrink-0 flex-col pb-[114.08px] phone:pb-[80px]">
+        {/* The row from 46 to 1416. */}
+        <div
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={WORDS.length}
+          aria-valuenow={shown}
+          className="t-h5 mr-margin ml-[46px] flex justify-between text-neutral-1000 phone:ml-margin phone:text-[11px]"
+        >
+          {/* Each word fades up as it is counted (a CSS transition: no animation frames needed). */}
+          {WORDS.map((w, i) => (
+            <span
+              key={w}
+              className={`transition-[opacity,translate] duration-300 ease-out ${i < shown ? "translate-y-0 opacity-100" : "translate-y-1.5 opacity-0"}`}
+            >
+              {w}
+            </span>
+          ))}
+        </div>
+        {/* The ELEVEN (the gate wordmark at 1392 × 284, black: public/icons/eleven-gate-v2.svg), 24 from the left.
+            Phone: 358 wide on the 16 margins. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/icons/eleven-gate-v2.svg"
+          alt="Eleven"
+          width={1392}
+          height={284}
+          className="mt-[68.32px] ml-margin h-auto max-w-none phone:mt-[19.96px]"
+          style={{ width: phone ? 358 : 1392 }}
+        />
       </div>
-      {/* The ELEVEN (the gate wordmark at 1392 × 284, black: public/icons/eleven-gate-v2.svg): 24 from the left, its foot 114 above the screen's
-          bottom. Phone: 358 wide on the 16 margins. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/icons/eleven-gate-v2.svg"
-        alt="Eleven"
-        width={1392}
-        height={284}
-        className="absolute left-margin h-auto max-w-none phone:w-[358px]"
-        style={{ bottom: phone ? 80 : 114.08, width: phone ? 358 : 1392 }}
-      />
     </motion.section>
   );
 }

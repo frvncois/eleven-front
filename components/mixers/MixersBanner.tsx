@@ -6,7 +6,7 @@ import { animate, motion, useMotionTemplate, useMotionValue, useReducedMotion } 
 import { mixers } from "@/lib/content";
 import { sound } from "@/lib/sound";
 import { usePathname } from "next/navigation";
-import { EASE_DISSOLVE, SWING, THEME_INK, themeColor } from "@/lib/motion";
+import { EASE_DISSOLVE, SWING, THEME_INK, wedgeColor } from "@/lib/motion";
 import { useDialogFocus } from "@/lib/dialog-focus";
 
 // The wedge (in the page accent) runs full width from the top, its lower edge from
@@ -36,13 +36,13 @@ const ICONS: Record<string, { cx: number; cy: number; h: number }> = {
  * the top, right corner first, left corner catching up, so the edge tilts into its angle. The page
  * behind blurs with no colour. Hovering a name pops its icon into an empty spot between the names;
  * clicking a name opens that mixer. Click outside or Esc closes (the wedge swings back up).
- * The wedge wears the page's accent, names and icons in that colour's ink
+ * The wedge wears the page's accent (Mixers red on the home), names and icons in that colour's ink
  * (black or grey). Cursor: the plain arrow over the wedge, the CLOSE tag only over the blurred
  * page, in the page accent with black text.
  */
 export function MixersBanner({ open, onClose }: { open: boolean; onClose: () => void }) {
   const still = useReducedMotion() ?? false;
-  const accent = themeColor(usePathname());
+  const accent = wedgeColor(usePathname());
   const ink = THEME_INK[accent] ?? "#bdbdbd";
   const [mounted, setMounted] = useState(open);
   const layer = useRef<HTMLDivElement>(null);
