@@ -44,31 +44,56 @@
     "label": "services",
     "items": [
       [
-        "Sound Design",
-        "Making the noises, like [[boom]], [[splash]] and [[vroom]]"
-      ],
-      [
-        "Voice Casting",
-        "We find people who [[talk good]] on a microphone"
-      ],
-      [
         "Mix",
         "Making all the sounds not too loud, not too quiet, but [[juuuust right]]"
       ],
       [
-        "Music",
-        "[[Dooo Wapaa Dooodoo]]"
+        "Sound Design",
+        "Making the noises, like [[boom]], [[splash]] and [[vroom]]"
+      ],
+      [
+        "VO",
+        "We record [[someone talking]], but you can’t see them"
       ],
       [
         "ADR",
         "Redoing the on camera take, the original one was… [[meh]]"
       ],
       [
-        "VO",
-        "We record [[someone talking]], but you can’t see them"
+        "Music",
+        "[[Dooo Wapaa Dooodoo]]"
+      ],
+      [
+        "Voice Casting",
+        "We find people who [[talk good]] on a microphone"
       ]
     ],
-    "sounds": {}
+    "sounds": {
+      "juuuust right": [
+        "/sounds/eleven/service-mix.m4a"
+      ],
+      "boom": [
+        "/sounds/eleven/service-boom.m4a"
+      ],
+      "splash": [
+        "/sounds/eleven/service-splash.m4a"
+      ],
+      "vroom": [
+        "/sounds/eleven/service-vroom.m4a"
+      ],
+      "someone talking": [
+        "/sounds/eleven/service-vo.m4a"
+      ],
+      "meh": [
+        "/sounds/eleven/service-adr.m4a"
+      ],
+      "Dooo Wapaa Dooodoo": [
+        "/sounds/eleven/service-music.m4a"
+      ],
+      "talk good": [
+        "/sounds/eleven/service-voice-casting.m4a"
+      ]
+    }
   },
   "team": {
     "label": "These are our humans",
@@ -133,19 +158,11 @@
           ]
         },
         {
-          "slug": "sean-kiely",
-          "bg": "light-grey",
-          "ink": "neutral-1000",
-          "roles": [
-            "Producer"
-          ]
-        },
-        {
-          "slug": "taylor-sargent",
+          "slug": "adrea",
           "bg": "purple",
           "ink": "neutral-300",
           "roles": [
-            "Producer"
+            "[Role]"
           ]
         }
       ]

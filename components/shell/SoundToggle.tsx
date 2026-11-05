@@ -9,10 +9,33 @@ import { useSound } from "@/lib/sound";
  * The current word is solid, the other dimmed; flipping rolls the solid copy up through a clipped cell.
  * The bars bounce while sound is on and rest as short stubs when it is off. `meter={false}` drops them (the sound
  * gate). `stacked` (the sound gate): SOUND on its own line, OFF / ON centred 4 under it.
+ * `onChoose` (the sound gate): OFF and ON are two answers, not a toggle. Each sets its own state (clicking OFF never
+ * turns sound on) and then reports the choice.
  */
-export function SoundToggle({ meter = true, stacked = false }: { meter?: boolean; stacked?: boolean }) {
+export function SoundToggle({ meter = true, stacked = false, onChoose }: { meter?: boolean; stacked?: boolean; onChoose?: (on: boolean) => void }) {
   const s = useSound();
   const on = s.unlocked && !s.muted;
+
+  if (onChoose) {
+    const choose = (want: boolean) => {
+      s.setMuted(!want); // a click on ON is the gesture that unlocks audio
+      onChoose(want);
+    };
+    return (
+      <div data-sound-toggle className={`flex items-center uppercase ${stacked ? "flex-col gap-1" : "gap-[0.25em]"}`}>
+        <span>Sound</span>
+        <span className="flex items-center gap-[0.25em]">
+          <button type="button" aria-label="Continue without sound" onClick={() => choose(false)} className="cursor-pointer uppercase">
+            <Word text="Off" active={!on} />
+          </button>
+          <span className="opacity-35">/</span>
+          <button type="button" aria-label="Turn sound on" onClick={() => choose(true)} className="cursor-pointer uppercase">
+            <Word text="On" active={on} />
+          </button>
+        </span>
+      </div>
+    );
+  }
 
   return (
     <button

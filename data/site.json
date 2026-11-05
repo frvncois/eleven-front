@@ -54,6 +54,21 @@
       ],
       "map": "https://maps.google.com/?q=2255+Barry+Avenue,+Los+Angeles,+CA+90064",
       "phone": "310.526.2911"
+    },
+    "reps": {
+      "label": "Rep",
+      "people": [
+        {
+          "name": "Matt Conforti",
+          "email": "matt@novickconforti.com",
+          "phone": "+1 609-781-3152"
+        },
+        {
+          "name": "Brent Novick",
+          "email": "brent@novickconforti.com",
+          "phone": "+1 415-860-1055"
+        }
+      ]
     }
   },
   "footer": {

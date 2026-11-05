@@ -64,6 +64,8 @@
 /* ------------------------------------------------------------------ */
 @utility t-display-big { font-family: var(--font-serif); font-size: 120px; line-height: 0.95; text-transform: uppercase; }
 @utility t-h2 { font-family: var(--font-serif); font-size: 64px; line-height: 1; }
+/* About story: Heading/H2 one step down (56), the page read as too loud at 64 (Eleven, Nov 2026). */
+@utility t-story { font-family: var(--font-serif); font-size: 56px; line-height: 1; }
 @utility t-h2-indent { font-family: var(--font-serif); font-size: 64px; line-height: 1; text-indent: 120px; }
 @utility t-h3 { font-family: var(--font-sans); font-weight: 700; font-size: 28px; line-height: 1; text-transform: uppercase; }
 @utility t-h4 { font-family: var(--font-sans); font-weight: 700; font-size: 24px; line-height: 1.1; text-transform: uppercase; &:where(html.phone *) { font-size: 12px; } }

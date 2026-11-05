@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import VimeoPlayer from "@vimeo/player";
 import type { Project } from "@/lib/content";
-import { sound, useSound } from "@/lib/sound";
+import { sound } from "@/lib/sound";
 import { EASE_SWEEP, PHONE_MOTION } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 import { Scrub, captionOf, creditsOf, embedUrl } from "@/components/mixers/Player";
@@ -55,8 +55,9 @@ export function PlayerMobile({ films, index, onIndex, onClose, longform = false 
   const layer = useRef<HTMLDivElement>(null);
   useDialogFocus(open, layer);
   const film = open ? films[index] : null;
-  const s = useSound();
-  const muted = !(s.unlocked && !s.muted);
+  // The film always has its sound (the site's SOUND chip drives the SFX, not the films); iOS still starts it muted,
+  // so it is turned up on play, or on the first touch where the phone refuses.
+  const muted = false;
   useDockCovered(open);
 
   const frameRef = useRef<HTMLIFrameElement>(null);

@@ -40,7 +40,7 @@ export function TeamBarsMobile({ cards }: { cards: Card[] }) {
       if (best !== cur) {
         cur = best;
         setOpen(best);
-        if (best !== -1) sound.cue("step");
+        if (best !== -1) sound.cue("teamStep");
       }
     };
     raf = requestAnimationFrame(tick);

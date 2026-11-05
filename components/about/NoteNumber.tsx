@@ -1,11 +1,12 @@
 /**
- * A story note's number as two digits ("01", "02"…): Neue Haas bold 10, black, centred in a 16 px pink square.
+ * A story note's number as two digits ("01", "02"…): Neue Haas bold 12, black, centred in a 20 px pink square, big
+ * enough to be noticed, still small enough to read as a footnote mark.
  * The same mark in the text (raised like a footnote) and beside the side note, so the pair reads.
  */
 export function NoteNumber({ n, className = "" }: { n: string; className?: string }) {
   return (
     <span
-      className={`inline-flex size-4 items-center justify-center bg-pink indent-0 font-sans text-[10px] leading-none font-bold not-italic text-neutral-1000 ${className}`}
+      className={`inline-flex size-5 items-center justify-center bg-pink indent-0 font-sans text-[12px] leading-none font-bold not-italic text-neutral-1000 ${className}`}
     >
       {n}
     </span>

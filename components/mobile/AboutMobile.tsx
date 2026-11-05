@@ -27,7 +27,7 @@ const block = (k: number) => {
 };
 
 /**
- * About on a phone. Story in Mobile/Story (Junicode 32) as one continuous text
+ * About on a phone. Story in Junicode 26 (a step under the 28 it had, with the desktop) as one continuous text
  * (STORY above), the sticker held on screen, the snow globe, services as name over description, the room banner, the team bars
  * that open as they cross the middle, then "work together?" on one screen with a CONTACT US chip.
  */
@@ -42,11 +42,11 @@ export function AboutMobile() {
         <StorySticker src={story.sticker.src} width={72} height={31} top={170} left={16} hold="14%" />
         {/* Top padding 324. */}
         <section className="flex flex-col px-margin pt-[324px]">
-          <p className="font-serif text-[28px] leading-none" style={block(0)}>
+          <p className="font-serif text-[26px] leading-none" style={block(0)}>
             {story.intro}
           </p>
           {story.paragraphs.map((p, i) => (
-            <p key={p.note.n} className="font-serif text-[28px] leading-none" style={block(i + 1)}>
+            <p key={p.note.n} className="font-serif text-[26px] leading-none" style={block(i + 1)}>
               <StoryText text={p.text} />
             </p>
           ))}
@@ -110,8 +110,8 @@ export function AboutMobile() {
           whole screen links. The team above ends on an 80 padding, like its 80 top. */}
       <Link href={about.contact.href} className="flex h-(--vh) flex-col items-center justify-center gap-6 px-margin">
         <div className="flex w-span-4 flex-col items-center text-center">
-          <h2 className="font-serif text-[28px] leading-none text-balance">{about.contact.title}</h2>
-          <p className="font-serif text-[28px] leading-none">{about.contact.line}</p>
+          <h2 className="font-serif text-[26px] leading-none text-balance">{about.contact.title}</h2>
+          <p className="font-serif text-[26px] leading-none">{about.contact.line}</p>
           <p className="t-mini mt-3 normal-case">{about.contact.aside}</p>
         </div>
         <span className="chip bg-pink">{about.contact.cursor}</span>

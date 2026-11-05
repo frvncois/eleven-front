@@ -473,6 +473,8 @@ function List({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void })
               rows.current[c * tiles.length + i] = node;
             }}
             type="button"
+            // The step note plays as a project reaches the middle, so no button click on touch.
+            data-sound="off"
             data-row={c * tiles.length + i}
             tabIndex={c === 1 ? 0 : -1}
             aria-hidden={c === 1 ? undefined : true}

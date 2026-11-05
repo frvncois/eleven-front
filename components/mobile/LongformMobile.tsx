@@ -12,17 +12,25 @@ import { appScale } from "@/lib/device";
 
 /**
  * Longform on a phone. One film per screen, cropped to cover the portrait (until
- * Eleven sends 9:16 cuts), with the slow push-in and 25 % dim of desktop. The films follow the finger and land
- * on one when it lets go, the same feel as the Archive list (lib/stepper). The colour strip stays vertical like desktop (across the screen the titles
- * don't fit): 24 squares down the left margin, centred, the current one opening into a tag of client over
- * title (LongformTag, shared with desktop). No "turn the phone" prompt. Tap = the player.
+ * Eleven sends 9:16 cuts), with the slow push-in and 25 % dim of desktop. The films move like the Archive list:
+ * they follow the finger and land on one when it lets go (lib/stepper), the film in the middle is full screen and
+ * the ones around it step back (smaller, GAP apart), so the next one grows into place as the current one shrinks
+ * away, and after the last film comes the first again. The colour strip stays vertical like desktop (across the
+ * screen the titles don't fit): 24 squares down the left margin, centred, the current one opening into a tag of
+ * client over title (LongformTag, shared with desktop). No "turn the phone" prompt. Tap = the player.
  */
+// The Archive list's pyramid, for full-screen films: the middle one at 1, its neighbours SIDE (a band of each shows
+// above and below while it moves), GAP between them.
+const SIDE = 0.8;
+const REACH = 1.2; // films over which the size steps back down to SIDE
+const GAP = 8;
+const smooth = (t: number) => t * t * (3 - 2 * t);
 export function LongformMobile({ films }: { films: Film[] }) {
   const [index, setIndex] = useState(0);
   // Reduced motion: no endless push-in, the still sits at rest.
   const pushIn = !useReducedMotion();
   const [playing, setPlaying] = useState<number | null>(null);
-  const track = useRef<HTMLDivElement>(null);
+  const items = useRef<(HTMLButtonElement | null)[]>([]);
   // Position in films (fractional) and where it is landing; the loop below draws it.
   const pos = useRef(0);
   const target = useRef<number | null>(null);
@@ -32,8 +40,13 @@ export function LongformMobile({ films }: { films: Film[] }) {
     playingRef.current = playing;
   });
 
-  // The strip: jump to a film.
-  const go = (i: number) => (target.current = Math.max(0, Math.min(films.length - 1, i)));
+  // The strip: go to a film the short way round.
+  const go = (i: number) => {
+    const n = films.length;
+    const from = target.current ?? pos.current;
+    const d = ((((i - from) % n) + n * 1.5) % n) - n / 2;
+    target.current = Math.round(from + d);
+  };
 
   // The same feel as the Archive list (lib/stepper): the films follow the finger, and on release land on one
   // (a swipe or a gentle flick moves one, a hard flick up to three), easing in.
@@ -46,7 +59,7 @@ export function LongformMobile({ films }: { films: Film[] }) {
     let last = 0;
     let raf = 0;
     let wheelEnd: ReturnType<typeof setTimeout> | undefined;
-    const clamp = (p: number) => Math.max(-0.15, Math.min(n - 0.85, p));
+    const wrap = (k: number) => ((k % n) + n) % n;
     const tick = () => {
       raf = requestAnimationFrame(tick);
       if (!drag && target.current !== null) {
@@ -56,15 +69,35 @@ export function LongformMobile({ films }: { films: Film[] }) {
           target.current = null;
         }
       }
-      if (track.current) track.current.style.transform = `translate3d(0, ${(-pos.current * vhOf()).toFixed(1)}px, 0)`;
-      const i = Math.max(0, Math.min(n - 1, Math.round(pos.current)));
+      // Sizes from each film's distance to the middle, positions stacked outward from the nearest one with the real
+      // heights + GAP (the Archive list's method), drawn with transforms only.
+      const h = vhOf();
+      const c = pos.current;
+      const k0 = Math.round(c);
+      const size = (k: number) => SIDE + (1 - SIDE) * smooth(Math.max(0, 1 - Math.abs(k - c) / REACH));
+      const centre = new Map<number, number>([[k0, h / 2 + (k0 - c) * (h * size(k0) + GAP)]]);
+      for (let k = k0 + 1; k <= k0 + 2; k++) centre.set(k, centre.get(k - 1)! + (h * (size(k - 1) + size(k))) / 2 + GAP);
+      for (let k = k0 - 1; k >= k0 - 2; k--) centre.set(k, centre.get(k + 1)! - (h * (size(k + 1) + size(k))) / 2 - GAP);
+      const shown = new Set<number>();
+      centre.forEach((y, k) => {
+        const node = items.current[wrap(k)];
+        if (!node || shown.has(wrap(k))) return;
+        shown.add(wrap(k));
+        const sc = size(k);
+        node.style.visibility = "visible";
+        node.style.transform = `translate3d(0, ${(y - (h * sc) / 2).toFixed(1)}px, 0) scale(${sc.toFixed(4)})`;
+      });
+      items.current.forEach((node, i) => {
+        if (node && !shown.has(i)) node.style.visibility = "hidden";
+      });
+      const i = wrap(k0);
       if (i !== last) {
         last = i;
         sound.cue("longformStep");
         setIndex(i);
       }
     };
-    raf = requestAnimationFrame(tick);
+    tick(); // draw now (it schedules the loop), so the films never show stacked at 0
     const start = (e: TouchEvent) => {
       if (playingRef.current !== null) return;
       drag = { y: e.touches[0].clientY, t: performance.now(), start: Math.round(pos.current), moved: 0 };
@@ -77,7 +110,7 @@ export function LongformMobile({ films }: { films: Film[] }) {
       e.preventDefault();
       const dy = (e.touches[0].clientY - drag.y) / appScale();
       const now = performance.now();
-      pos.current = clamp(pos.current - dy / vhOf());
+      pos.current -= dy / vhOf();
       v = v * 0.6 + (-dy / Math.max(1, now - drag.t)) * 16.7 * 0.4;
       drag.moved += Math.abs(dy);
       if (drag.moved > 8) dragged.current = true;
@@ -87,16 +120,16 @@ export function LongformMobile({ films }: { films: Film[] }) {
     const end = () => {
       if (!drag) return;
       if (performance.now() - drag.t > 80) v = 0;
-      target.current = Math.max(0, Math.min(n - 1, landing(drag.start, pos.current, v, vhOf(), 30)));
+      target.current = landing(drag.start, pos.current, v, vhOf(), 30);
       drag = null;
     };
     const wheel = (e: WheelEvent) => {
       if (playingRef.current !== null) return;
       e.preventDefault();
       target.current = null;
-      pos.current = clamp(pos.current + e.deltaY / appScale() / vhOf());
+      pos.current += e.deltaY / appScale() / vhOf();
       clearTimeout(wheelEnd);
-      wheelEnd = setTimeout(() => (target.current = Math.max(0, Math.min(n - 1, Math.round(pos.current)))), 140);
+      wheelEnd = setTimeout(() => (target.current = Math.round(pos.current)), 140);
     };
     window.addEventListener("touchstart", start, { passive: true });
     window.addEventListener("touchmove", move, { passive: false });
@@ -117,15 +150,20 @@ export function LongformMobile({ films }: { films: Film[] }) {
 
   return (
     <main className="relative h-(--vh) touch-none overflow-hidden bg-neutral-1000 select-none">
-      <div ref={track} className="absolute inset-x-0 top-0 will-change-transform">
+      <div className="absolute inset-0">
         {films.map((f, i) => (
           <button
             key={f.slug}
+            ref={(node) => {
+              items.current[i] = node;
+            }}
             type="button"
+            // The film's own note plays as it lands, so no button click on touch.
+            data-sound="off"
             // A drag is not a tap.
             onClick={() => !dragged.current && openWithSound(() => setPlaying(i))}
             aria-label={`Play ${f.label}`}
-            className="relative block h-(--vh) w-[390px] overflow-hidden"
+            className="invisible absolute top-0 left-0 block h-(--vh) w-[390px] origin-top overflow-hidden will-change-transform"
           >
             <motion.div
               key={i === index ? `on-${f.slug}` : f.slug}
@@ -155,6 +193,7 @@ export function LongformMobile({ films }: { films: Film[] }) {
             key={f.slug}
             type="button"
             onClick={() => go(i)}
+            data-sound="off"
             aria-label={f.label}
             aria-current={i === index ? "true" : undefined}
             className="block text-left"

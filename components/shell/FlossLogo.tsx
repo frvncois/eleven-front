@@ -14,8 +14,9 @@ import { prefersReducedMotion } from "@/lib/motion";
  * out as holes. The player renders into a hidden canvas; each frame is copied to the visible one with
  * the holes inside the box filled black, so the box reads white with black details on any page. Holes
  * outside the box (the loops the spilled floss makes) stay open. On light pages a thin black outline
- * is traced around the silhouette (stacked drop-shadows) so the white box sits on white; on dark pages
- * it is dimmed to the nav's grey.
+ * is traced around the silhouette so the white box sits on white; on dark pages it is dimmed to the nav's
+ * grey. The outline is drawn into the canvas pixels (a black copy of the silhouette stamped around it),
+ * not with CSS drop-shadows: those thin out and turn grey when the phone scales the logo down.
  *
  * Canvas sizing: in the 500×500 Lottie the floss box at frame 0 spans x 60–368, y 86–436, so the
  * canvas is scaled and offset to land that box in its slot: the webp's 106.651×113.346, 20 % smaller,
@@ -38,10 +39,26 @@ const OFFSET_BOTTOM = (500 - 436) * SCALE;
 const BOX = { x0: 55, x1: 360, y0: 20, y1: 432 };
 const CORNER = { x: 300, y: 380 };
 
-const LINE = "0.5px";
-const OUTLINE = [`${LINE} 0`, `-${LINE} 0`, `0 ${LINE}`, `0 -${LINE}`]
-  .map((o) => `drop-shadow(${o} 0 var(--color-neutral-1000))`)
-  .join(" ");
+/** Stamp a black copy of the drawing's silhouette around it, `r` canvas pixels out, so it gets a solid outline. */
+function traceOutline(ctx: CanvasRenderingContext2D, r: number) {
+  const { width: w, height: h } = ctx.canvas;
+  const sil = document.createElement("canvas");
+  sil.width = w;
+  sil.height = h;
+  const s = sil.getContext("2d");
+  if (!s) return;
+  s.drawImage(ctx.canvas, 0, 0);
+  s.globalCompositeOperation = "source-in";
+  s.fillStyle = "#000";
+  s.fillRect(0, 0, w, h);
+  ctx.globalCompositeOperation = "destination-over";
+  const steps = 16;
+  for (let i = 0; i < steps; i++) {
+    const a = (i / steps) * Math.PI * 2;
+    ctx.drawImage(sil, Math.cos(a) * r, Math.sin(a) * r);
+  }
+  ctx.globalCompositeOperation = "source-over";
+}
 
 /** Fill the enclosed transparent regions that lie entirely inside BOX with black. */
 function fillHoles(img: ImageData) {
@@ -117,7 +134,8 @@ function fillHoles(img: ImageData) {
 /** On dark pages (Longform) the white box dims to neutral/300 #bdbdbd, the grey of Nav/Bar and the sound toggle. */
 const GREY = `brightness(${0xbd / 0xff})`;
 
-export function FlossLogo({ tone = "dark" }: { tone?: "dark" | "light" }) {
+/** `outlined` draws the black outline on dark pages too (the phone nav: outlined on every page, grey or white). */
+export function FlossLogo({ tone = "dark", line = 0.5, outlined = tone === "dark" }: { tone?: "dark" | "light"; line?: number; outlined?: boolean }) {
   const sourceRef = useRef<HTMLCanvasElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const player = useRef<DotLottie | null>(null);
@@ -125,6 +143,13 @@ export function FlossLogo({ tone = "dark" }: { tone?: "dark" | "light" }) {
   const progress = useRef(0);
   const raf = useRef<number | undefined>(undefined);
   const disabled = useRef(false);
+  // The outline width in CSS px at the logo's own size (before any scale-down), 0 = none. Read by paint().
+  const outlinePx = useRef(outlined ? line : 0);
+  const repaint = useRef<() => void>(() => {});
+  useEffect(() => {
+    outlinePx.current = outlined ? line : 0;
+    repaint.current();
+  }, [outlined, line]);
 
   useEffect(() => {
     disabled.current =
@@ -146,7 +171,9 @@ export function FlossLogo({ tone = "dark" }: { tone?: "dark" | "light" }) {
       const img = ctx.getImageData(0, 0, dst.width, dst.height);
       fillHoles(img);
       ctx.putImageData(img, 0, 0);
+      if (outlinePx.current) traceOutline(ctx, outlinePx.current * (dst.width / CANVAS));
     };
+    repaint.current = paint;
 
     import("@lottiefiles/dotlottie-web").then(({ DotLottie }) => {
       if (cancelled || !sourceRef.current) return;
@@ -208,7 +235,7 @@ export function FlossLogo({ tone = "dark" }: { tone?: "dark" | "light" }) {
         ref={canvasRef}
         aria-hidden
         className="pointer-events-none absolute"
-        style={{ ...box, filter: tone === "dark" ? OUTLINE : GREY }}
+        style={{ ...box, filter: tone === "light" ? GREY : undefined }}
       />
     </span>
   );

@@ -14,9 +14,9 @@ type Props = { name: string; slug: string; bg: string; ink: string; roles: strin
 export function TeamCard({ name, slug, bg, ink, roles }: Props) {
   const takes: string[] = [];
   const onEnter = () => {
-    // Stand-in: the shared step sounds until each person has their own takes (replace before launch).
+    // Eleven's plucks until each person has their own takes.
     if (takes.length) sound.play(takes, slug);
-    else sound.cue("step");
+    else sound.cue("teamStep");
   };
   const roll = "absolute inset-0 flex items-center justify-center transition-[translate,opacity] duration-300 ease-out motion-reduce:transition-none";
   return (

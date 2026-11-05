@@ -31,8 +31,16 @@ const GAP = 4; // between the list's projects
 const STEP = 300; // wheel distance from one project to the next
 // Grid: the designed field spread out a little so there is air between projects, then
 // evened out (relax) so there are no big holes. Tile sizes stay.
-const SPREAD = 1.32; // room so projects sit well apart
-const MIN_GAP = 136; // smallest space between two projects after evening out
+const SPREAD = 1.2; // room so projects sit apart without leaving white pockets
+const MIN_GAP = 116; // smallest space between two projects after evening out
+// Evening out: a hard pass keeps MIN_GAP, a soft long-range push (on for the first 73 % of the passes) spreads
+// crowded areas into the holes, so no pocket reads as "not much work here".
+const RELAX_PASSES = 600;
+const PUSH = 60000;
+const PUSH_RANGE = 1800;
+// Every few passes the emptiest spot pulls its nearest project towards it (fillHole), so the last pockets close.
+const FILL_EVERY = 6;
+const FILL_STEP = 120;
 const GROW = 1.15; // field frames 15 % bigger than the grid's 2 / 3 / 4 columns
 // On arrival the nav must read clearly: the opening view (searched over the whole wrapped field)
 // keeps the top nav clear, avoids the floss and toggle corners, and fills the screen.
@@ -80,6 +88,16 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
   // The grid only plays its flat morph phase when it comes back from the list.
   const [fromList, setFromList] = useState(false);
   const [playing, setPlaying] = useState<number | null>(null);
+  // Even out the grid's field in idle time while the list shows, so switching to GRID doesn't wait for it.
+  useEffect(() => {
+    const run = () => relaxedTiles(tiles, { w: field.w * SPREAD, h: field.h * SPREAD });
+    if ("requestIdleCallback" in window) {
+      const id = requestIdleCallback(run, { timeout: 2000 });
+      return () => cancelIdleCallback(id);
+    }
+    const id = setTimeout(run, 500);
+    return () => clearTimeout(id);
+  }, [tiles, field.w, field.h]);
 
   const choose = (v: "grid" | "list") => {
     sound.cue(v === "list" ? "gather" : "explode");
@@ -111,7 +129,7 @@ export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number;
 function relax(tiles: Tile[], field: { w: number; h: number }) {
   const c = tiles.map((t) => ({ x: t.x + t.w / 2, y: t.y + t.h / 2 }));
   const near = (d: number, size: number) => d - size * Math.round(d / size);
-  for (let it = 0; it < 220; it++) {
+  for (let it = 0; it < RELAX_PASSES; it++) {
     const f = c.map(() => ({ x: 0, y: 0 }));
     for (let i = 0; i < c.length; i++) {
       for (let j = i + 1; j < c.length; j++) {
@@ -133,8 +151,8 @@ function relax(tiles: Tile[], field: { w: number; h: number }) {
         } else {
           // Soft long-range push so crowded areas spill into the holes.
           const d2 = dx * dx + dy * dy;
-          if (d2 < 900 * 900) {
-            const k = (it < 160 ? 9000 : 0) / Math.max(d2, 1e4);
+          if (d2 < PUSH_RANGE * PUSH_RANGE) {
+            const k = (it < RELAX_PASSES * 0.73 ? PUSH : 0) / Math.max(d2, 1e4);
             f[i].x -= dx * k * 0.02;
             f[i].y -= dy * k * 0.02;
             f[j].x += dx * k * 0.02;
@@ -147,8 +165,36 @@ function relax(tiles: Tile[], field: { w: number; h: number }) {
       p.x = (p.x + f[i].x + field.w) % field.w;
       p.y = (p.y + f[i].y + field.h) % field.h;
     });
+    if (it % FILL_EVERY === 0 && it < RELAX_PASSES * 0.73) fillHole(c, tiles, field, near);
   }
   return tiles.map((t, i) => ({ ...t, x: c[i].x - t.w / 2, y: c[i].y - t.h / 2 }));
+}
+
+/** Find the emptiest spot on the field (sampled every FILL_STEP) and pull the nearest project halfway towards it. */
+function fillHole(c: { x: number; y: number }[], tiles: Tile[], field: { w: number; h: number }, near: (d: number, size: number) => number) {
+  let best = { d: -1, x: 0, y: 0 };
+  for (let y = 0; y < field.h; y += FILL_STEP) {
+    for (let x = 0; x < field.w; x += FILL_STEP) {
+      let m = Infinity;
+      for (let i = 0; i < c.length; i++) {
+        const ex = Math.max(Math.abs(near(x - c[i].x, field.w)) - tiles[i].w / 2, 0);
+        const ey = Math.max(Math.abs(near(y - c[i].y, field.h)) - tiles[i].h / 2, 0);
+        m = Math.min(m, Math.hypot(ex, ey));
+      }
+      if (m > best.d) best = { d: m, x, y };
+    }
+  }
+  let ni = 0;
+  let nd = Infinity;
+  for (let i = 0; i < c.length; i++) {
+    const d = Math.hypot(near(best.x - c[i].x, field.w), near(best.y - c[i].y, field.h));
+    if (d < nd) {
+      nd = d;
+      ni = i;
+    }
+  }
+  c[ni].x = (c[ni].x + near(best.x - c[ni].x, field.w) * 0.5 + field.w) % field.w;
+  c[ni].y = (c[ni].y + near(best.y - c[ni].y, field.h) * 0.5 + field.h) % field.h;
 }
 
 // The opening view per screen height and the evened-out layout, worked out once per visit.

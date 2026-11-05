@@ -8,11 +8,12 @@ import { SWING, prefersReducedMotion } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 
 const WORDS = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
-// The count, one word at a time over about 4.3 s: a word every 0.38 s from 0.3 s, ten lands at 3.72 s,
-// held 0.6 s, then the panel swings up at 4.32 s.
-const FIRST_MS = 300;
-const STEP_MS = 380;
-const HOLD_MS = 600;
+// The count, one word at a time over about 8 s (Eleven: 4 s was too fast to register what to do): the words wait
+// 2 s so the eye reads the copy at the top first, then a word every 0.54 s, ten lands at 6.86 s, held 0.7 s, and the
+// panel swings up at 7.56 s (gone at about 8.3 s).
+const FIRST_MS = 2000;
+const STEP_MS = 540;
+const HOLD_MS = 700;
 const SWING_S = 0.7;
 const SWING_LAG_S = 0.14; // the right corner follows the left, like the Mixers wedge closing
 /** When the home's nav (Home, PhoneShell) fades in, counted from the moment the gate starts to leave. */
@@ -28,7 +29,8 @@ const EDGE_PHONE = { left: 48, right: 67 };
  * Sound gate, over the playing home reel: the H3 line
  * and SOUND OFF / ON (the choice) centred at the top, the counting words "one" … "ten" in a row above the big ELEVEN.
  * The words appear one at a time (a step sound each, heard only with sound on); after "ten" the panel swings back up,
- * left corner first, like the Mixers wedge closing. Nobody is stuck here: the gate leaves on its own.
+ * left corner first, like the Mixers wedge closing. Choosing OFF or ON opens it at once (no waiting for the count);
+ * with no choice, it leaves on its own after "ten".
  * `onDone` fires when the swing starts (the home marks the gate seen); AnimatePresence keeps this mounted until the
  * swing has finished (usePresence).
  */
@@ -112,7 +114,7 @@ export function GateLoader({ onDone, phone = false }: { onDone: () => void; phon
           {home.gate.line[1]}
         </p>
         <div className="t-h4 mt-[clamp(32px,calc(var(--vh)-750px),58px)] text-[16px] phone:mt-[38px] phone:text-[12px]">
-          <SoundToggle meter={false} stacked />
+          <SoundToggle meter={false} stacked onChoose={onDone} />
         </div>
         <p className="t-h6 mt-6 text-center">{home.gate.hint}</p>
       </div>

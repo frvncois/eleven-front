@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import VimeoPlayer from "@vimeo/player";
 import { splitCaption, type Project } from "@/lib/content";
 import { mixerBySlug } from "@/lib/content";
-import { sound, useSound } from "@/lib/sound";
+import { sound } from "@/lib/sound";
 import { EASE_DISSOLVE } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 import site from "@/data/site.json";
@@ -20,11 +20,11 @@ const CHIP_SM = "chip-sm cursor-pointer";
 const IDLE_MS = 5000;
 
 /**
- * Open a film WITH sound, even if the visitor muted the site before: watching is a deliberate act.
+ * Open a film WITH sound, whatever the site's SOUND toggle says: watching is a deliberate act, and the toggle is
+ * for the site's own sounds (SFX, reel, rooms), not the films. The site's choice is left as it is.
  * Call it inside the click handler (the gesture lets the browser start audio), before the player opens.
  */
 export function openWithSound(open: () => void) {
-  sound.setMuted(false);
   sound.unlock();
   open();
 }
@@ -128,8 +128,8 @@ type Props = {
 export function Player({ films, index, onIndex, onClose, longform = false }: Props) {
   const open = index !== null;
   const film = open ? films[index] : null;
-  const s = useSound();
-  const muted = !(s.unlocked && !s.muted);
+  // The film always has its sound; the SOUND chip in the corner only drives the site's own sounds.
+  const muted = false;
 
   const frameRef = useRef<HTMLIFrameElement>(null);
   const playerRef = useRef<VimeoPlayer | null>(null);
@@ -204,11 +204,6 @@ export function Player({ films, index, onIndex, onClose, longform = false }: Pro
       playerRef.current = null;
     };
   }, [film, index, films.length, onIndex]);
-
-  // The site's sound toggle drives the film's volume.
-  useEffect(() => {
-    playerRef.current?.setMuted(muted).catch(() => {});
-  }, [muted]);
 
   const toggle = useCallback(() => {
     const p = playerRef.current;

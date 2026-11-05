@@ -14,11 +14,14 @@ import { MenuCard } from "./MenuCard";
 import { GATE_EXIT } from "@/components/home/GateLoader";
 import { FlossLogo, SLOT } from "@/components/shell/FlossLogo";
 
-// Pages whose top sits on video: the floss stays plain there (no black outline).
+// Pages whose top sits on video: the floss dims to grey there.
 const ON_VIDEO = ["/", "/longform"];
 // The nav logo on every page is the floss, like the desktop nav: 40 tall.
 const FLOSS_H = 40;
 const FLOSS_K = FLOSS_H / SLOT.h;
+// The outline is drawn before the scale-down, so it is thickened to land at 0.75 px on screen: a touch heavier
+// than the desktop's 0.5, so it still reads on the 40 tall logo.
+const FLOSS_LINE = 0.75 / FLOSS_K;
 // The phone chip (globals.css `chip`: 24 tall, 12 px bold caps).
 const CHIP = "chip pointer-events-auto";
 
@@ -75,10 +78,10 @@ export function PhoneShell() {
                 className="pointer-events-auto relative top-4 mb-[2px] block transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90"
                 style={{ width: SLOT.w * FLOSS_K, height: FLOSS_H }}
               >
-                {/* Drawn at its desktop size (sharp), scaled down from the top-left corner. White on video, outlined
-                    in black on white pages, like the desktop nav. */}
+                {/* Drawn at its desktop size (sharp), scaled down from the top-left corner. Grey on video, white on
+                    white pages, outlined in black on both. */}
                 <span className="block origin-top-left" style={{ transform: `scale(${FLOSS_K})` }}>
-                  <FlossLogo tone={onVideo ? "light" : "dark"} />
+                  <FlossLogo tone={onVideo ? "light" : "dark"} line={FLOSS_LINE} outlined />
                 </span>
               </Link>
               <AnimatePresence>

@@ -3,7 +3,11 @@
 import { useEffect, useRef } from "react";
 import { sound } from "@/lib/sound";
 
-/** Media/Reel: the full-screen reel. On the sound bus, so the gate, mute and overlays control it. */
+/**
+ * Media/Reel: the full-screen reel. On the sound bus, so the gate, mute and overlays control it.
+ * It plays under the gate (a band of it shows below the panel) and keeps playing as the gate swings away: no
+ * restart, so opening the gate reads as one continuous shot.
+ */
 export function HomeReel({ src, poster }: { src: string; poster: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {

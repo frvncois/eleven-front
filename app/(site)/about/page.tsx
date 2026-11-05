@@ -32,8 +32,8 @@ function AboutDesktop() {
 
       {/* Story + snow globe share one container so the sticker can run through both.
           The second paragraph always starts level with the top of the floss (Nav/Sub,
-          bottom 16 + 72.54 tall = vh − 88.54, the floss at 64 %), the intro (7 lines, 448) sits
-          on top of it, so the padding is vh − 536.54 (≈ 487 on a 1024 screen). The sticker rests at
+          bottom 16 + 72.54 tall = vh − 88.54, the floss at 64 %), the intro (6 lines of 56, 332.5) sits
+          on top of it, so the padding is vh − 425.67 (≈ 598 on a 1024 screen). The sticker rests at
           120 (held at 12 % ≈ 120 / 1024) and stays until after the snow globe, fading out at its end. */}
       <div className="relative">
         {/* 9-col grid: the sticker starts on col 3. */}
@@ -41,9 +41,9 @@ function AboutDesktop() {
         {/* 9-col grid: text on the 24 margin, the notes 1 col wide, paragraph 1 from col 3, paragraph 2 from col 4, both to 1416.
             Each first line is indented one column step (indent-col), so it starts on the next column:
             intro col 2, paragraph 1 col 4, paragraph 2 col 5. */}
-        <section className="relative flex flex-col px-margin pt-[calc(var(--vh)-536.54px)]">
+        <section className="relative flex flex-col px-margin pt-[calc(var(--vh)-425.67px)]">
           <div className="relative flex w-full flex-col items-end">
-            <p className="t-h2 indent-col w-full">{story.intro}</p>
+            <p className="t-story indent-col w-full">{story.intro}</p>
             {story.paragraphs.map((p, i) => (
               <div key={p.note.n} className={`flex w-full justify-between ${i === 0 ? "items-end" : "items-center"}`}>
                 <aside className="t-body-sm flex w-span-1 shrink-0 gap-2">
@@ -52,7 +52,7 @@ function AboutDesktop() {
                     <NoteText text={p.note.text} photo={"photo" in p.note ? p.note.photo : undefined} />
                   </span>
                 </aside>
-                <p className={`t-h2 indent-col shrink-0 ${i === 0 ? "w-span-7" : "w-span-6"}`}>
+                <p className={`t-story indent-col shrink-0 ${i === 0 ? "w-span-7" : "w-span-6"}`}>
                   <StoryText text={p.text} />
                 </p>
               </div>
@@ -79,7 +79,8 @@ function AboutDesktop() {
 
       {/* Services: black rule on top, the label left,
           and from x 633 one row per service: the name in condensed serif capitals (Junicode wdth 87.5,
-          50/100) and a big bold description (Neue 75, 46/100) right-aligned, rules between rows. */}
+          44/100) and a big bold description (Neue 75, 40/100) right-aligned, rules between rows (a step down
+          from 50 / 46, with the story, so the page hits less hard). */}
       {/* 9-col grid: label column 4 cols (24 to 634), the list from col 5 (650), text ending at 1416. */}
       <section className="flex items-start border-t border-neutral-1000 pt-margin pb-[120px] pl-margin">
         <h2 className="t-eyebrow w-span-4 shrink-0">{services.label}</h2>
@@ -89,8 +90,8 @@ function AboutDesktop() {
               key={name}
               className={`flex items-start justify-between pr-margin pb-margin ${i ? "pt-margin" : ""} ${i < services.items.length - 1 ? "border-b border-neutral-1000" : ""}`}
             >
-              <span className="w-[322px] shrink-0 font-serif text-[50px] leading-none uppercase [font-stretch:87.5%]">{name}</span>
-              <span className="min-w-0 flex-1 text-right font-sans text-[46px] leading-none font-bold text-pretty">
+              <span className="w-[322px] shrink-0 font-serif text-[44px] leading-none uppercase [font-stretch:87.5%]">{name}</span>
+              <span className="min-w-0 flex-1 text-right font-sans text-[40px] leading-none font-bold text-pretty">
                 <ServiceText text={note} />
               </span>
             </li>
@@ -125,8 +126,8 @@ function AboutDesktop() {
         className="flex h-[1024px] items-center justify-center px-margin pt-[120px] pb-16"
       >
         <div className="flex w-span-5 flex-col items-center text-center">
-          <h2 className="t-h2 text-balance">{about.contact.title}</h2>
-          <p className="t-h2">{about.contact.line}</p>
+          <h2 className="t-story text-balance">{about.contact.title}</h2>
+          <p className="t-story">{about.contact.line}</p>
           <p className="t-mini mt-4 normal-case">{about.contact.aside}</p>
         </div>
       </Link>

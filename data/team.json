@@ -96,27 +96,15 @@
     }
   },
   {
-    "slug": "taylor-sargent",
-    "name": "Taylor Sargent",
-    "role": "Producer",
-    "email": "taylor@elevensound.com",
-    "instagram": "https://www.instagram.com/tsarge_/",
-    "linkedin": "https://www.linkedin.com/in/tsargentkanazawa/",
+    "slug": "adrea",
+    "name": "Adrea",
+    "role": "[Role]",
+    "email": "[adrea@elevensound.com]",
+    "instagram": null,
+    "linkedin": null,
     "isMixer": false,
     "order": 6,
-    "photo": "/media/team/taylor-sargent.webp",
-    "icon": null
-  },
-  {
-    "slug": "sean-kiely",
-    "name": "Sean Kiely",
-    "role": "Producer",
-    "email": "sean@elevensound.com",
-    "instagram": "https://www.instagram.com/seanshine432/",
-    "linkedin": "https://www.linkedin.com/in/sean-kiely-sounddesign/",
-    "isMixer": false,
-    "order": 7,
-    "photo": "/media/team/sean-kiely.webp",
+    "photo": null,
     "icon": null
   }
 ]
