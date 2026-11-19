@@ -8,6 +8,7 @@ import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { EASE_SWEEP } from "@/lib/motion";
 import { LongformTag } from "./LongformTag";
+import ui from "@/data/ui.json";
 
 /** `position`: object-position of the still when the phone crops it to portrait (data/longform.json). */
 export type Film = Project & { label: string; color: string; position?: string };
@@ -81,7 +82,7 @@ export function LongformReel({ films }: { films: Film[] }) {
           <button
             key={f.slug}
             type="button"
-            data-cursor="play"
+            data-cursor={ui.cursors.play}
             onClick={() => openWithSound(() => setPlaying(i))}
             aria-label={`Play ${f.label}`}
             className="relative block h-(--vh) w-[1440px] cursor-pointer overflow-hidden"
@@ -103,7 +104,7 @@ export function LongformReel({ films }: { films: Film[] }) {
       </div>
 
       {/* Legend: one square per film; the current one opens into a tag of client over title (LongformTag). */}
-      <nav aria-label="Films" className="absolute top-1/2 left-6 z-10 flex -translate-y-1/2 flex-col items-start">
+      <nav aria-label={ui.regions.films} className="absolute top-1/2 left-6 z-10 flex -translate-y-1/2 flex-col items-start">
         {films.map((f, i) => (
           <motion.button
             key={f.slug}

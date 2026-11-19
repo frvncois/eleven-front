@@ -60,3 +60,7 @@ deno.lock
 # Raw Figma exports (masters, kept locally). The site ships the WebP/MP4 in public/images/figma
 /design/exports
 /.next-lab/
+
+# Content pulled from Strapi by scripts/pull-content.mjs (npm run content).
+# Edit the content in Strapi, never these files.
+/data/*.json

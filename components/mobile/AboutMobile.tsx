@@ -65,7 +65,7 @@ export function AboutMobile() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={story.globe.src}
-            alt="Snow globe of the old Santa Monica studio"
+            alt={story.globe.alt}
             width={story.globe.width}
             height={story.globe.height}
             className="absolute top-12 left-col-2 h-auto w-span-4"

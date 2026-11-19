@@ -12,6 +12,7 @@ import { span } from "@/lib/grid";
 import { EASE_DISSOLVE } from "@/lib/motion";
 import { ViewToggle } from "@/components/shell/ViewToggle";
 import { appScale } from "@/lib/device";
+import ui from "@/data/ui.json";
 
 export type Tile = Project & { label: string; client: string; x: number; y: number; w: number; h: number };
 
@@ -78,8 +79,8 @@ const vhOf = () => parseFloat(getComputedStyle(document.documentElement).getProp
  * The toggle morphs one view into the other (gather / explode sounds). Click a tile to play it.
  */
 const VIEWS: [{ value: "grid" | "list"; label: string }, { value: "grid" | "list"; label: string }] = [
-  { value: "list", label: "List" },
-  { value: "grid", label: "Grid" },
+  { value: "list", label: ui.views.list },
+  { value: "grid", label: ui.views.grid },
 ];
 
 export function IndexView({ tiles, field }: { tiles: Tile[]; field: { w: number; h: number } }) {
@@ -604,7 +605,7 @@ function ListView({ tiles, onPlay, paused }: { tiles: Tile[]; onPlay: (i: number
               ref={(el) => {
                 buttons.current[i] = el;
               }}
-              data-cursor="play"
+              data-cursor={ui.cursors.play}
               tabIndex={i === middle ? 0 : -1}
               onClick={() => onPlay(i)}
               className="absolute block cursor-pointer"

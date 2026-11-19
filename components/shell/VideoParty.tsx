@@ -10,25 +10,32 @@ import { usePhone, appScale } from "@/lib/device";
 import { ToggleButterfly } from "@/components/ui/ToggleButterfly";
 import site from "@/data/site.json";
 import { useDialogFocus } from "@/lib/dialog-focus";
+import { PARTY_PLACEMENT } from "@/lib/layout";
 
 type Item = (typeof party.items)[number];
+type Place = (typeof PARTY_PLACEMENT)[number];
 const ITEMS: Item[] = party.items;
 
-// Where the picture sits on its colour, from the 1440 × 900 frames: a corner or the middle on the 24 margins
-// (16 on the phone), or a set height from the top. On the phone the pictures run at 62 % of their desktop width.
-function placeOf(item: Item, phone: boolean): React.CSSProperties {
+// Where the picture sits on its colour, from the 1440 × 900 frames (lib/layout): a corner or the middle
+// on the 24 margins (16 on the phone), or a share of the height from the top. The shape is the picture's
+// own, so swapping it in Strapi keeps its proportions. On the phone they run at 62 % of the desktop width.
+function placeOf(item: Item, place: Place, phone: boolean): React.CSSProperties {
   const m = phone ? 16 : 24;
-  const width = phone ? Math.min(358, Math.round(item.width * 0.62)) : item.width;
-  const s: React.CSSProperties = { width, aspectRatio: `${item.width} / ${item.height}`, maxHeight: `calc(100% - ${2 * m}px)` };
-  if (item.x === "left") s.left = m;
-  else if (item.x === "right") s.right = m;
+  const width = phone ? Math.min(358, Math.round(place.width * 0.62)) : place.width;
+  const s: React.CSSProperties = {
+    width,
+    aspectRatio: `${item.imageWidth} / ${item.imageHeight}`,
+    maxHeight: `calc(100% - ${2 * m}px)`,
+  };
+  if (place.x === "left") s.left = m;
+  else if (place.x === "right") s.right = m;
   else s.left = "50%";
-  if (item.y === "top") s.top = m;
-  else if (item.y === "bottom") s.bottom = m;
-  else if (item.y === "center") s.top = "50%";
-  else s.top = `${Number(item.y) * 100}%`;
-  const tx = item.x === "center" ? "-50%" : "0";
-  const ty = item.y === "center" ? "-50%" : "0";
+  if (place.y === "top") s.top = m;
+  else if (place.y === "bottom") s.bottom = m;
+  else if (place.y === "center") s.top = "50%";
+  else s.top = `${place.y * 100}%`;
+  const tx = place.x === "center" ? "-50%" : "0";
+  const ty = place.y === "center" ? "-50%" : "0";
   if (tx !== "0" || ty !== "0") s.translate = `${tx} ${ty}`;
   return s;
 }
@@ -43,7 +50,10 @@ function placeOf(item: Item, phone: boolean): React.CSSProperties {
  */
 export function VideoParty({ on }: { on: boolean }) {
   const pick = usePartyPick();
-  const item = ITEMS[Math.max(0, pick) % ITEMS.length];
+  const at = Math.max(0, pick) % ITEMS.length;
+  const item = ITEMS[at];
+  // The designed slots, in order; a seventh picture would reuse the first slot rather than land nowhere.
+  const place = PARTY_PLACEMENT[at % PARTY_PLACEMENT.length];
   const phone = usePhone();
   // The pressed butterfly (viewport px) in stage units (the stage is zoomed), and the reveal's centre on it.
   const o = partyStore.origin;
@@ -89,7 +99,7 @@ export function VideoParty({ on }: { on: boolean }) {
           tabIndex={-1}
           role="dialog"
           aria-modal="true"
-          aria-label="Easter egg"
+          aria-label={party.ariaLabel}
           // Over everything (desktop navs z-50, phone dock z-80, menu z-79): only its own butterfly (and the phone's CLOSE) show.
           className="fixed inset-0 z-[96] overflow-hidden outline-none"
           style={{ backgroundColor: `var(--color-${item.bg})` }}
@@ -103,7 +113,7 @@ export function VideoParty({ on }: { on: boolean }) {
             <button
               type="button"
               aria-label={site.player.close}
-              data-cursor="close"
+              data-cursor={party.closeCursor}
               data-cursor-tone="chip"
               onClick={() => partyStore.set(false)}
               className="absolute inset-0 cursor-default"
@@ -115,10 +125,10 @@ export function VideoParty({ on }: { on: boolean }) {
             <motion.img
               src={item.image}
               alt=""
-              width={item.width}
-              height={item.height}
+              width={place.width}
+              height={Math.round((place.width * item.imageHeight) / item.imageWidth)}
               className="pointer-events-none absolute object-cover"
-              style={placeOf(item, phone)}
+              style={placeOf(item, place, phone)}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35, ease: SWING }}

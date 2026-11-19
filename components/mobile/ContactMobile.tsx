@@ -32,7 +32,7 @@ export function ContactMobile() {
 
       <div className="mt-10 h-[216px] w-full overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/media/contact/steve-brule.gif" alt="Dr. Steve Brule holding a microphone" width={390} height={216} className="size-full object-cover" />
+        <img src={contact.image} alt={contact.imageAlt} width={390} height={216} className="size-full object-cover" />
       </div>
 
       <address className="mt-10 flex flex-col gap-8 px-margin not-italic">

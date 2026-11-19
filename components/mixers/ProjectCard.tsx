@@ -1,6 +1,7 @@
 "use client";
 
 import type { Project } from "@/lib/content";
+import ui from "@/data/ui.json";
 
 /**
  * Card/Project, the mixer page's grid view. Default: thumbnail, then the caption 8 below it in the
@@ -12,7 +13,7 @@ export function ProjectCard({ project, onOpen }: { project: Project; onOpen: (p:
     <button
       type="button"
       onClick={() => onOpen(project)}
-      data-cursor="play"
+      data-cursor={ui.cursors.play}
       className="group relative flex h-full min-w-0 flex-1 cursor-pointer flex-col text-left"
     >
       <span className="relative block w-full flex-1 overflow-hidden pb-[46px] transition-[padding] duration-300 ease-out group-hover:pb-0">

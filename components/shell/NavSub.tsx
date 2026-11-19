@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SoundToggle } from "./SoundToggle";
 import { FlossLogo } from "./FlossLogo";
 import { usePhone } from "@/lib/device";
+import ui from "@/data/ui.json";
 
 /**
  * Nav/Sub: the floss logo bottom-left, rising from the bar,
@@ -19,7 +20,7 @@ export function NavSub({ toggles, bareToggles = false, wordmark = true, tone = "
       {wordmark && (
       <Link
         href={"/"}
-        aria-label="Eleven, home"
+        aria-label={ui.regions.homeAria}
         className="fixed bottom-4 left-margin z-50 block transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90"
       >
         <FlossLogo tone={tone} />

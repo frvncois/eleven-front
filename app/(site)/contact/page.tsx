@@ -52,7 +52,7 @@ function ContactDesktop() {
         <div className="relative mt-[82px] h-[265px]">
           <div className="absolute top-0 left-margin flex w-span-3 justify-center overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/media/contact/steve-brule.gif" alt="Dr. Steve Brule holding a microphone" width={480} height={265} className="h-[265px] w-[480px] max-w-none object-cover" />
+            <img src={contact.image} alt={contact.imageAlt} width={480} height={265} className="h-[265px] w-[480px] max-w-none object-cover" />
           </div>
 
           <address className="not-italic">

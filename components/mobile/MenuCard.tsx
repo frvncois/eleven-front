@@ -8,6 +8,7 @@ import site from "@/data/site.json";
 import { mixers } from "@/lib/content";
 import { sound } from "@/lib/sound";
 import { PHONE_MOTION } from "@/lib/motion";
+import ui from "@/data/ui.json";
 
 const UNFOLD = PHONE_MOTION.sheet;
 
@@ -23,7 +24,7 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
   const pathname = usePathname();
   const [drawer, setDrawer] = useState(false);
   const { studio } = site.contact;
-  const instagram = site.footer.social.find((x) => x.label === "Instagram");
+  const instagram = site.footer.social.find((x) => x.platform === "instagram");
 
   useEffect(() => {
     if (!open) return;
@@ -46,14 +47,14 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
               nav chips sit above this layer, so they stay sharp. */}
           <motion.button
             type="button"
-            aria-label="Close the menu"
+            aria-label={ui.regions.closeMenu}
             onClick={onClose}
             className="absolute inset-0 cursor-default backdrop-blur-[6px]"
             variants={{ out: { opacity: 0 }, in: { opacity: 1 } }}
             transition={PHONE_MOTION.layer}
           />
           <motion.nav
-            aria-label="Main"
+            aria-label={ui.regions.main}
             className={`absolute inset-x-margin bottom-[48px] max-h-[calc(var(--vh)-110px)] overflow-y-auto transition-colors duration-300 ${drawer ? "bg-red text-neutral-300" : "bg-neutral-200"}`}
             data-lenis-prevent
             variants={{ out: { clipPath: "inset(100% 0 0 0)" }, in: { clipPath: "inset(0% 0 0 0)" } }}
@@ -75,11 +76,11 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
                 return (
                   <motion.li
                     key={item.label}
-                    className={`border-neutral-300 ${drawer && item.label !== "Mixers" ? "border-b-0" : "border-b"}`}
+                    className={`border-neutral-300 ${drawer && item.key !== "mixers" ? "border-b-0" : "border-b"}`}
                     variants={{ out: { opacity: 0, y: 12 }, in: { opacity: 1, y: 0 } }}
                     transition={{ ...PHONE_MOTION.reveal, delay: 0.12 + (site.nav.length - i) * 0.03 }}
                   >
-                    {item.label === "Mixers" ? (
+                    {item.key === "mixers" ? (
                       <>
                         <button
                           type="button"

@@ -13,6 +13,7 @@ import { usePhone } from "@/lib/device";
 import { FlossLogo } from "@/components/shell/FlossLogo";
 import { HomeReel } from "./HomeReel";
 import { GATE_EXIT, GateLoader } from "./GateLoader";
+import ui from "@/data/ui.json";
 
 
 // Phone: no big ELEVEN on the home; the nav's wordmark is the logo, the reel has the screen.
@@ -75,7 +76,7 @@ export function Home() {
       {!phone && (
         <motion.button
           type="button"
-          aria-label="Eleven, back to the sound gate"
+          aria-label={ui.regions.homeGateAria}
           onClick={() => setGateSeen(false)}
           disabled={gate}
           className="absolute bottom-4 left-margin z-10 block cursor-pointer transition-transform duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] active:scale-90 disabled:pointer-events-none"

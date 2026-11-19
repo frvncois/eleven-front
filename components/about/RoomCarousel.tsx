@@ -5,12 +5,13 @@ import { sound, type RoomHandle, type RoomPreset } from "@/lib/sound";
 import { usePhone, appScale } from "@/lib/device";
 import { prefersReducedMotion } from "@/lib/motion";
 import { lerpQuad, quadVisible, rectToQuadCss, taperField, type Quad } from "@/lib/perspective";
+import { ROOM_HEIGHTS } from "@/lib/layout";
 
-type Room = { room: string; photo: string; preset: string; audio: string | null; height: number };
+type Room = { room: string; photo: string; preset: string; audio: string | null };
 
 const W = 610; // 4 columns of the 9-col grid
 const GAP = 16; // the grid gutter
-const DATA_W = 622; // card width the heights in about.json were measured at
+const DATA_W = 622; // card width the heights in lib/layout were measured at
 const DRIFT = 28; // design px per second, right to left
 const COPIES = 3; // enough sets to cover the screen while one wraps
 const FRICTION = 0.92; // throw decay per frame after a drag or a swipe
@@ -48,7 +49,8 @@ export function RoomCarousel({ items }: { items: Room[] }) {
   const phone = usePhone();
   const w = phone ? PHONE_W : W;
   const set = items.length * (w + (phone ? PHONE_GAP : GAP));
-  const heights = items.map((r) => (r.height * w) / DATA_W);
+  // Designed crops, in order (lib/layout); a sixth room would cycle the rhythm rather than break.
+  const heights = items.map((_, i) => (ROOM_HEIGHTS[i % ROOM_HEIGHTS.length] * w) / DATA_W);
   const tallest = Math.max(...heights);
 
 
@@ -206,7 +208,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
         {/* Each room placed on its own (Warp), on both devices; the row only holds the height. */}
         <div ref={track} className="relative" style={{ height: tallest }}>
           {Array.from({ length: COPIES }, (_, c) =>
-            items.map((r) => (
+            items.map((r, i) => (
               <button
                 key={`${c}-${r.photo}`}
                 ref={(el) => {
@@ -230,7 +232,7 @@ export function RoomCarousel({ items }: { items: Room[] }) {
                   toggle(r);
                 }}
                 className="absolute top-0 left-0 block shrink-0 origin-top-left cursor-pointer overflow-hidden will-change-transform"
-                style={{ width: w, height: (r.height * w) / DATA_W }}
+                style={{ width: w, height: heights[i] }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={r.photo} alt={c ? "" : r.room} draggable={false} className="block size-full object-cover" />

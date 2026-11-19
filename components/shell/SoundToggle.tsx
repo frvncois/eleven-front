@@ -1,6 +1,7 @@
 "use client";
 
 import { useSound } from "@/lib/sound";
+import ui from "@/data/ui.json";
 
 /**
  * Toggle/Sound: SOUND OFF / ON with a three-bar meter.
@@ -23,14 +24,14 @@ export function SoundToggle({ meter = true, stacked = false, onChoose }: { meter
     };
     return (
       <div data-sound-toggle className={`flex items-center uppercase ${stacked ? "flex-col gap-1" : "gap-[0.25em]"}`}>
-        <span>Sound</span>
+        <span>{ui.gate.soundLabel}</span>
         <span className="flex items-center gap-[0.25em]">
-          <button type="button" aria-label="Continue without sound" onClick={() => choose(false)} className="cursor-pointer uppercase">
-            <Word text="Off" active={!on} />
+          <button type="button" aria-label={ui.gate.skipAria} onClick={() => choose(false)} className="cursor-pointer uppercase">
+            <Word text={ui.gate.offLabel} active={!on} />
           </button>
           <span className="opacity-35">/</span>
-          <button type="button" aria-label="Turn sound on" onClick={() => choose(true)} className="cursor-pointer uppercase">
-            <Word text="On" active={on} />
+          <button type="button" aria-label={ui.gate.onAria} onClick={() => choose(true)} className="cursor-pointer uppercase">
+            <Word text={ui.gate.onLabel} active={on} />
           </button>
         </span>
       </div>
@@ -40,17 +41,17 @@ export function SoundToggle({ meter = true, stacked = false, onChoose }: { meter
   return (
     <button
       type="button"
-      aria-label={on ? "Mute sound" : "Turn sound on"}
+      aria-label={on ? ui.gate.muteAria : ui.gate.onAria}
       aria-pressed={on}
       data-sound-toggle
       onClick={() => s.toggle()}
       className={`group flex cursor-pointer items-center uppercase ${stacked ? "flex-col gap-1" : "gap-[0.25em]"}`}
     >
-      <span>Sound</span>
+      <span>{ui.gate.soundLabel}</span>
       <span className="flex items-center gap-[0.25em]">
-        <Word text="Off" active={!on} />
+        <Word text={ui.gate.offLabel} active={!on} />
         <span className="opacity-35">/</span>
-        <Word text="On" active={on} />
+        <Word text={ui.gate.onLabel} active={on} />
       </span>
       {meter && (
         <span data-on={on} className="sound-meter ml-[0.25em] flex h-[0.7em] items-end gap-[0.12em]" aria-hidden>

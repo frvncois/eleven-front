@@ -1,5 +1,7 @@
 "use client";
 
+import ui from "@/data/ui.json";
+
 type Option<V extends string> = { value: V; label: string };
 
 /**
@@ -22,7 +24,7 @@ export function ViewToggle<V extends string>({
     <button
       type="button"
       data-sound="off"
-      aria-label={`Show as ${next.label.toLowerCase()}`}
+      aria-label={ui.views.showAsTemplate.replace("{view}", next.label.toLowerCase())}
       onClick={() => onChange(next.value)}
       className="flex cursor-pointer items-center uppercase"
     >

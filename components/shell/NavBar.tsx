@@ -8,6 +8,7 @@ import site from "@/data/site.json";
 import { sound } from "@/lib/sound";
 import { preloadArchive } from "@/lib/archive-preload";
 import { usePhone } from "@/lib/device";
+import ui from "@/data/ui.json";
 
 // Column + alignment per link, in site.nav order (Mixers, Archive, Longform, About, Contact).
 const NAV_CELLS = [
@@ -33,7 +34,7 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
   return (
     <>
     <nav
-      aria-label="Main"
+      aria-label={ui.regions.main}
       className={`grid-site fixed inset-x-0 top-0 z-50 items-center py-margin ${tone === "light" ? "text-neutral-300" : "text-neutral-1000"}`}
     >
       {site.nav.map((item, i) => {

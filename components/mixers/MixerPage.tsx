@@ -10,11 +10,12 @@ import { sound } from "@/lib/sound";
 import { ProjectCard } from "./ProjectCard";
 import { Player, openWithSound } from "./Player";
 import { ViewToggle } from "@/components/shell/ViewToggle";
+import ui from "@/data/ui.json";
 
 type MixerView = "carousel" | "grid";
 const VIEWS: [{ value: MixerView; label: string }, { value: MixerView; label: string }] = [
-  { value: "carousel", label: "List" },
-  { value: "grid", label: "Grid" },
+  { value: "carousel", label: ui.views.list },
+  { value: "grid", label: ui.views.grid },
 ];
 
 /**
@@ -91,14 +92,14 @@ export function MixerPage({ mixer, spots }: { mixer: Person; spots: Project[] })
             transition={still ? { duration: 0 } : SWAP}
           >
             {view === "carousel" ? (
-              <section aria-label="Projects" className="relative w-full overflow-x-clip" style={{ height: STRIP_H }}>
+              <section aria-label={ui.regions.projects} className="relative w-full overflow-x-clip" style={{ height: STRIP_H }}>
                 <div className="absolute inset-x-0 top-1/2">
                   <VanishStrip films={spots} depth={1.25} onOpen={open} />
                 </div>
               </section>
             ) : (
               // 9-col grid: 3 cards a row, each 3 cols (453), the gutter (16) both ways.
-              <section aria-label="Projects" className="flex w-full flex-col gap-gutter px-margin">
+              <section aria-label={ui.regions.projects} className="flex w-full flex-col gap-gutter px-margin">
                 {rows.map((row, i) => (
                   <div key={i} className="flex h-[353px] gap-gutter">
                     {row.map((p) => (

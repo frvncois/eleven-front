@@ -5,6 +5,7 @@ import { prefersReducedMotion } from "@/lib/motion";
 import type { Project } from "@/lib/content";
 import { lerpQuad, quadVisible, rectToQuadCss, taperField, type Quad } from "@/lib/perspective";
 import { useStrip, wrap } from "./useStrip";
+import ui from "@/data/ui.json";
 
 /** Every card is drawn flat at this size, then mapped onto its quad with one matrix3d. */
 const CW = 480;
@@ -86,7 +87,7 @@ export function VanishStrip({ films, depth, onOpen }: { films: Project[]; depth:
             cards.current[k] = el;
           }}
           type="button"
-          data-cursor="play"
+          data-cursor={ui.cursors.play}
           onClick={click(() => onOpen(i))}
           className="group absolute top-0 left-0 block origin-top-left cursor-pointer text-left will-change-transform"
           style={{ width: CW, height: CH, visibility: "hidden" }}

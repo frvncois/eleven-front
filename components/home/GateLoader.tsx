@@ -3,10 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { animate, motion, useMotionTemplate, useMotionValue, usePresence } from "framer-motion";
 import home from "@/data/home.json";
+import ui from "@/data/ui.json";
 import { sound } from "@/lib/sound";
 import { SWING, prefersReducedMotion } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 
+// The count's words. Not content: the loader counts to ten in English and the timing below is
+// tuned to exactly ten steps, so there is nothing here for an editor to decide.
 const WORDS = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 // The count, one word at a time over about 8 s (Eleven: 4 s was too fast to register what to do): the words wait
 // 2 s so the eye reads the copy at the top first, then a word every 0.54 s, ten lands at 6.86 s, held 0.7 s, and the
@@ -99,7 +102,7 @@ export function GateLoader({ onDone, phone = false }: { onDone: () => void; phon
   return (
     <motion.section
       ref={panel}
-      aria-label="Sound"
+      aria-label={ui.gate.soundAria}
       className="absolute inset-0 z-20 flex flex-col justify-between gap-10 bg-yellow"
       style={leaving ? { clipPath: clip, WebkitClipPath: clip } : { clipPath: rest, WebkitClipPath: rest }}
     >
@@ -144,7 +147,7 @@ export function GateLoader({ onDone, phone = false }: { onDone: () => void; phon
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/icons/eleven-gate-v2.svg"
-          alt="Eleven"
+          alt={ui.gate.wordmarkAlt}
           width={1392}
           height={284}
           className="mt-[68.32px] ml-margin h-auto max-w-none phone:mt-[19.96px]"

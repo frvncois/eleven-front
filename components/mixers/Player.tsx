@@ -10,6 +10,7 @@ import { EASE_DISSOLVE } from "@/lib/motion";
 import { SoundToggle } from "@/components/shell/SoundToggle";
 import site from "@/data/site.json";
 import { useDialogFocus } from "@/lib/dialog-focus";
+import ui from "@/data/ui.json";
 
 const labels = site.player;
 // Every button in the player is the same small grey chip (CLOSE, + INFO, NEXT and SOUND one size,
@@ -38,7 +39,7 @@ export function embedUrl(vimeo: string, muted: boolean) {
   return `https://player.vimeo.com/video/${m[1]}?${q}`;
 }
 
-const MIXER_TBC = "Mixer to confirm";
+const MIXER_TBC = ui.credits.mixerTbc;
 
 /** The film's credits rows, [name, role]: always the mixer, one row for mix and sound design. */
 export function creditsOf(film: Project): [string, string][] {
@@ -46,10 +47,10 @@ export function creditsOf(film: Project): [string, string][] {
   return [
     // Always name the mixer. Six longform films are not credited on
     // Eleven's site, so they show a placeholder until Eleven sends the names.
-    [mixer?.name ?? MIXER_TBC, mixer ? "Mix / Sound design" : "Mix"],
-    film.agency && [film.agency, "Agency"],
-    film.production && [film.production, "Production"],
-    film.director && [film.director, "Director"],
+    [mixer?.name ?? MIXER_TBC, mixer ? ui.credits.roleMixSound : ui.credits.roleMix],
+    film.agency && [film.agency, ui.credits.roleAgency],
+    film.production && [film.production, ui.credits.roleProduction],
+    film.director && [film.director, ui.credits.roleDirector],
   ].filter(Boolean) as [string, string][];
 }
 
@@ -80,7 +81,7 @@ export function Scrub({ time, duration, onSeek }: { time: number; duration: numb
       <div
         role="slider"
         tabIndex={0}
-        aria-label="Seek"
+        aria-label={ui.player.seek}
         aria-valuemin={0}
         aria-valuemax={Math.round(duration)}
         aria-valuenow={Math.round(time)}
@@ -271,7 +272,7 @@ export function Player({ films, index, onIndex, onClose, longform = false }: Pro
           {/* Click the film to pause / play. */}
           <button
             type="button"
-            aria-label={playing ? "Pause" : "Play"}
+            aria-label={playing ? ui.player.pause : ui.player.play}
             data-cursor={hidden ? undefined : playing ? "pause" : "play"}
             onClick={toggle}
             className={`absolute inset-0 ${hidden ? "cursor-none" : "cursor-default"}`}
@@ -337,7 +338,7 @@ export function Player({ films, index, onIndex, onClose, longform = false }: Pro
             {films.length > 1 && (
               <button
                 type="button"
-                aria-label="Next film"
+                aria-label={ui.player.nextFilm}
                 onClick={() => onIndex((index! + 1) % films.length)}
                 className={`${CHIP_SM} pointer-events-auto absolute right-margin`}
                 style={{ top: "calc(var(--vh) * 471 / 1024)" }}

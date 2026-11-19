@@ -12,11 +12,12 @@ import { useDockToggle } from "./dock";
 import { STEPPER, landing } from "@/lib/stepper";
 import { lerpQuad, rectToQuadCss, taperField, type Quad } from "@/lib/perspective";
 import { appScale } from "@/lib/device";
+import ui from "@/data/ui.json";
 
 type View = "carousel" | "grid";
 const VIEWS: [{ value: View; label: string }, { value: View; label: string }] = [
-  { value: "carousel", label: "List" },
-  { value: "grid", label: "Grid" },
+  { value: "carousel", label: ui.views.list },
+  { value: "grid", label: ui.views.grid },
 ];
 
 const CARD = { w: 300, h: 168.75, gap: 8 };
@@ -257,7 +258,7 @@ export function MixerMobile({ mixer, spots }: { mixer: Person; spots: Project[] 
 
       <AnimatePresence mode="popLayout" initial={false}>
         {view === "carousel" ? (
-          <motion.section key="carousel" aria-label="Projects" className="absolute inset-x-0 top-[calc(var(--vh)*0.52)]" {...LAYER} transition={SWAP}>
+          <motion.section key="carousel" aria-label={ui.regions.projects} className="absolute inset-x-0 top-[calc(var(--vh)*0.52)]" {...LAYER} transition={SWAP}>
             <div className="overflow-x-clip py-1">
               <div ref={trackRef} className="flex w-max items-start gap-2 will-change-transform">
                 {Array.from({ length: COPIES }, (_, c) =>
@@ -291,7 +292,7 @@ export function MixerMobile({ mixer, spots }: { mixer: Person; spots: Project[] 
             </div>
           </motion.section>
         ) : (
-          <motion.section key="grid" aria-label="Projects" className="mt-[88px] flex flex-col gap-8" {...LAYER} transition={SWAP}>
+          <motion.section key="grid" aria-label={ui.regions.projects} className="mt-[88px] flex flex-col gap-8" {...LAYER} transition={SWAP}>
             {spots.map((p, i) => (
               <button key={p.slug} type="button" onClick={() => openWithSound(() => setPlaying(i))} className="flex flex-col gap-2 text-left">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

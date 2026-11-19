@@ -3,16 +3,32 @@ import path from "node:path";
 import { INDEXABLE } from "./lib/site";
 
 /**
+ * Posters, reels, the gif and the service sounds are served from the Strapi media library, so its
+ * origin has to be allowed by the CSP as well as by next/image. Build-time only data (scripts/pull-content.mjs
+ * writes data/*.json before the build), so nothing here is fetched from the browser.
+ */
+const MEDIA_ORIGIN = (() => {
+  const raw = process.env.STRAPI_URL ?? process.env.NEXT_PUBLIC_STRAPI_URL;
+  if (!raw) return null;
+  try {
+    return new URL(raw).origin;
+  } catch {
+    throw new Error(`STRAPI_URL is not a valid URL: ${raw}`);
+  }
+})();
+
+/**
  * Security headers on every response. The CSP lists exactly what the site loads: its own files, the Vimeo
- * player frames, inline scripts and styles (the pre-paint stage script, Next's own inline data, motion
- * styles) and WebAssembly for the floss animation. Dev is left without a CSP (hot reload needs eval).
+ * player frames, the Strapi media origin, inline scripts and styles (the pre-paint stage script, Next's own
+ * inline data, motion styles) and WebAssembly for the floss animation. Dev is left without a CSP (hot reload needs eval).
  */
 const CSP = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
-  "media-src 'self' blob: data:", // data: = the sound kit's silent keep-alive clip
+  `img-src 'self' data: blob:${MEDIA_ORIGIN ? ` ${MEDIA_ORIGIN}` : ""}`,
+  // data: = the sound kit's silent keep-alive clip
+  `media-src 'self' blob: data:${MEDIA_ORIGIN ? ` ${MEDIA_ORIGIN}` : ""}`,
   "font-src 'self'",
   "connect-src 'self'",
   "worker-src 'self' blob:",
@@ -34,12 +50,19 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  // Let `next upgrade --agent` pick up security releases on its own.
+  experimental: { agentUpgrade: "security" },
   // `npm run dev` builds into .next-dev so a production build (deploy) never clobbers a running dev server.
   distDir: process.env.NEXT_DIST_DIR || ".next",
   // The studio root (../../..) has its own package.json; keep Turbopack scoped here.
   turbopack: { root: path.resolve(__dirname) },
-  // Media in public/ is pre-sized WebP/MP4: no runtime image optimisation.
-  images: { unoptimized: true },
+  // Media is pre-sized WebP/MP4 in the Strapi library: no runtime image optimisation.
+  // `remotePatterns` is not enforced while `unoptimized` is on, but it keeps the allowlist
+  // correct if optimisation is ever switched back on.
+  images: {
+    unoptimized: true,
+    ...(MEDIA_ORIGIN && { remotePatterns: [new URL(`${MEDIA_ORIGIN}/uploads/**`)] }),
+  },
   // Keep the dev badge out of the bottom-left wordmark.
   devIndicators: false,
   // Phone review on the same Wi-Fi (http://<this Mac's IP>:3700): Next blocks dev assets for other hosts otherwise.

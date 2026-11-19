@@ -1,6 +1,7 @@
 "use client";
 
 import { party, useParty } from "@/lib/party";
+import ui from "@/data/ui.json";
 
 /**
  * Toggle/Butterfly. Click for the funny-animals easter egg (PartyMode → VideoParty).
@@ -20,7 +21,7 @@ export function ToggleButterfly() {
       }}
       aria-pressed={on}
       aria-label={on ? "Stop the party" : "Start the party"}
-      data-cursor="click me"
+      data-cursor={ui.cursors.clickMe}
       data-cursor-tone="pink"
       className={`butterfly-chip relative block size-6 cursor-pointer ${on ? "is-party" : ""}`}
     >

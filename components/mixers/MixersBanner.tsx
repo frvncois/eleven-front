@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { animate, motion, useMotionTemplate, useMotionValue, useReducedMotion } from "framer-motion";
 import { mixers } from "@/lib/content";
+import ui from "@/data/ui.json";
 import { sound } from "@/lib/sound";
 import { usePathname } from "next/navigation";
 import { EASE_DISSOLVE, SWING, THEME_INK, wedgeColor } from "@/lib/motion";
@@ -12,6 +13,8 @@ import { useDialogFocus } from "@/lib/dialog-focus";
 // The wedge (in the page accent) runs full width from the top, its lower edge from
 // 179.7 at the left to 581.9 at the right. Names sit in a stair along that edge.
 const WEDGE = { left: 179.718, right: 581.946 };
+// Hand-tuned against that edge: each name's top-left, and the empty spot its icon pops into
+// (centre + height). Designed geometry, not content — moving one overlaps the diagonal.
 const NAMES: Record<string, { x: number; y: number }> = {
   "jordan-meltzer": { x: 132, y: 57 },
   "jeff-payne": { x: 699, y: 57 },
@@ -20,13 +23,11 @@ const NAMES: Record<string, { x: number; y: number }> = {
   "bruce-bueckert": { x: 1040, y: 197 },
   "marco-tornillo": { x: 942, y: 337 },
 };
-// Where each icon pops on hover: an empty patch of the wedge between the names (centre + height),
-// kept inside the wedge.
 const ICONS: Record<string, { cx: number; cy: number; h: number }> = {
   "jordan-meltzer": { cx: 300, cy: 180, h: 120 },
   "jeff-payne": { cx: 600, cy: 78, h: 100 },
   "aj-murillo": { cx: 1046, cy: 78, h: 100 },
-  "bob-gremore": { cx: 735, cy: 305, h: 70 }, // smaller + clear of the diagonal, so it is not cropped
+  "bob-gremore": { cx: 735, cy: 305, h: 70 },
   "bruce-bueckert": { cx: 1380, cy: 450, h: 120 },
   "marco-tornillo": { cx: 1150, cy: 445, h: 90 },
 };
@@ -101,11 +102,11 @@ export function MixersBanner({ open, onClose }: { open: boolean; onClose: () => 
 
   if (!mounted) return null;
   return (
-    <div ref={layer} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Mixers" className="fixed inset-0 z-[60] outline-none">
+    <div ref={layer} tabIndex={-1} role="dialog" aria-modal="true" aria-label={ui.regions.mixers} className="fixed inset-0 z-[60] outline-none">
       <motion.button
         type="button"
-        aria-label="Close"
-        data-cursor="close"
+        aria-label={ui.dock.close}
+        data-cursor={ui.cursors.close}
         data-cursor-tone="accent"
         onClick={onClose}
         className="absolute inset-0 cursor-default"

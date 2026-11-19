@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Chrome } from "@/components/shell/Chrome";
 import { Stretch404 } from "@/components/ui/Stretch404";
+import ui from "@/data/ui.json";
 
 export const metadata: Metadata = { title: "Not found" };
 
@@ -13,7 +14,7 @@ export default function NotFound() {
     <main className="relative h-(--vh) overflow-hidden bg-bg">
       <Stretch404 />
       <h1 className="t-h2 absolute inset-x-0 top-[calc(var(--vh)*0.496)] -translate-y-1/2 px-margin text-center text-neutral-1000 [text-box:trim-both_cap_alphabetic] phone:text-[24px]">
-        Sorry we lost you.
+        {ui.notFound.title}
       </h1>
       <Chrome />
     </main>

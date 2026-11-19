@@ -13,6 +13,7 @@ import { useDock } from "./dock";
 import { MenuCard } from "./MenuCard";
 import { GATE_EXIT } from "@/components/home/GateLoader";
 import { FlossLogo, SLOT } from "@/components/shell/FlossLogo";
+import ui from "@/data/ui.json";
 
 // Pages whose top sits on video: the floss dims to grey there.
 const ON_VIDEO = ["/", "/longform"];
@@ -68,7 +69,7 @@ export function PhoneShell() {
             <div className="relative flex h-[44.5px] items-end justify-between px-margin">
               <Link
                 href="/"
-                aria-label={pathname === "/" ? "Eleven, back to the sound gate" : "Eleven, home"}
+                aria-label={pathname === "/" ? ui.regions.homeGateAria : ui.regions.homeAria}
                 // On the home it brings the sound gate back, like the desktop floss; elsewhere it just goes home.
                 onClick={(e) => {
                   if (pathname !== "/") return;
@@ -99,7 +100,7 @@ export function PhoneShell() {
                 <SoundToggle />
               </div>
               <button type="button" data-sound="off" aria-expanded={menu} onClick={onMenu} className={`${CHIP} cursor-pointer`}>
-                {menu ? "Close" : "Menu"}
+                {menu ? ui.dock.close : ui.dock.menu}
               </button>
             </div>
           </motion.div>

@@ -12,11 +12,12 @@ import { useDockToggle } from "./dock";
 import { STEPPER, landing } from "@/lib/stepper";
 import { rectToQuadCss, type Quad } from "@/lib/perspective";
 import { appScale } from "@/lib/device";
+import ui from "@/data/ui.json";
 
 type View = "field" | "list";
 const VIEWS: [{ value: View; label: string }, { value: View; label: string }] = [
-  { value: "list", label: "List" },
-  { value: "field", label: "Grid" },
+  { value: "list", label: ui.views.list },
+  { value: "field", label: ui.views.grid },
 ];
 
 // The desktop field (lib/grid tiles, 2 / 3 / 4 columns) drawn at 34 %: S ≈ 102, M ≈ 154, L ≈ 205 wide
@@ -274,7 +275,7 @@ function Field({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void }
   }, [tiles]);
 
   return (
-    <div ref={root} data-lenis-prevent role="application" aria-label="Archive, drag to explore" className="absolute inset-0 touch-none overflow-hidden select-none">
+    <div ref={root} data-lenis-prevent role="application" aria-label={ui.regions.archiveDrag} className="absolute inset-0 touch-none overflow-hidden select-none">
       {tiles.map((t, i) => (
         <div
           key={t.slug}
@@ -499,7 +500,7 @@ function List({ tiles, onOpen }: { tiles: Tile[]; onOpen: (i: number) => void })
 
   const t = tiles[current];
   return (
-    <section ref={root} aria-label="Projects" data-lenis-prevent className="absolute inset-0 touch-none overflow-hidden select-none">
+    <section ref={root} aria-label={ui.regions.projects} data-lenis-prevent className="absolute inset-0 touch-none overflow-hidden select-none">
       {stack}
       {/* The caption, pinned mid-screen on the left: client and title in grey chips. */}
       <div className="pointer-events-none absolute top-1/2 left-margin flex max-w-[118px] -translate-y-1/2 flex-col items-start">

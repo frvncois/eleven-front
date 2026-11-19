@@ -11,19 +11,20 @@ import { PartyMode } from "@/components/shell/PartyMode";
 import { PhoneShell } from "@/components/mobile/PhoneShell";
 import { ReviewNotes } from "@/components/dev/ReviewNotes";
 import { INDEXABLE, SITE_URL } from "@/lib/site";
+import site from "@/data/site.json";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "Eleven", template: "%s · Eleven" },
-  description: "Eleven is a boutique audio post-production studio in West LA since 1999. Mix, sound design, VO, ADR, music and voice casting. Good hangs, too.",
-  openGraph: { siteName: "Eleven", type: "website", locale: "en_US" },
+  title: { default: site.seo.defaultTitle, template: site.seo.titleTemplate },
+  description: site.seo.description,
+  openGraph: { siteName: site.seo.siteName, type: "website", locale: site.seo.locale },
   robots: INDEXABLE ? { index: true, follow: true } : { index: false, follow: false, noarchive: true },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#fdfcfc",
+  themeColor: site.seo.themeColor,
 };
 
 /**
