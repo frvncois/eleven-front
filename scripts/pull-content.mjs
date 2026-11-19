@@ -15,7 +15,8 @@ import path from "node:path";
 import process from "node:process";
 
 const STRAPI = (process.env.STRAPI_URL ?? "http://localhost:1337").replace(/\/$/, "");
-const TOKEN = process.env.STRAPI_API_TOKEN;
+// A blank or whitespace-only value is no token: send nothing rather than an empty Bearer.
+const TOKEN = process.env.STRAPI_API_TOKEN?.trim() || undefined;
 const OUT = path.resolve(import.meta.dirname, "../data");
 
 async function api(endpoint, params = {}) {
@@ -32,6 +33,15 @@ async function api(endpoint, params = {}) {
       `could not reach Strapi at ${STRAPI} (${cause.message}).\n` +
         `STRAPI_URL must point at a Strapi this machine can open — a build host cannot see localhost.`,
       { cause },
+    );
+  }
+  if (res.status === 401 && TOKEN) {
+    // Strapi answers an invalid token with 401 instead of falling back to the Public role, so a bad
+    // token is worse than none: the content types are publicly readable (eleven-back/src/index.ts).
+    throw new Error(
+      `${endpoint} → 401, so STRAPI_API_TOKEN is not a valid API token for ${STRAPI}.\n` +
+        `It must be an API token (Strapi → Settings → API Tokens, read-only), not a transfer token.\n` +
+        `The content is publicly readable, so unsetting STRAPI_API_TOKEN also fixes this.`,
     );
   }
   if (!res.ok) throw new Error(`${endpoint} → ${res.status} ${res.statusText}\n${await res.text()}`);
