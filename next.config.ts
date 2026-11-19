@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import fs from "node:fs";
 import path from "node:path";
 import { INDEXABLE } from "./lib/site";
 
@@ -6,16 +7,53 @@ import { INDEXABLE } from "./lib/site";
  * Posters, reels, the gif and the service sounds are served from the Strapi media library, so its
  * origin has to be allowed by the CSP as well as by next/image. Build-time only data (scripts/pull-content.mjs
  * writes data/*.json before the build), so nothing here is fetched from the browser.
+ *
+ * The library is not always on the same host as the API: Strapi Cloud serves the API from
+ * <project>.strapiapp.com and the uploads from <project>.media.strapiapp.com. So the origins are read
+ * from the pulled content itself (prebuild runs first) rather than guessed from STRAPI_URL — whatever
+ * the media URLs say is what the CSP allows, on Cloud, self-hosted or a local Strapi alike.
  */
-const MEDIA_ORIGIN = (() => {
+const MEDIA_ORIGINS = (() => {
+  const origins = new Set<string>();
+
   const raw = process.env.STRAPI_URL ?? process.env.NEXT_PUBLIC_STRAPI_URL;
-  if (!raw) return null;
-  try {
-    return new URL(raw).origin;
-  } catch {
-    throw new Error(`STRAPI_URL is not a valid URL: ${raw}`);
+  if (raw) {
+    try {
+      origins.add(new URL(raw).origin);
+    } catch {
+      throw new Error(`STRAPI_URL is not a valid URL: ${raw}`);
+    }
   }
+
+  // Every media field the pull wrote, as an absolute URL. Missing data/ is fine: the prebuild
+  // writes it, and a dev run with no content yet still has to boot.
+  const dir = path.resolve(__dirname, "data");
+  if (fs.existsSync(dir)) {
+    for (const file of fs.readdirSync(dir)) {
+      if (!file.endsWith(".json")) continue;
+      const json = fs.readFileSync(path.join(dir, file), "utf8");
+      for (const [, url] of json.matchAll(/"(https?:\/\/[^"]+\/uploads?\/[^"]*)"/g)) {
+        try {
+          origins.add(new URL(url).origin);
+        } catch {
+          /* not a URL we can place; the CSP simply will not list it */
+        }
+      }
+      // Strapi Cloud's media host has no /uploads/ segment in the path.
+      for (const [, url] of json.matchAll(/"(https?:\/\/[^"]*media\.strapiapp\.com[^"]*)"/g)) {
+        try {
+          origins.add(new URL(url).origin);
+        } catch {
+          /* ditto */
+        }
+      }
+    }
+  }
+
+  return [...origins];
 })();
+
+const MEDIA_SRC = MEDIA_ORIGINS.length ? ` ${MEDIA_ORIGINS.join(" ")}` : "";
 
 /**
  * Security headers on every response. The CSP lists exactly what the site loads: its own files, the Vimeo
@@ -26,9 +64,9 @@ const CSP = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob:${MEDIA_ORIGIN ? ` ${MEDIA_ORIGIN}` : ""}`,
+  `img-src 'self' data: blob:${MEDIA_SRC}`,
   // data: = the sound kit's silent keep-alive clip
-  `media-src 'self' blob: data:${MEDIA_ORIGIN ? ` ${MEDIA_ORIGIN}` : ""}`,
+  `media-src 'self' blob: data:${MEDIA_SRC}`,
   "font-src 'self'",
   "connect-src 'self'",
   "worker-src 'self' blob:",
@@ -61,7 +99,7 @@ const nextConfig: NextConfig = {
   // correct if optimisation is ever switched back on.
   images: {
     unoptimized: true,
-    ...(MEDIA_ORIGIN && { remotePatterns: [new URL(`${MEDIA_ORIGIN}/uploads/**`)] }),
+    ...(MEDIA_ORIGINS.length && { remotePatterns: MEDIA_ORIGINS.map((o) => new URL(`${o}/**`)) }),
   },
   // Keep the dev badge out of the bottom-left wordmark.
   devIndicators: false,

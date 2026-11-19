@@ -21,9 +21,19 @@ const OUT = path.resolve(import.meta.dirname, "../data");
 async function api(endpoint, params = {}) {
   const url = new URL(`${STRAPI}/api/${endpoint}`);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
-  const res = await fetch(url, {
-    headers: { ...(TOKEN && { Authorization: `Bearer ${TOKEN}` }) },
-  });
+  let res;
+  try {
+    res = await fetch(url, {
+      headers: { ...(TOKEN && { Authorization: `Bearer ${TOKEN}` }) },
+    });
+  } catch (cause) {
+    // `fetch failed` on its own says nothing about which host was unreachable.
+    throw new Error(
+      `could not reach Strapi at ${STRAPI} (${cause.message}).\n` +
+        `STRAPI_URL must point at a Strapi this machine can open — a build host cannot see localhost.`,
+      { cause },
+    );
+  }
   if (!res.ok) throw new Error(`${endpoint} → ${res.status} ${res.statusText}\n${await res.text()}`);
   const { data } = await res.json();
   if (!data) throw new Error(`${endpoint} returned no data — is it published?`);
@@ -62,6 +72,15 @@ const PROJECT_POPULATE = {
 };
 
 async function main() {
+  // A build host has no Strapi of its own, so the localhost default can only be a missing env var.
+  // Say so here rather than letting it fail later as an unexplained "fetch failed".
+  if (!process.env.STRAPI_URL && (process.env.VERCEL || process.env.CI)) {
+    throw new Error(
+      "STRAPI_URL is not set, so there is nothing to pull the content from.\n" +
+        "Set it to the public Strapi URL for every environment that builds the site\n" +
+        "(Vercel → Settings → Environment Variables), then redeploy.",
+    );
+  }
   await mkdir(OUT, { recursive: true });
   const written = [];
   const write = async (name, value) => {
