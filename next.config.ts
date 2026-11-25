@@ -68,7 +68,9 @@ const CSP = [
   // data: = the sound kit's silent keep-alive clip
   `media-src 'self' blob: data:${MEDIA_SRC}`,
   "font-src 'self'",
-  "connect-src 'self'",
+  // The sound kit fetches its clips with fetch() + decodeAudioData (lib/sound.ts), so the media
+  // origin has to be allowed here too -- media-src does not cover a fetch.
+  `connect-src 'self'${MEDIA_SRC}`,
   "worker-src 'self' blob:",
   "frame-src https://player.vimeo.com",
   "frame-ancestors 'none'",
