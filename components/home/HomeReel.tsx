@@ -27,7 +27,6 @@ export function HomeReel({ src, poster }: { src: string; poster: string }) {
       autoPlay
       loop
       playsInline
-      muted
       preload="auto"
       className="absolute inset-0 size-full object-cover"
     />
