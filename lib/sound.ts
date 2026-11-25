@@ -8,6 +8,7 @@
 // - tone(): soft synthesized blip, the fallback when a cue has no file.
 // - registerMedia / duck / unduck: background media on a bus that overlays can fade.
 import { useEffect, useState, startTransition } from "react";
+import site from "@/data/site.json";
 
 type Kit = { tone: (f?: number, d?: number, v?: number) => void; whoosh: (d?: number, v?: number, a?: number, b?: number) => void }
 type Cue = { files: string[]; volume: number; sequence?: boolean; placeholder: (k: Kit) => void }
@@ -37,6 +38,44 @@ const CUES = {
   gather: { files: [A("menu-open")], volume: 0.6, placeholder: (k: Kit) => k.whoosh(0.6, 0.12, 400, 2600) },
 } satisfies Record<string, Cue>
 const seqPos = new Map<string, number>()
+
+// Three of the cues are editable in Strapi (Site Settings → sounds): the nav hover, the button
+// click and the page-change sweep. A filled field replaces the cue's bundled takes; an empty one
+// (or content pulled before the fields existed) leaves CUES as it is, so the site always has sound.
+// Everything else in CUES stays in code.
+// Two of the cues are editable per nav link (Site Settings → nav → a link's `hoverSound` and
+// `transitionSound`): hovering that link, and the sweep that lands on its page. An empty field —
+// or content pulled before the fields existed — leaves CUES as it is, so the site always has
+// sound. Everything else in CUES stays in code.
+type Takes = string[] | null
+type CmsNavItem = { key: string; match: string; hoverSound?: Takes; transitionSound?: Takes }
+const navItems = (site as { nav: CmsNavItem[] }).nav
+
+/**
+ * A nav link's own hover takes (Site Settings → nav → `hoverSound`), or null when that link has
+ * none — `cue("navHover")` then plays the bundled kit. Pass it to `cue`:
+ * `sound.cue("navHover", navSound(item.key))`.
+ */
+export function navSound(key: string): Takes {
+  const item = navItems.find((n) => n.key === key)
+  return item?.hoverSound?.length ? item.hoverSound : null
+}
+
+/**
+ * The sweep that lands on a page plays that page's own `transitionSound`, so clicking through to
+ * Archive can sound different from clicking through to About. Matched the way the sweep picks its
+ * colour (lib/motion `themeColor`): the nav link whose `match` is the longest prefix of the
+ * destination. Null for the pages that are not nav links (the home, Legal) and for a link with no
+ * transition sound — both then play the bundled sweep.
+ */
+export function sweepSound(path: string): Takes {
+  let best: CmsNavItem | undefined
+  for (const n of navItems) {
+    if (path !== n.match && !path.startsWith(n.match + "/")) continue
+    if (!best || n.match.length > best.match.length) best = n
+  }
+  return best?.transitionSound?.length ? best.transitionSound : null
+}
 
 export type RoomPreset = "studio" | "lobby" | "outside"
 export type RoomHandle = { setPan: (x: number) => void; setNear: (y: number) => void; stop: () => void; analyser: AnalyserNode | null }
@@ -376,18 +415,23 @@ function createKit() {
       }
     },
     /**
-     * Named UI sounds. Each cue plays Eleven's file when one is listed in CUES, otherwise its synthesized `placeholder`.
-     * Swapping in the real sounds = adding the file in public/sounds and its path here.
+     * Named UI sounds. A cue plays the takes passed as `own` (one caller's own sound, e.g. a single
+     * nav link's) when there are any, otherwise the files bundled in CUES, otherwise its
+     * synthesized `placeholder`. `own` keeps the cue's volume and gets its own no-repeat group, so
+     * a link with three takes never plays the same one twice in a row.
      */
-    cue(name: keyof typeof CUES) {
+    cue(name: keyof typeof CUES, own?: string[] | null) {
       const c: Cue = CUES[name]
-      if (!c.files.length) return c.placeholder(kit)
+      const files = own?.length ? own : c.files
+      if (!files.length) return c.placeholder(kit)
       if (c.sequence) {
         const i = seqPos.get(name) ?? 0
-        seqPos.set(name, (i + 1) % c.files.length)
-        return kit.play([c.files[i]], name, c.volume)
+        seqPos.set(name, (i + 1) % files.length)
+        return kit.play([files[i]], name, c.volume)
       }
-      return kit.play(c.files, name, c.volume)
+      // A caller's own takes are their own no-repeat group, so one link's choice does not count as
+      // "the last take" for the next link.
+      return kit.play(files, own?.length ? `${name}:${files[0]}` : name, c.volume)
     },
     registerMedia(el: HTMLMediaElement) {
       media.add(el)

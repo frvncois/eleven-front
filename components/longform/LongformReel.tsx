@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { Project } from "@/lib/content";
 import { Chrome } from "@/components/shell/Chrome";
 import { Player, openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { EASE_SWEEP } from "@/lib/motion";
 import { LongformTag } from "./LongformTag";
+import { LongformPreview } from "./LongformPreview";
 import ui from "@/data/ui.json";
 
 /** `position`: object-position of the still when the phone crops it to portrait (data/longform.json). */
@@ -17,16 +18,14 @@ const SLIDE_MS = 900;
 
 /**
  * Longform. One film per screen; a scroll,
- * swipe or arrow key moves to the next one. Each film previews as its still with a
- * slow 10 s push-in (1 → 1.06) under a 25 % dim, standing in for Eleven's 10 s
- * preview loops. The legend on the left: one colour square per film, fading in one after another on
+ * swipe or arrow key moves to the next one. The film on screen previews itself (LongformPreview):
+ * muted, looping the 10 s from its `previewStart`, under a 25 % dim. The others hold their still,
+ * as does the one on screen until Vimeo has painted. The legend on the left: one colour square per film, fading in one after another on
  * first load; the current one opens into its title. Click a
  * square to jump, click the film ("play" tag) to watch it in the player.
  */
 export function LongformReel({ films }: { films: Film[] }) {
   const [index, setIndex] = useState(0);
-  // Reduced motion: no endless push-in, the still sits at rest.
-  const pushIn = !useReducedMotion();
   const [playing, setPlaying] = useState<number | null>(null);
   const lock = useRef(false);
 
@@ -87,17 +86,8 @@ export function LongformReel({ films }: { films: Film[] }) {
             aria-label={`Play ${f.label}`}
             className="relative block h-(--vh) w-[1440px] cursor-pointer overflow-hidden"
           >
-            {/* The 10 s preview stand-in: a slow push-in, restarted each time the film comes on screen. */}
-            <motion.div
-              key={i === index ? `on-${f.slug}` : f.slug}
-              className="absolute inset-0"
-              initial={{ scale: 1 }}
-              animate={i === index && pushIn ? { scale: [1, 1.06] } : { scale: 1 }}
-              transition={i === index && pushIn ? { duration: 10, ease: "linear", repeat: Infinity, repeatType: "loop" } : { duration: 0 }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={f.poster ?? ""} alt="" className="absolute inset-0 size-full object-cover" loading={i < 2 ? "eager" : "lazy"} />
-            </motion.div>
+            {/* The film previews itself while it is the one on screen; the full player takes over on click. */}
+            <LongformPreview film={f} active={i === index && playing === null} stage={1440} />
             <div className="absolute inset-0 bg-neutral-1000/25" />
           </button>
         ))}

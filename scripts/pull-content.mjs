@@ -52,6 +52,11 @@ async function api(endpoint, params = {}) {
 
 /** A media field → its absolute URL, or null. Strapi Cloud already returns absolute URLs. */
 const url = (m) => (m?.url ? (m.url.startsWith("http") ? m.url : `${STRAPI}${m.url}`) : null);
+/** A multiple-media audio field → its URLs (the takes), or null when the editor left it empty. */
+const takesOf = (m) => {
+  const urls = (m ?? []).map(url).filter(Boolean);
+  return urls.length ? urls : null;
+};
 /** An image's own pixel size, which Strapi stores on the upload — ask for `DIMS` in the populate. */
 const dims = (m, where) => {
   if (!m?.width || !m?.height) throw new Error(`${where}: the image has no width/height on the upload`);
@@ -168,7 +173,9 @@ async function main() {
 
   // ---------- site.json ----------
   const site = await api("site-setting", {
-    "populate[nav]": "true",
+    // The nav's own fields come back anyway; its two sounds are media, so they must be asked for.
+    "populate[nav][populate][hoverSound][fields][0]": "url",
+    "populate[nav][populate][transitionSound][fields][0]": "url",
     "populate[footer][populate][legal]": "true",
     "populate[footer][populate][credits]": "true",
     "populate[footer][populate][social]": "true",
@@ -182,10 +189,26 @@ async function main() {
     "populate[image][fields][0]": "url",
   });
 
+  // Asking for `nav.sound` means a nested populate; a component's own fields still come back, but a
+  // typo there would silently empty the nav instead of failing, so check before writing.
+  if (site.nav.some((n) => !n.key || !n.label || !n.href)) {
+    throw new Error("site nav: a link came back without its key / label / href — check the nav populate");
+  }
+
   await write("site.json", {
     // `key` and `platform` exist so code never matches on an editable label
     // (MenuCard used to branch on label === "Mixers" / "Instagram").
-    nav: site.nav.map((n) => ({ key: n.key, label: n.label, href: n.href, match: n.match, color: n.color })),
+    // Each link's own two sounds — hovering it, and the sweep that lands on its page — null where
+    // the editor left the field empty (lib/sound.ts then plays the kit bundled in public/sounds).
+    nav: site.nav.map((n) => ({
+      key: n.key,
+      label: n.label,
+      href: n.href,
+      match: n.match,
+      color: n.color,
+      hoverSound: takesOf(n.hoverSound),
+      transitionSound: takesOf(n.transitionSound),
+    })),
     contact: {
       title: contact.title,
       image: url(contact.image),

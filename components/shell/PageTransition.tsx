@@ -4,14 +4,15 @@ import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { DUR, EASE_SWEEP, prefersReducedMotion, themeColor } from "@/lib/motion";
 import { preloadArchive } from "@/lib/archive-preload";
-import { sound } from "@/lib/sound";
+import { sound, sweepSound } from "@/lib/sound";
 
 const CARRY_KEY = "eleven-sweep";
 
 
 /**
  * Page sweep: six bands cover from the left, the route changes,
- * the bands leave to the right. One colour for the whole transition, the destination's.
+ * the bands leave to the right. One colour for the whole transition, the destination's — and the
+ * destination's own sound too, where Site Settings → nav gives that link one.
  * Intercepts every same-origin <a> click in the capture phase, so plain Next <Link>s get it for free.
  * Opt out with data-no-sweep.
  */
@@ -59,7 +60,7 @@ export function PageTransition() {
       if (url.pathname === "/archive") preloadArchive();
       const color = themeColor(url.pathname);
       window.__lenis?.stop();
-      sound.cue("sweepIn");
+      sound.cue("sweepIn", sweepSound(url.pathname));
       sweep("translateX(-101%)", "translateX(0)", color).then(() => {
         new Promise<void>((resolve) => {
           pending.current = { color, resolve };

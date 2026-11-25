@@ -5,7 +5,7 @@ import { useState } from "react";
 import { MixersBanner } from "@/components/mixers/MixersBanner";
 import { usePathname } from "next/navigation";
 import site from "@/data/site.json";
-import { sound } from "@/lib/sound";
+import { navSound, sound } from "@/lib/sound";
 import { preloadArchive } from "@/lib/archive-preload";
 import { usePhone } from "@/lib/device";
 import ui from "@/data/ui.json";
@@ -23,7 +23,8 @@ const NAV_CELLS = [
  * Nav/Bar: five links on the 9-col grid, Heading/H4: cols 1 / 3 / 5 / 7 / 9,
  * aligned start / start / centre / end / end, so the gaps stay within ~8% of equal.
  * Hover = the link's colour (Mixers red, Archive aqua, Longform dark green, About pink, Contact royal blue),
- * 0.3 s ease-out, + a short sound; the current page keeps the hover state.
+ * 0.3 s ease-out, + a short sound: the link's own takes when Site Settings → nav gives it any,
+ * otherwise the shared hover kit; the current page keeps the hover state.
  * `tone="light"` (neutral/300) where it sits on video: home, player.
  */
 export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
@@ -39,13 +40,14 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
     >
       {site.nav.map((item, i) => {
         const current = pathname === item.match || pathname.startsWith(item.match + "/");
+        const hover = navSound(item.key);
         // Hover = the link's own brand colour at full strength; the current page keeps it.
         const cls = `${NAV_CELLS[i]} t-h4 cursor-pointer whitespace-nowrap transition-colors duration-300 ease-out hover:text-(--hover) ${current ? "text-(--hover)" : ""}`;
         const style = { "--hover": `var(--color-${item.color})` } as React.CSSProperties;
         // Mixers opens the roster wedge (MixersBanner) instead of a page.
         if (item.label === "Mixers")
           return (
-            <button key={item.label} type="button" data-sound="off" aria-current={current ? "page" : undefined} onClick={() => setMixersOpen(true)} onPointerEnter={() => sound.cue("navHover")} className={`${cls} uppercase`} style={style}>
+            <button key={item.label} type="button" data-sound="off" aria-current={current ? "page" : undefined} onClick={() => setMixersOpen(true)} onPointerEnter={() => sound.cue("navHover", hover)} className={`${cls} uppercase`} style={style}>
               {item.label}
             </button>
           );
@@ -55,7 +57,7 @@ export function NavBar({ tone = "dark" }: { tone?: "dark" | "light" }) {
             href={item.href}
             aria-current={current ? "page" : undefined}
             onPointerEnter={() => {
-              sound.cue("navHover");
+              sound.cue("navHover", hover);
               if (item.href === "/archive") preloadArchive();
             }}
             className={cls}

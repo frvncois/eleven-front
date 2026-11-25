@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import site from "@/data/site.json";
 import { mixers } from "@/lib/content";
-import { sound } from "@/lib/sound";
+import { navSound, sound } from "@/lib/sound";
 import { PHONE_MOTION } from "@/lib/motion";
 import ui from "@/data/ui.json";
 
@@ -87,7 +87,7 @@ export function MenuCard({ open, onClose }: { open: boolean; onClose: () => void
                           data-sound="off"
                           aria-expanded={drawer}
                           onClick={() => {
-                            sound.cue("navHover");
+                            sound.cue("navHover", navSound(item.key));
                             setDrawer((v) => !v);
                           }}
                           className={`${cls} flex cursor-pointer items-center justify-between uppercase transition-colors duration-300`}

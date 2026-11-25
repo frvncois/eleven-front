@@ -1,19 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { Film } from "@/components/longform/LongformReel";
 import { openWithSound } from "@/components/mixers/Player";
 import { sound } from "@/lib/sound";
 import { STEPPER, landing } from "@/lib/stepper";
 import { PlayerMobile } from "./PlayerMobile";
 import { LongformTag } from "@/components/longform/LongformTag";
+import { LongformPreview } from "@/components/longform/LongformPreview";
 import { appScale } from "@/lib/device";
 import ui from "@/data/ui.json";
 
 /**
  * Longform on a phone. One film per screen, cropped to cover the portrait (until
- * Eleven sends 9:16 cuts), with the slow push-in and 25 % dim of desktop. The films move like the Archive list:
+ * Eleven sends 9:16 cuts): the film on screen previews itself, muted, like desktop
+ * (LongformPreview), under the same 25 % dim. The films move like the Archive list:
  * they follow the finger and land on one when it lets go (lib/stepper), the film in the middle is full screen and
  * the ones around it step back (smaller, GAP apart), so the next one grows into place as the current one shrinks
  * away, and after the last film comes the first again. The colour strip stays vertical like desktop (across the
@@ -28,8 +30,6 @@ const GAP = 8;
 const smooth = (t: number) => t * t * (3 - 2 * t);
 export function LongformMobile({ films }: { films: Film[] }) {
   const [index, setIndex] = useState(0);
-  // Reduced motion: no endless push-in, the still sits at rest.
-  const pushIn = !useReducedMotion();
   const [playing, setPlaying] = useState<number | null>(null);
   const items = useRef<(HTMLButtonElement | null)[]>([]);
   // Position in films (fractional) and where it is landing; the loop below draws it.
@@ -166,22 +166,9 @@ export function LongformMobile({ films }: { films: Film[] }) {
             aria-label={`Play ${f.label}`}
             className="invisible absolute top-0 left-0 block h-(--vh) w-[390px] origin-top overflow-hidden will-change-transform"
           >
-            <motion.div
-              key={i === index ? `on-${f.slug}` : f.slug}
-              className="absolute inset-0"
-              initial={{ scale: 1 }}
-              animate={i === index && pushIn ? { scale: [1, 1.06] } : { scale: 1 }}
-              transition={i === index && pushIn ? { duration: 10, ease: "linear", repeat: Infinity, repeatType: "loop" } : { duration: 0 }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={f.poster ?? ""}
-                alt=""
-                className="absolute inset-0 size-full object-cover"
-                style={{ objectPosition: f.position ?? "50% 50%" }}
-                loading={i < 2 ? "eager" : "lazy"}
-              />
-            </motion.div>
+            {/* The film previews itself while it is the one on screen (LongformPreview), the still
+                under it until Vimeo has painted; `position` keeps the 9:16 crop of that still. */}
+            <LongformPreview film={f} active={i === index && playing === null} stage={390} objectPosition={f.position} />
             <div className="absolute inset-0 bg-neutral-1000/25" />
           </button>
         ))}

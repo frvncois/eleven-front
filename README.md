@@ -32,8 +32,10 @@ currently published content.
 | `party.json` | `Party Mode` |
 | `ui.json` | `UI Labels` |
 
-What is still in code, on purpose: the sound engine's cue map (`lib/sound.ts`), the layout maths
-(`lib/grid.ts`, `lib/motion.ts`, `lib/perspective.ts`), and the dev-only review notes.
+What is still in code, on purpose: most of the sound engine's cue map (`lib/sound.ts`), the layout
+maths (`lib/grid.ts`, `lib/motion.ts`, `lib/perspective.ts`), and the dev-only review notes.
+Editable in `Site Settings` → `nav`: each link's own `hoverSound` and `transitionSound` (the sweep
+that lands on that page). Both fall back to the kit in `public/sounds` when the field is empty.
 See `../eleven-back/CONTENT-MODEL.md` for the full model.
 
 ## Media
@@ -43,7 +45,8 @@ absolute URLs. `next.config.ts` derives the origin from `STRAPI_URL` and allows 
 (`img-src` / `media-src`) and `images.remotePatterns` — so **`STRAPI_URL` must be set in the Vercel
 project**, or images and sounds are blocked by the CSP in production.
 
-Fonts, the `app/` icons and the UI sound kit stay in `public/`.
+Fonts, the `app/` icons and the UI sound kit stay in `public/` — the kit as the fallback for the
+cues an editor has not filled in.
 
 ## Deploying (Vercel)
 
