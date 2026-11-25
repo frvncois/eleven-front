@@ -85,6 +85,22 @@ const KEY = "eleven-sound"
 const FADE = 0.4
 const isBrowser = () => typeof window !== "undefined"
 
+// sessionStorage, quietly: Firefox throws SecurityError ("The operation is insecure.") on every access when
+// site data is blocked (ETP Strict, cookies off, some private windows), and the reader below runs on every
+// pointerdown / click, so an unguarded read threw once per interaction and aborted the re-unlock with it.
+const readMute = () => {
+  try {
+    return isBrowser() ? sessionStorage.getItem(KEY) : null
+  } catch {
+    return null
+  }
+}
+const writeMute = (v: string) => {
+  try {
+    if (isBrowser()) sessionStorage.setItem(KEY, v)
+  } catch {}
+}
+
 // iPhone: Web Audio follows the ring / silent switch (the films don't), so with the switch on silent every UI sound
 // is dropped even with "sound on". Declaring a playback session (Safari 16.4+) and, for older iOS, keeping a silent
 // <audio> element playing moves the page into the playback category, where the switch no longer applies.
@@ -108,7 +124,7 @@ function createKit() {
   let master: GainNode | null = null
   let bg: GainNode | null = null
   let unlocked = false
-  let muted = isBrowser() && sessionStorage.getItem(KEY) === "muted"
+  let muted = readMute() === "muted"
   let ducked = false
   const listeners = new Set<Listener>()
   const buffers = new Map<string, Promise<AudioBuffer | null>>()
@@ -182,14 +198,14 @@ function createKit() {
       ctx.resume()
       playbackSession()
       unlocked = true
-      sessionStorage.setItem(KEY, muted ? "muted" : "on")
+      writeMute(muted ? "muted" : "on")
       ramp(master, muted ? 0 : 1)
       fadeMedia(muted || ducked ? 0 : 1)
       emit()
     },
     setMuted(m: boolean) {
       muted = m
-      if (isBrowser()) sessionStorage.setItem(KEY, m ? "muted" : "on")
+      writeMute(m ? "muted" : "on")
       if (!unlocked) {
         if (!m) kit.unlock()
         else emit()
@@ -466,7 +482,7 @@ function createKit() {
     const resume = (e: Event) => {
       // A click on the sound toggle itself decides on its own (otherwise it would unlock, then flip back off).
       if ((e.target as Element | null)?.closest?.("[data-sound-toggle]")) return
-      if (!unlocked && sessionStorage.getItem(KEY) === "on") return kit.unlock()
+      if (!unlocked && readMute() === "on") return kit.unlock()
       if (unlocked && !muted && ctx && ctx.state !== "running") {
         ctx.resume().catch(() => {})
         playbackSession()
