@@ -109,7 +109,7 @@ export function BallCanvas({
     // Posters were usually decoded before the page opened (lib/archive-preload). They go to the GPU
     // a few per frame, those on screen first, so opening the page never stalls. A tile draws once
     // its poster is in.
-    type Tex = { tex: WebGLTexture | null; crop: [number, number, number, number]; pic: ImageBitmap | HTMLImageElement | null };
+    type Tex = { tex: WebGLTexture | null; crop: [number, number, number, number]; pic: ImageBitmap | HTMLImageElement | null; failed?: boolean };
     const tex: Tex[] = items.map(() => ({ tex: null, crop: [1, 1, 0, 0], pic: null }));
     let alive = true;
     items.forEach((it, i) => {
@@ -119,7 +119,17 @@ export function BallCanvas({
       const pic = t.pic!;
       const tx = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, tx);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, pic);
+      // A poster the GPU will not take (a cross-origin image that never went through CORS throws
+      // SecurityError here) must be given up on: the queue below re-tries anything without a texture,
+      // so a throw that leaves t.tex null comes back every frame, three a frame, for as long as the
+      // page is open. Mark it failed instead -- that tile simply stays untextured.
+      try {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, pic);
+      } catch {
+        t.failed = true;
+        gl.deleteTexture(tx);
+        return;
+      }
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -149,7 +159,7 @@ export function BallCanvas({
       let budget = PER_FRAME;
       items
         .map((it, i) => ({ i, d: Math.hypot(pos[i].left.get() + it.w / 2 - 720, pos[i].top.get() + it.h / 2 - height / 2) }))
-        .filter(({ i }) => !tex[i].tex && tex[i].pic)
+        .filter(({ i }) => !tex[i].tex && tex[i].pic && !tex[i].failed)
         .sort((a, b) => a.d - b.d)
         .forEach(({ i }) => budget-- > 0 && upload(items[i], tex[i]));
       gl.clearColor(0, 0, 0, 0);

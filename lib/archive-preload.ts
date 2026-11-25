@@ -15,6 +15,11 @@ export function posterBitmap(src: string) {
   if (!p) {
     const img = new Image();
     img.decoding = "async";
+    // The posters are on the Strapi media host, and these end up in WebGL as textures (BallCanvas).
+    // Without this the image is cross-origin-tainted, and Firefox throws SecurityError ("The operation
+    // is insecure.") on every texImage2D. The media host answers with Access-Control-Allow-Origin: *.
+    // Set before .src, or it does not apply to the load.
+    img.crossOrigin = "anonymous";
     img.src = src;
     p = img
       .decode()
